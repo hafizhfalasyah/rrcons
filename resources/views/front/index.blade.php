@@ -13,25 +13,51 @@
 @endphp
 
 <!DOCTYPE html>
-<html lang="en" x-data="{ open: false }" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ open: false }" xmlns="http://www.w3.org/1999/xhtml" >
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>RRCONS | Beranda - Solusi Bisnis Terbaik untuk Masa Depan</title>
 
+        <title>{{ __('index.seo.title') }}</title>
+
         <!-- SEO Meta Tag -->
-        <meta name="description" content="RR Consultant Indonesia hadir untuk memberikan solusi bisnis yang memadai dan berkelanjutan. Temukan layanan kami, profil tim, pelatihan bisnis, serta blog dan galeri acara.">
-        <meta name="keywords" content="RR Consultant, Konsultan Bisnis, Solusi Bisnis, Pelatihan, Transformasi Digital, Layanan Profesional">
-        <meta name="author" content="RR Consultant Indonesia">
-        <meta property="og:title" content="RRCONS | Beranda - Solusi Bisnis Terbaik untuk Masa Depan">
-        <meta property="og:description" content="Kami memberikan solusi yang sesuai kebutuhan bisnis Anda, dari layanan profesional hingga pelatihan dan media digital.">
-        {{-- <meta property="og:image" content="{{ asset('images/home-og.jpg') }}"> --}}
-        <meta property="og:url" content="{{ url()->current() }}">
-        {{-- <meta name="twitter:card" content="summary_large_image"> --}}
+        <meta
+            name="description"
+            content="{{ __('index.seo.description') }}"
+        >
+        <meta
+            name="keywords"
+            content="{{ __('index.seo.keywords') }}"
+        >
+        <meta
+            name="author"
+            content="{{ __('index.seo.author') }}"
+        >
+        <meta
+            property="og:title"
+            content="{{ __('index.seo.og_title') }}"
+        >
+        <meta
+            property="og:description"
+            content="{{ __('index.seo.og_description') }}"
+        >
+        <meta
+            property="og:url"
+            content="{{ url()->current() }}"
+        >
 
         <!-- Tailwind CDN -->
         <script src="https://cdn.tailwindcss.com"></script>
+
+        <!-- Icon -->
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="{{ asset('front/image/logo.png') }}"
+        >
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -130,60 +156,253 @@
 
     <body class="body font-body" x-data="{ open: false }">
 
+        @php
+            $currentLocale = app()->getLocale();
+
+            $activeLanguageName = match ($currentLocale) {
+                'en' => __('index.navigation.language.english'),
+                default => __('index.navigation.language.indonesian'),
+            };
+
+            $activeLanguageFlag = match ($currentLocale) {
+                'en' => 'front/image/united-kingdom.png',
+                default => 'front/image/indonesia.png',
+            };
+        @endphp
+
         <!-- start of navbar -->
-        <nav class="fixed top-0 left-0 w-full py-5 shadow-sm bg-white z-40 text-lg">
-            <div class="max-w-screen-xl mx-auto px-6 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-black rounded-full shadow-lg">
-                        <img src="{{ asset('front/image/logo.png') }}" alt="Logo" class="h-12 w-auto">
+        <nav class="fixed top-0 left-0 z-40 w-full bg-white py-5 text-lg shadow-sm">
+            <div class="mx-auto flex max-w-screen-xl items-center justify-between px-6">
+
+                <!-- Brand -->
+                <a
+                    href="{{ route('home') }}"
+                    class="flex items-center space-x-3"
+                    aria-label="{{ __('index.navigation.brand.name') }}"
+                >
+                    <div class="rounded-full bg-black shadow-lg">
+                        <img
+                            src="{{ asset('front/image/logo.png') }}"
+                            alt="{{ __('index.navigation.brand.logo_alt') }}"
+                            class="h-12 w-auto"
+                        >
                     </div>
+
                     <div class="text-3xl font-bold">
                         <span class="text-gray-900">RR</span><span class="text-blue-600">CONS</span>
                     </div>
-                </div>
+                </a>
 
                 <!-- Desktop Menu -->
-                <div class="hidden md:flex space-x-6 font-medium">
-                    <a href="{{ route('home') }}" class="relative nav-link {{ Request::routeIs('home') ? 'active text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' }} tracking-[0.5px] px-[10px]">Home</a>
-                    <a href="{{ route('rrfuture') }}" class="relative nav-link {{ Request::routeIs('rrfuture') ? 'active text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' }} tracking-[0.5px] px-[10px]">RR Future</a>
-                    <a href="{{ route('service') }}" class="relative nav-link {{ Request::routeIs('service') ? 'active text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' }} tracking-[0.5px] px-[10px]">Service</a>
-                    <a href="{{ route('blog') }}" class="relative nav-link {{ Request::routeIs('blog') ? 'active text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' }} tracking-[0.5px] px-[10px]">Blog</a>
-                    <a href="{{ route('contact') }}" class="relative nav-link {{ Request::routeIs('contact') ? 'active text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' }} tracking-[0.5px] px-[10px]">Contact</a>
+                <div class="hidden items-center space-x-6 font-medium md:flex">
+                    <a
+                        href="{{ route('home') }}"
+                        class="nav-link relative px-[10px] tracking-[0.5px]
+                            {{ Request::routeIs('home')
+                                ? 'active font-semibold text-blue-600'
+                                : 'text-gray-700 hover:text-blue-600'
+                            }}"
+                    >
+                        {{ __('index.navigation.menu.home') }}
+                    </a>
+
+                    <a
+                        href="{{ route('rrfuture') }}"
+                        class="nav-link relative px-[10px] tracking-[0.5px]
+                            {{ Request::routeIs('rrfuture')
+                                ? 'active font-semibold text-blue-600'
+                                : 'text-gray-700 hover:text-blue-600'
+                            }}"
+                    >
+                        {{ __('index.navigation.menu.rr_future') }}
+                    </a>
+
+                    <a
+                        href="{{ route('service') }}"
+                        class="nav-link relative px-[10px] tracking-[0.5px]
+                            {{ Request::routeIs('service')
+                                ? 'active font-semibold text-blue-600'
+                                : 'text-gray-700 hover:text-blue-600'
+                            }}"
+                    >
+                        {{ __('index.navigation.menu.service') }}
+                    </a>
+
+                    <a
+                        href="{{ route('blog') }}"
+                        class="nav-link relative px-[10px] tracking-[0.5px]
+                            {{ Request::routeIs('blog')
+                                ? 'active font-semibold text-blue-600'
+                                : 'text-gray-700 hover:text-blue-600'
+                            }}"
+                    >
+                        {{ __('index.navigation.menu.blog') }}
+                    </a>
+
+                    <a
+                        href="{{ route('contact') }}"
+                        class="nav-link relative px-[10px] tracking-[0.5px]
+                            {{ Request::routeIs('contact')
+                                ? 'active font-semibold text-blue-600'
+                                : 'text-gray-700 hover:text-blue-600'
+                            }}"
+                    >
+                        {{ __('index.navigation.menu.contact') }}
+                    </a>
                 </div>
 
-                <!-- Language Switcher & Login -->
-                <div class="hidden md:flex items-center gap-4">
-                    <!-- Language Switcher -->
+                <!-- Language Switcher and Login -->
+                <div class="hidden items-center gap-4 md:flex">
+
+                    <!-- Desktop Language Switcher -->
                     <div class="relative">
-                        <button id="langToggleDesktop" class="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 focus:outline-none">
-                            <img src="{{ asset(app()->getLocale() === 'en' ? 'front/image/united-kingdom.png' : 'front/image/indonesia.png') }}" alt="Translate Icon" class="w-5 h-5" />
-                            <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.1 1.02l-4.25 4.65a.75.75 0 01-1.1 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        <button
+                            id="langToggleDesktop"
+                            type="button"
+                            class="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-gray-700 transition hover:bg-gray-50 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                            aria-label="{{ __('index.navigation.language.open_selector') }}"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            aria-controls="langDropdownDesktop"
+                        >
+                            <img
+                                src="{{ asset($activeLanguageFlag) }}"
+                                alt="{{ $activeLanguageName }}"
+                                class="h-5 w-5 rounded-full object-cover"
+                            >
+
+                            <span class="font-medium">
+                                {{ $activeLanguageName }}
+                            </span>
+
+                            <svg
+                                id="langArrowDesktop"
+                                class="ml-1 h-4 w-4 transition-transform duration-200"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.1 1.02l-4.25 4.65a.75.75 0 01-1.1 0l-4.25-4.65a.75.75 0 01.02-1.06z"
+                                    clip-rule="evenodd"
+                                />
                             </svg>
                         </button>
-                        <div id="langDropdownDesktop" class="hidden absolute right-0 mt-2 min-w-[140px] bg-white rounded-md shadow-md z-50">
-                            <a href="{{ route('set.language', 'id') }}" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:rounded-md">
-                                <img src="{{ asset('front/image/indonesia.png') }}" alt="Indonesia" class="w-5 h-5" />
-                                <span class="ml-5 font-medium {{ app()->getLocale() === 'id' ? 'text-blue-600' : '' }}">Indonesia</span>
+
+                        <div
+                            id="langDropdownDesktop"
+                            class="absolute right-0 z-50 mt-2 hidden min-w-[180px] overflow-hidden rounded-xl border border-gray-100 bg-white py-1 shadow-xl"
+                        >
+                            <a
+                                href="{{ route('set.language', 'id') }}"
+                                lang="id"
+                                class="flex w-full items-center px-4 py-3 text-sm transition hover:bg-gray-100
+                                    {{ $currentLocale === 'id'
+                                        ? 'bg-blue-50 font-semibold text-blue-600'
+                                        : 'text-gray-700'
+                                    }}"
+                            >
+                                <img
+                                    src="{{ asset('front/image/indonesia.png') }}"
+                                    alt="{{ __('index.navigation.language.indonesian') }}"
+                                    class="h-5 w-5 rounded-full object-cover"
+                                >
+
+                                <span class="ml-3">
+                                    {{ __('index.navigation.language.indonesian') }}
+                                </span>
+
+                                @if ($currentLocale === 'id')
+                                    <svg
+                                        class="ml-auto h-4 w-4"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2.5"
+                                            d="M5 13l4 4L19 7"
+                                        />
+                                    </svg>
+                                @endif
                             </a>
-                            <a href="{{ route('set.language', 'en') }}" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:rounded-md">
-                                <img src="{{ asset('front/image/united-kingdom.png') }}" alt="English" class="w-5 h-5" />
-                                <span class="ml-5 font-medium {{ app()->getLocale() === 'en' ? 'text-blue-600' : '' }}">English</span>
+
+                            <a
+                                href="{{ route('set.language', 'en') }}"
+                                lang="en"
+                                class="flex w-full items-center px-4 py-3 text-sm transition hover:bg-gray-100
+                                    {{ $currentLocale === 'en'
+                                        ? 'bg-blue-50 font-semibold text-blue-600'
+                                        : 'text-gray-700'
+                                    }}"
+                            >
+                                <img
+                                    src="{{ asset('front/image/united-kingdom.png') }}"
+                                    alt="{{ __('index.navigation.language.english') }}"
+                                    class="h-5 w-5 rounded-full object-cover"
+                                >
+
+                                <span class="ml-3">
+                                    {{ __('index.navigation.language.english') }}
+                                </span>
+
+                                @if ($currentLocale === 'en')
+                                    <svg
+                                        class="ml-auto h-4 w-4"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2.5"
+                                            d="M5 13l4 4L19 7"
+                                        />
+                                    </svg>
+                                @endif
                             </a>
                         </div>
                     </div>
 
                     <!-- Login Button -->
-                    <a href="{{ route('login') }}" class="bg-blue-600 text-white text-lg px-8 py-2 rounded-full font-semibold hover:bg-blue-700 transition hover:scale-105 duration-300">Login</a>
+                    <a
+                        href="{{ route('login') }}"
+                        class="rounded-full bg-blue-600 px-8 py-2 text-lg font-semibold text-white transition duration-300 hover:scale-105 hover:bg-blue-700"
+                    >
+                        {{ __('index.navigation.menu.login') }}
+                    </a>
                 </div>
 
-                <!-- Hamburger Menu -->
+                <!-- Mobile Menu Button -->
                 <div class="md:hidden">
-                    <button id="menu-toggle" class="focus:outline-none" aria-label="Toggle menu">
-                        <svg class="w-7 h-7 text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16" />
+                    <button
+                        id="menu-toggle"
+                        type="button"
+                        class="rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                        aria-label="{{ __('index.navigation.mobile.open_menu') }}"
+                        aria-controls="mobile-menu"
+                        aria-expanded="false"
+                    >
+                        <svg
+                            class="h-7 w-7 text-gray-800"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"
+                            />
                         </svg>
                     </button>
                 </div>
@@ -192,57 +411,242 @@
         <!-- end of navbar -->
 
         <!-- start of mobile menu -->
-        <div id="mobile-menu" class="fixed top-0 left-0 h-full w-64 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-50 flex flex-col text-[20px]">
-            <div class="p-6 flex items-center justify-between border-b">
-                <div class="text-3xl font-semibold text-gray-900">Menu</div>
-                <button id="close-menu" class="focus:outline-none" aria-label="Close menu">
-                    <svg class="w-6 h-6 text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
+        <div
+            id="mobile-menu"
+            class="fixed left-0 top-0 z-50 flex h-full w-72 -translate-x-full transform flex-col bg-white text-[20px] shadow-lg transition-transform duration-300 ease-in-out"
+        >
+            <!-- Mobile Menu Header -->
+            <div class="flex items-center justify-between border-b p-6">
+                <div class="text-3xl font-semibold text-gray-900">
+                    {{ __('index.navigation.mobile.title') }}
+                </div>
+
+                <button
+                    id="close-menu"
+                    type="button"
+                    class="rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                    aria-label="{{ __('index.navigation.mobile.close_menu') }}"
+                >
+                    <svg
+                        class="h-6 w-6 text-gray-800"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        aria-hidden="true"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"
+                        />
                     </svg>
                 </button>
             </div>
-            <nav class="flex-grow p-6 flex flex-col space-y-6">
-                <a href="{{ route('home') }}" class="relative nav-link {{ Request::routeIs('home') ? 'active text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' }} tracking-[0.5px] px-[10px]">Home</a>
-                <a href="{{ route('rrfuture') }}" class="relative nav-link {{ Request::routeIs('rrfuture') ? 'active text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' }} tracking-[0.5px] px-[10px]">RR Future</a>
-                <a href="{{ route('service') }}" class="relative nav-link {{ Request::routeIs('service') ? 'active text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' }} tracking-[0.5px] px-[10px]">Service</a>
-                <a href="{{ route('blog') }}" class="relative nav-link {{ Request::routeIs('blog') ? 'active text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' }} tracking-[0.5px] px-[10px]">Blog</a>
-                <a href="{{ route('contact') }}" class="relative nav-link {{ Request::routeIs('contact') ? 'active text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' }} tracking-[0.5px] px-[10px]">Contact</a>
-                <a href="{{ route('login') }}" class="inline-block bg-blue-600 text-white text-lg px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition self-start">Login</a>
 
-                <!-- Language Switcher - Mobile -->
-                <div class="md:hidden pl-6 pr-6 border-t border-gray-200 pt-4">
+            <!-- Mobile Navigation -->
+            <nav class="flex flex-grow flex-col space-y-6 overflow-y-auto p-6">
+                <a
+                    href="{{ route('home') }}"
+                    class="nav-link relative px-[10px] tracking-[0.5px]
+                        {{ Request::routeIs('home')
+                            ? 'active font-semibold text-blue-600'
+                            : 'text-gray-700 hover:text-blue-600'
+                        }}"
+                >
+                    {{ __('index.navigation.menu.home') }}
+                </a>
+
+                <a
+                    href="{{ route('rrfuture') }}"
+                    class="nav-link relative px-[10px] tracking-[0.5px]
+                        {{ Request::routeIs('rrfuture')
+                            ? 'active font-semibold text-blue-600'
+                            : 'text-gray-700 hover:text-blue-600'
+                        }}"
+                >
+                    {{ __('index.navigation.menu.rr_future') }}
+                </a>
+
+                <a
+                    href="{{ route('service') }}"
+                    class="nav-link relative px-[10px] tracking-[0.5px]
+                        {{ Request::routeIs('service')
+                            ? 'active font-semibold text-blue-600'
+                            : 'text-gray-700 hover:text-blue-600'
+                        }}"
+                >
+                    {{ __('index.navigation.menu.service') }}
+                </a>
+
+                <a
+                    href="{{ route('blog') }}"
+                    class="nav-link relative px-[10px] tracking-[0.5px]
+                        {{ Request::routeIs('blog')
+                            ? 'active font-semibold text-blue-600'
+                            : 'text-gray-700 hover:text-blue-600'
+                        }}"
+                >
+                    {{ __('index.navigation.menu.blog') }}
+                </a>
+
+                <a
+                    href="{{ route('contact') }}"
+                    class="nav-link relative px-[10px] tracking-[0.5px]
+                        {{ Request::routeIs('contact')
+                            ? 'active font-semibold text-blue-600'
+                            : 'text-gray-700 hover:text-blue-600'
+                        }}"
+                >
+                    {{ __('index.navigation.menu.contact') }}
+                </a>
+
+                <a
+                    href="{{ route('login') }}"
+                    class="self-start rounded-full bg-blue-600 px-6 py-3 text-lg font-semibold text-white transition hover:bg-blue-700"
+                >
+                    {{ __('index.navigation.menu.login') }}
+                </a>
+
+                <!-- Mobile Language Switcher -->
+                <div class="border-t border-gray-200 pt-5">
                     <div class="relative w-full">
-                        <button id="langToggleMobile" class="flex justify-between items-center w-full px-4 py-2 text-sm text-gray-700 hover:text-blue-600 focus:outline-none">
-                            <div class="flex items-center gap-2">
-                                <img src="{{ asset('front/image/indonesia.png') }}" alt="Translate Icon" class="w-5 h-5" />
-                                <span>Pilih Bahasa</span>
+                        <button
+                            id="langToggleMobile"
+                            type="button"
+                            class="flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm text-gray-700 transition hover:bg-gray-50 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                            aria-label="{{ __('index.navigation.language.open_selector') }}"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            aria-controls="langDropdownMobile"
+                        >
+                            <div class="flex items-center gap-3">
+                                <img
+                                    src="{{ asset($activeLanguageFlag) }}"
+                                    alt="{{ $activeLanguageName }}"
+                                    class="h-5 w-5 rounded-full object-cover"
+                                >
+
+                                <div class="text-left">
+                                    <span class="block text-xs text-gray-500">
+                                        {{ __('index.navigation.language.label') }}
+                                    </span>
+
+                                    <span class="block font-medium">
+                                        {{ $activeLanguageName }}
+                                    </span>
+                                </div>
                             </div>
-                            <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.1 1.02l-4.25 4.65a.75.75 0 01-1.1 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+
+                            <svg
+                                id="langArrowMobile"
+                                class="h-4 w-4 transition-transform duration-200"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.1 1.02l-4.25 4.65a.75.75 0 01-1.1 0l-4.25-4.65a.75.75 0 01.02-1.06z"
+                                    clip-rule="evenodd"
+                                />
                             </svg>
                         </button>
 
-                        <div id="langDropdownMobile" class="hidden absolute right-0 mt-2 min-w-[140px] bg-white rounded-md shadow-md z-50">
-                            <button class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:rounded-md" id="langIDDesktop">
-                                <img src="{{ asset('front/image/indonesia.png') }}" alt="Indonesia" class="w-5 h-5" />
-                                <span class="ml-5">Indonesia</span>
-                            </button>
-                            <button class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:rounded-md" id="langENDesktop">
-                                <img src="{{ asset('front/image/united-kingdom.png') }}" alt="English" class="w-5 h-5" />
-                                <span class="ml-5">English</span>
-                            </button>
+                        <div
+                            id="langDropdownMobile"
+                            class="mt-2 hidden w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md"
+                        >
+                            <a
+                                href="{{ route('set.language', 'id') }}"
+                                lang="id"
+                                class="flex w-full items-center px-4 py-3 text-sm transition hover:bg-gray-100
+                                    {{ $currentLocale === 'id'
+                                        ? 'bg-blue-50 font-semibold text-blue-600'
+                                        : 'text-gray-700'
+                                    }}"
+                            >
+                                <img
+                                    src="{{ asset('front/image/indonesia.png') }}"
+                                    alt="{{ __('index.navigation.language.indonesian') }}"
+                                    class="h-5 w-5 rounded-full object-cover"
+                                >
+
+                                <span class="ml-3">
+                                    {{ __('index.navigation.language.indonesian') }}
+                                </span>
+
+                                @if ($currentLocale === 'id')
+                                    <svg
+                                        class="ml-auto h-4 w-4"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2.5"
+                                            d="M5 13l4 4L19 7"
+                                        />
+                                    </svg>
+                                @endif
+                            </a>
+
+                            <a
+                                href="{{ route('set.language', 'en') }}"
+                                lang="en"
+                                class="flex w-full items-center px-4 py-3 text-sm transition hover:bg-gray-100
+                                    {{ $currentLocale === 'en'
+                                        ? 'bg-blue-50 font-semibold text-blue-600'
+                                        : 'text-gray-700'
+                                    }}"
+                            >
+                                <img
+                                    src="{{ asset('front/image/united-kingdom.png') }}"
+                                    alt="{{ __('index.navigation.language.english') }}"
+                                    class="h-5 w-5 rounded-full object-cover"
+                                >
+
+                                <span class="ml-3">
+                                    {{ __('index.navigation.language.english') }}
+                                </span>
+
+                                @if ($currentLocale === 'en')
+                                    <svg
+                                        class="ml-auto h-4 w-4"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2.5"
+                                            d="M5 13l4 4L19 7"
+                                        />
+                                    </svg>
+                                @endif
+                            </a>
                         </div>
                     </div>
                 </div>
             </nav>
         </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div
+            id="mobile-menu-overlay"
+            class="fixed inset-0 z-40 hidden bg-black/50 backdrop-blur-sm md:hidden"
+        ></div>
         <!-- end of mobile menu -->
 
         <!-- start of hero -->
         @foreach ($heroes as $hero)
-            <section class="container max-w-screen-xl rounded-[2rem] overflow-hidden mx-auto mt-10 px-4 relative text-white min-h-[600px] pt-36 sm:py-48 mb-50" style="background-image: url('{{ asset('storage/back/home/hero/' . $hero->bg_img) }}'); background-size: cover; background-position: center; margin-top: 8rem;">
+            <section class="container max-w-screen-xl rounded-[2rem] overflow-hidden mx-auto mt-10 px-4 relative text-white min-h-[600px] pt-36 sm:py-48 mb-50" style="background-image: url('{{ asset('storage/' . $hero->bg_img) }}'); background-size: cover; background-position: center; margin-top: 8rem;">
                 <div class="absolute inset-0 bg-black opacity-75"></div> <!-- Dark Overlay -->
                 <div class="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h1 class="uppercase text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-snug mb-4">
@@ -264,8 +668,11 @@
 
                 <div class="flex flex-col md:flex-row items-center gap-8">
                     <div class="md:w-1/2 w-full flex justify-center">
-                        <img src="{{ asset('storage/back/home/about/' . $about->img) }}" alt="Team Working"
-                        class="rounded-2xl w-full max-w-sm scale-95 object-cover drop-shadow-[0_15px_30px_rgba(0,0,0,1)]">
+                        <img
+                            src="{{ asset('storage/' . $about->img) }}"
+                            alt="{{ __('index.sections.about.image_alt') }}"
+                            class="rounded-2xl w-full max-w-sm scale-95 object-cover drop-shadow-[0_15px_30px_rgba(0,0,0,1)]"
+                        >
                     </div>
 
                     <!-- Text -->
@@ -384,7 +791,11 @@
 
                     <div class="group relative bg-white rounded-2xl shadow-md px-6 pt-16 pb-8 text-center transition duration-500 ease-in-out hover:scale-105 hover:shadow-2xl h-80 flex flex-col items-center justify-start overflow-visible mt-10 sm:mt-0" data-aos="{{ $aosAnim }}">
                         <div class="absolute top-7 group-hover:top-0 left-1/2 transform -translate-x-1/2 group-hover:-translate-y-1/2 transition-all duration-500 ease-in-out w-24 h-24 bg-blue-100 flex items-center justify-center rounded-full shadow-lg z-20 border-4 border-white">
-                            <img src="{{ asset($img) }}" alt="Logo {{ $index + 1 }}" class="w-14 h-14 object-contain group-hover:scale-110 transition-transform duration-500" />
+                            <img
+                                src="{{ asset($img) }}"
+                                alt="{{ __('index.sections.advantage.image_alt', ['number' => $index + 1]) }}"
+                                class="w-14 h-14 object-contain group-hover:scale-110 transition-transform duration-500"
+                            />
                         </div>
                         <div class="mt-20 text-center transition-all duration-500 ease-in-out">
                             <h2 class="text-theme-blue text-lg font-semibold mb-2 group-hover:scale-105 group-hover:-translate-y-10 transition-all">
@@ -400,7 +811,7 @@
         </section>
         <!-- end of Advantage -->
 
-        <!-- start of team -->
+        {{-- <!-- start of team -->
         <section class="pt-36 px-4 max-w-screen-xl mx-auto px-4 text-center">
             @if ($profiles->first())
                 <div class="text-center mb-12">
@@ -425,7 +836,7 @@
                     <!-- Cards -->
                     @foreach ($profiles as $profile)
                         <div class="bg-white shadow rounded-xl overflow-hidden text-center p-4 flex-shrink-0 w-64 scroll-snap-item">
-                            <img src="{{ asset('storage/back/home/profile/' . $profile->img) }}" alt="{{ $profile->name }}" class="mx-auto mb-4 w-full h-80 object-cover" />
+                            <img src="{{ asset('storage/' . $profile->img) }}" alt="{{ $profile->name }}" class="mx-auto mb-4 w-full h-80 object-cover" />
                             <h3 class="font-semibold text-md">{{ $profile->name }}</h3>
                             <p class="text-sm text-gray-500">{{ $profile->position }}</p>
                         </div>
@@ -434,7 +845,7 @@
                 </div>
             </div>
         </section>
-        <!-- end of team -->
+        <!-- end of team --> --}}
 
         <!-- start of bussiness coaching -->
         <section class="pt-36 px-4 max-w-6xl mx-auto text-center">
@@ -451,16 +862,22 @@
                     <div class="transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl bg-white rounded-xl shadow-md overflow-hidden">
                         <div class="w-full aspect-[4/3] overflow-hidden">
                             <img
-                                src="{{ asset('storage/back/home/business/' . $item->img) }}"
+                                src="{{ asset('storage/' . $item->img) }}"
                                 alt="{{ $item->title }}"
+                                aria-label="{{ __('index.sections.business_coaching.open_image', ['title' => $item->title]) }}"
                                 class="w-full h-full object-cover transition-transform duration-500 hover:scale-105 coaching-image cursor-pointer"
                             >
                         </div>
                         <div class="p-4 text-left">
                             <h3 class="font-semibold text-lg text-gray-800 mb-2">{{ $item->title }}</h3>
                             <p class="text-gray-600 text-sm mb-3">{{ $item->desc }}</p>
-                            <a href="{{ $item->form_link }}" target="_blank" class="inline-block px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                                Daftar Sekarang
+                            <a
+                                href="{{ $item->form_link }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="inline-block mt-4 px-6 py-3 text-sm bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
+                            >
+                                {{ __('index.sections.business_coaching.register_now') }}
                             </a>
                         </div>
                     </div>
@@ -474,13 +891,21 @@
                     <!-- Gambar & Tombol X dalam satu container -->
                     <div class="relative inline-block">
                         <!-- Tombol Close di dalam gambar -->
-                        <button id="close-lightbox"
-                        class="absolute top-2 right-2 z-10 text-white text-lg font-bold cursor-pointer
-                            rounded-full bg-gray-900 w-8 h-8 flex items-center justify-center shadow-md">
-                        &times;
+                        <button
+                            id="close-lightbox"
+                            type="button"
+                            aria-label="{{ __('index.sections.business_coaching.close_lightbox') }}"
+                            class="absolute top-2 right-2 z-10 text-white text-lg font-bold cursor-pointer rounded-full bg-gray-900 w-8 h-8 flex items-center justify-center shadow-md"
+                        >
+                            &times;
                         </button>
                         <!-- Gambar -->
-                        <img src="" alt="Full size image" id="lightbox-img" class="max-w-full max-h-[80vh] rounded-md">
+                        <img
+                            src=""
+                            alt="{{ __('index.sections.business_coaching.full_image_alt') }}"
+                            id="lightbox-img"
+                            class="max-w-full max-h-[80vh] rounded-md"
+                        >
                     </div>
 
                 </div>
@@ -504,8 +929,11 @@
                     <div class="card-hover bg-white rounded-xl shadow-md overflow-hidden" data-aos="zoom-in">
                         <div class="w-full aspect-[9/16] overflow-hidden relative group" data-video-id="video{{ $index }}">
                             <video id="video{{ $index }}" class="w-full h-full object-cover transition-transform duration-300" muted loop playsinline preload="metadata">
-                                <source src="{{ asset('storage/back/home/sosmed/' . $item->video) }}" type="video/mp4">
-                                Browser tidak mendukung video.
+                                <source
+                                    src="{{ asset('storage/' . $item->video) }}"
+                                    type="video/mp4"
+                                >
+                                {{ __('index.sections.social_media.video_not_supported') }}
                             </video>
                             <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-25 group-hover:bg-opacity-40 transition pointer-events-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="video-icon h-12 w-12 text-white opacity-80 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -516,18 +944,26 @@
                         <div class="p-4">
                             <h3 class="font-semibold text-lg text-gray-800 mb-2">{{ $item->title }}</h3>
                             @php
-                                $platformText = 'Lihat di Sosial Media';
+                                $platformText = __('index.sections.social_media.view_default');
 
-                                if (Str::contains($item->sosmed_link, 'instagram.com')) {
-                                    $platformText = 'Lihat di Instagram';
-                                } elseif (Str::contains($item->sosmed_link, 'tiktok.com')) {
-                                    $platformText = 'Lihat di TikTok';
-                                } elseif (Str::contains($item->sosmed_link, 'youtube.com') || Str::contains($item->sosmed_link, 'youtu.be')) {
-                                    $platformText = 'Lihat di YouTube';
+                                if (\Illuminate\Support\Str::contains($item->sosmed_link, 'instagram.com')) {
+                                    $platformText = __('index.sections.social_media.view_instagram');
+                                } elseif (\Illuminate\Support\Str::contains($item->sosmed_link, 'tiktok.com')) {
+                                    $platformText = __('index.sections.social_media.view_tiktok');
+                                } elseif (
+                                    \Illuminate\Support\Str::contains($item->sosmed_link, 'youtube.com')
+                                    || \Illuminate\Support\Str::contains($item->sosmed_link, 'youtu.be')
+                                ) {
+                                    $platformText = __('index.sections.social_media.view_youtube');
                                 }
                             @endphp
 
-                            <a href="{{ $item->sosmed_link }}" target="_blank" class="inline-block mt-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                            <a
+                                href="{{ $item->sosmed_link }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="inline-block mt-4 px-6 py-3 text-sm bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
+                            >
                                 {{ $platformText }}
                             </a>
                         </div>
@@ -551,22 +987,43 @@
             <!-- Dropdown Filter -->
             <div class="flex flex-wrap justify-center items-center gap-3 mb-8 text-sm">
                 <!-- Dropdown Bulan -->
-                <select id="filterMonth" class="border border-gray-300 rounded-full px-4 py-1 focus:ring focus:ring-blue-400">
-                    <option value="all" selected>-- Semua Bulan --</option>
+                <select
+                    id="filterMonth"
+                    class="border border-gray-400 rounded-full px-4 py-1 hover:bg-gray-200 focus:ring focus:ring-blue-400 cursor-pointer"
+                >
+                    <option value="all" selected>
+                        {{ __('index.sections.gallery.all_months') }}
+                    </option>
+
                     @foreach ($months as $m)
                         @php
-                            $namaBulan = \Carbon\Carbon::create()->month($m)->translatedFormat('F');
+                            $namaBulan = \Carbon\Carbon::create()
+                                ->month($m)
+                                ->locale($currentLocale)
+                                ->translatedFormat('F');
+
                             $valBulan = str_pad($m, 2, '0', STR_PAD_LEFT);
                         @endphp
-                        <option value="{{ $valBulan }}">{{ $namaBulan }}</option>
+
+                        <option value="{{ $valBulan }}" class="cursor-pointer">
+                            {{ $namaBulan }}
+                        </option>
                     @endforeach
                 </select>
 
                 <!-- Dropdown Tahun -->
-                <select id="filterYear" class="border border-gray-300 rounded-full px-4 py-1 focus:ring focus:ring-blue-400 text-sm">
-                    <option value="all" selected>-- Semua Tahun --</option>
+                <select
+                    id="filterYear"
+                    class="border border-gray-400 rounded-full px-4 py-1 hover:bg-gray-200 focus:ring focus:ring-blue-400 text-sm cursor-pointer"
+                >
+                    <option value="all" selected>
+                        {{ __('index.sections.gallery.all_years') }}
+                    </option>
+
                     @foreach ($years as $y)
-                        <option value="{{ $y }}">{{ $y }}</option>
+                        <option value="{{ $y }}" class="cursor-pointer">
+                            {{ $y }}
+                        </option>
                     @endforeach
                 </select>
             </div>
@@ -575,12 +1032,17 @@
             <div id="galleryWrapper" class="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
                 @foreach ($gallery as $item)
                     @php
-                        $bulanTahun = \Carbon\Carbon::create($item->year, $item->month)->translatedFormat('F Y');
+                        $bulanTahun = \Carbon\Carbon::create(
+                            $item->year,
+                            $item->month
+                        )
+                            ->locale($currentLocale)
+                            ->translatedFormat('F Y');
                         $tanggalDataAttr = \Carbon\Carbon::create($item->year, $item->month)->format('Y-m');
                     @endphp
 
                     <div class="relative group overflow-hidden rounded-xl shadow-xl" data-year="{{ $item->year }}" data-date="{{ $tanggalDataAttr }}">
-                        <img src="{{ asset('storage/back/home/gallery/' . $item->img) }}" alt="{{ $item->title }}" class="w-full object-cover h-auto group-hover:scale-110 transition-transform duration-700">
+                        <img src="{{ asset('storage/' . $item->img) }}" alt="{{ $item->title }}" class="w-full object-cover h-auto group-hover:scale-110 transition-transform duration-700">
                         <div class="absolute inset-0 bg-black/20 transition duration-500 ease-in-out group-hover:bg-black/30"></div>
                         <div class="absolute bottom-0 left-0 px-4 py-3 text-white opacity-0 group-hover:opacity-100 transition duration-500">
                             <div class="bg-black/60 px-3 py-2 rounded-tr-xl">
@@ -601,13 +1063,23 @@
                 <!-- Left Title -->
                 <div>
                     <h2 class="uppercase text-4xl font-bold text-gray-900 mb-4">
-                        Temukan Blog Terbaru <br><span class="text-blue-600 text-left">Kami</span>
+                        {{ __('index.sections.blog.latest_title') }}
+                        <br>
+                        <span class="text-blue-600 text-left">
+                            {{ __('index.sections.blog.latest_highlight') }}
+                        </span>
                     </h2>
                 </div>
 
                 <!-- Right Filter -->
                 <div id="categoryFilter" class="text-md font-semibold text-gray-500 space-x-4">
-                    <a href="#" data-category="" class="category-link {{ request('category') ? 'hover:underline' : 'text-blue-600 italic' }}">Semua Blog</a>
+                    <a
+                        href="#"
+                        data-category=""
+                        class="category-link {{ request('category') ? 'hover:underline' : 'text-blue-600 italic' }}"
+                    >
+                        {{ __('index.sections.blog.all_blogs') }}
+                    </a>
 
                     @foreach ($categories as $category)
                         <a href="#" data-category="{{ $category->slug }}" class="category-link {{ request('category') === $category->slug ? 'text-blue-600 italic' : 'hover:underline' }}">{{ $category->name }}</a>
@@ -622,10 +1094,11 @@
 
             <!-- Section: Call to Action Button -->
             <div class="mt-10 text-center">
-                <a href="{{ route('blog') }}">
-                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded shadow-lg">
-                        Lihat Semua Blog
-                    </button>
+                <a
+                    href="{{ route('blog') }}"
+                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm px-6 py-3 rounded-full shadow-lg"
+                >
+                    {{ __('index.sections.blog.view_all') }}
                 </a>
             </div>
         </section>
@@ -635,44 +1108,93 @@
         <section id="whatsapp-support" class="relative">
 
             <!-- Tombol WhatsApp -->
-            <button id="waBtn" class="fixed bottom-6 right-6 bg-green-500 rounded-full p-3 shadow-lg hover:bg-green-600 transition duration-300 z-50">
-                <img src="https://img.icons8.com/ios-filled/30/ffffff/whatsapp.png" alt="WhatsApp Icon" />
+            <button
+                id="waBtn"
+                type="button"
+                aria-label="{{ __('index.widgets.whatsapp.open_chat') }}"
+                class="fixed bottom-6 right-6 bg-green-500 rounded-full p-3 shadow-lg hover:bg-green-600 transition duration-300 z-50"
+            >
+                <img
+                    src="https://img.icons8.com/ios-filled/30/ffffff/whatsapp.png"
+                    alt="{{ __('index.widgets.whatsapp.icon_alt') }}"
+                >
             </button>
 
             <!-- Chat Box -->
-            <div id="chatBox" class="fixed bottom-24 right-6 w-80 rounded-xl shadow-lg overflow-hidden hidden z-40">
-
+            <div
+                id="chatBox"
+                class="fixed bottom-24 right-6 w-80 rounded-xl shadow-lg overflow-hidden hidden z-40"
+            >
                 <!-- Header -->
                 <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
                     <div class="flex items-center gap-2">
-                        <img src="{{ asset('front/image/logo.png') }}" alt="Logo" class="rounded-2xl w-12 h-12 bg-black rounded-full shadow-lg" />
+                        <img
+                            src="{{ asset('front/image/logo.png') }}"
+                            alt="{{ __('index.widgets.whatsapp.logo_alt') }}"
+                            class="w-12 h-12 bg-black rounded-full shadow-lg"
+                        >
+
                         <div>
-                            <div class="font-bold text-sm">Support RRCONS</div>
-                            <div class="text-xs text-green-500">online</div>
+                            <div class="font-bold text-sm">
+                                {{ __('index.widgets.whatsapp.support_name') }}
+                            </div>
+
+                            <div class="text-xs text-green-500">
+                                {{ __('index.widgets.whatsapp.online') }}
+                            </div>
                         </div>
                     </div>
-                    <button id="closeBtn" class="text-white text-xl font-bold">&times;</button>
+
+                    <button
+                        id="closeBtn"
+                        type="button"
+                        aria-label="{{ __('index.widgets.whatsapp.close_chat') }}"
+                        class="text-white text-xl font-bold"
+                    >
+                        &times;
+                    </button>
                 </div>
 
-                <!-- Body dengan background gambar -->
+                <!-- Body -->
                 <div class="p-4 bg-white bg-opacity-80">
-                    <!-- Bubble Chat -->
                     <div class="mb-6">
-                        <div class="text-sm font-semibold text-gray-700 mb-1">Support RRCONS</div>
+                        <div class="text-sm font-semibold text-gray-700 mb-1">
+                            {{ __('index.widgets.whatsapp.support_name') }}
+                        </div>
+
                         <div class="bg-white text-sm text-gray-800 p-3 rounded-lg shadow">
-                            Hi,<br />Ada yang bisa kami bantu?
+                            {{ __('index.widgets.whatsapp.greeting') }}
+                            <br>
+                            {{ __('index.widgets.whatsapp.question') }}
                         </div>
                     </div>
                 </div>
 
-                <!-- Footer putih dengan tombol dan info -->
+                @php
+                    $whatsappMessage = urlencode(
+                        __('index.common.message')
+                    );
+
+                    $whatsappUrl = "https://wa.me/6281252624284?text={$whatsappMessage}";
+                @endphp
+
+                <!-- Footer -->
                 <div class="bg-white px-4 pt-4 pb-6 text-center">
-                    <a href="https://wa.me/6281234567890?text=Halo%20saya%20mau%20bertanya" target="_blank" rel="noopener noreferrer">
-                        <button class="bg-green-500 text-white text-sm font-semibold w-full py-3 rounded-full shadow hover:bg-green-600 transition duration-300">
-                        Chat Sekarang
-                        </button>
+                    <a
+                        href="{{ $whatsappUrl }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="block bg-green-500 text-white text-sm font-semibold w-full py-3 rounded-full shadow hover:bg-green-600 transition duration-300"
+                    >
+                        {{ __('index.widgets.whatsapp.chat_now') }}
                     </a>
-                    <p class="text-xs text-gray-500 mt-2">⚡ by <span class="text-green-600 font-semibold">Solveit</span></p>
+
+                    <p class="text-xs text-gray-500 mt-2">
+                        ⚡ {{ __('index.widgets.whatsapp.powered_by') }}
+                        <span class="text-green-600 font-semibold">
+                            Solveit
+                        </span>
+                    </p>
                 </div>
             </div>
         </section>
@@ -685,71 +1207,143 @@
                 <!-- Logo & Description -->
                 <div class="space-y-4">
                     <div class="flex items-center space-x-2">
-                        <img src="{{ asset('front/image/logo.png') }}" alt="RR Logo" class="h-8 w-8">
-                        <h1 class="text-xl font-semibold">Rita Russo <span class="text-blue-600">Consultant</span></h1>
+                        <img
+                            src="{{ asset('front/image/logo.png') }}"
+                            alt="{{ __('index.footer.logo_alt') }}"
+                            class="h-8 w-8"
+                        >
+
+                        <h1 class="text-xl font-semibold">
+                            {{ __('index.footer.brand_name') }}
+
+                            <span class="text-blue-600">
+                                {{ __('index.footer.brand_highlight') }}
+                            </span>
+                        </h1>
                     </div>
+
                     <p class="text-gray-600 text-sm leading-relaxed">
-                        Sejak 2012, RR Cons, RR Future Tech, dan RR Vision telah menjadi mitra terpercaya bagi berbagai lembaga dan perusahaan, menghadirkan solusi yang disesuaikan dengan kebutuhan bisnis melalui kolaborasi, keahlian teknis, dan kreativitas
+                        {{ __('index.footer.description') }}
                     </p>
                 </div>
 
-                <!-- Address - pl 24 hanya di desktop -->
+                <!-- Address -->
                 <div class="sm:pl-0 md:pl-24">
-                    <h3 class="text-lg text-blue-600 font-semibold mb-2">Alamat</h3>
+                    <h3 class="text-lg text-blue-600 font-semibold mb-2">
+                        {{ __('index.footer.address_title') }}
+                    </h3>
+
                     <p class="text-gray-500">
-                        Jl. Perum Gadang Regency No.P2 No. 44, Gadang, Kec. Sukun, Kota Malang, Jawa Timur 65149
+                        {{ __('index.footer.address') }}
                     </p>
                 </div>
 
-                <!-- Contact - pl 32 hanya di desktop -->
+                <!-- Contact -->
                 <div class="sm:pl-0 md:pl-32">
-                    <h3 class="text-lg text-blue-600 font-semibold mb-2">Kontak</h3>
-                    <p class="text-gray-500">+91 945 658 3256</p>
-                    <p class="text-gray-500">support@pagedone.com</p>
+                    <h3 class="text-lg text-blue-600 font-semibold mb-2">
+                        {{ __('index.footer.contact_title') }}
+                    </h3>
+
+                    <p class="text-gray-500">
+                        +62 812-5262-4284
+                    </p>
+
+                    <p class="text-gray-500">
+                        ritarussoconsultant@gmail.com
+                    </p>
                 </div>
 
-                <!-- Office - ml-auto hanya di desktop -->
+                <!-- Office Hours -->
                 <div class="ml-0 md:ml-auto">
-                    <h3 class="text-lg text-blue-600 font-semibold mb-2">Jam Kantor</h3>
-                    <p class="text-gray-500">Senin - Jum'at</p>
-                    <p class="text-gray-500">08.00 - 16.00</p>
-                    <p class="text-gray-500">Sabtu</p>
-                    <p class="text-gray-500">08.00 - 12.00</p>
+                    <h3 class="text-lg text-blue-600 font-semibold mb-2">
+                        {{ __('index.footer.office_hours_title') }}
+                    </h3>
+
+                    <p class="text-gray-500">
+                        {{ __('index.footer.monday_friday') }}
+                    </p>
+
+                    <p class="text-gray-500">
+                        08.00 - 16.00
+                    </p>
+
+                    <p class="text-gray-500">
+                        {{ __('index.footer.saturday') }}
+                    </p>
+
+                    <p class="text-gray-500">
+                        08.00 - 12.00
+                    </p>
                 </div>
             </div>
 
-            <!-- Divider -->
             <div class="border-t border-gray-200 my-6"></div>
 
-            <!-- Bottom Footer -->
             <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 space-y-4 md:space-y-0">
-                <p><span class="text-blue-600">RRCONS 2025</span> , All rights reserved.</p>
+                <p>
+                    <span class="text-blue-600">
+                        © Rita Russo Consultant {{ now()->year }}
+                    </span>,
+                    {{ __('index.footer.copyright') }}
+                </p>
 
                 <div class="flex space-x-4">
-                    <!-- Instagram -->
-                    <a href="https://www.instagram.com/rrcons_/" aria-label="Instagram" target="_blank">
-                        <svg class="w-6 h-6 text-gray-600 hover:text-pink-500" fill="currentColor" viewBox="0 0 24 24">
+                    <a
+                        href="https://www.instagram.com/rrcons_/"
+                        aria-label="{{ __('index.footer.instagram') }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <svg
+                            class="w-6 h-6 text-gray-600 hover:text-pink-500"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                        >
                             <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5Zm9 2.25a.75.75 0 0 1 1.5 0v1a.75.75 0 0 1-1.5 0v-1ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/>
                         </svg>
                     </a>
 
-                    <!-- TikTok -->
-                    <a href="#" aria-label="TikTok" target="_blank">
-                        <svg class="w-6 h-6 text-gray-600 hover:text-black" fill="currentColor" viewBox="0 0 24 24">
+                    <a
+                        href="#"
+                        aria-label="{{ __('index.footer.tiktok') }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <svg
+                            class="w-6 h-6 text-gray-600 hover:text-black"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                        >
                             <path d="M12.75 2h2.5a5.25 5.25 0 0 0 5.25 5.25v2.5a7.75 7.75 0 0 1-5.25-1.85v7.1a6.25 6.25 0 1 1-6.25-6.25h.75v2.5h-.75a3.75 3.75 0 1 0 3.75 3.75V2Z"/>
                         </svg>
                     </a>
 
-                    <!-- X -->
-                    <a href="#" aria-label="X" target="_blank">
-                        <svg class="w-6 h-6 text-gray-600 hover:text-black" fill="currentColor" viewBox="0 0 24 24">
+                    <a
+                        href="#"
+                        aria-label="{{ __('index.footer.x') }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <svg
+                            class="w-6 h-6 text-gray-600 hover:text-black"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                        >
                             <path d="M14.5 10.5 21 3h-2.25l-5.25 6.25L9 3H3l6.93 10.02L3 21h2.25l5.7-6.77L15 21h6l-6.5-10.5Zm-2.07 2.45-.66-.98L5.1 4.5H8.1l4.17 6.15.66.98 6.93 10.02H16.9l-4.47-6.65Z"/>
                         </svg>
                     </a>
 
-                    <!-- Facebook -->
-                    <a href="#" aria-label="Facebook" target="_blank">
-                        <svg class="w-6 h-6 text-gray-600 hover:text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <a
+                        href="#"
+                        aria-label="{{ __('index.footer.facebook') }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <svg
+                            class="w-6 h-6 text-gray-600 hover:text-blue-600"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                        >
                             <path d="M14.5 3H10A4 4 0 0 0 6 7v3H3v4h3v7h4v-7h3.5l1-4H10V7a1 1 0 0 1 1-1h3.5V3Z"/>
                         </svg>
                     </a>
@@ -759,48 +1353,153 @@
         <!-- end of footer -->
 
         <!-- start of poster -->
-        <section x-data="popupController" x-init="init()" class="relative">
+        @if ($posters->isNotEmpty())
 
-            <!-- Gambar sumber yang disembunyikan -->
+        <section
+            x-data="popupController({{ $posters->count() }})"
+            x-init="init()"
+            class="relative"
+        >
+
+            <!-- Gambar sumber -->
             <div id="image-source" class="hidden">
                 @foreach ($posters as $poster)
-                    <img src="{{ asset('storage/back/home/poster/' . $poster->img) }}" alt="{{ $poster->name }}" />
+                    <img
+                        src="{{ asset('storage/' . $poster->img) }}"
+                        alt="{{ $poster->name }}"
+                    />
                 @endforeach
             </div>
 
+
             <!-- Popup -->
-            <div x-show="open" x-transition.opacity.scale class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+            <div
+                x-show="open"
+                x-transition.opacity.scale
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+            >
 
-                <div @click.away="open = false" class="relative p-0 bg-transparent shadow-none">
+                <div
+                    @click.away="open = false"
+                    class="relative p-0 bg-transparent shadow-none"
+                >
 
-                    <!-- Tombol Close -->
-                    <button @click="open = false" class="absolute top-2 right-2 bg-white/80 hover:bg-red-500 hover:text-white transition p-1.5 rounded-full z-10">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    <button
+                        @click="open = false"
+                        type="button"
+                        aria-label="{{ __('index.sections.poster.close') }}"
+                        class="absolute top-4 right-4
+                            w-12 h-12
+                            flex items-center justify-center
+                            rounded-full
+                            bg-red-500 text-white
+                            shadow-xl
+                            border border-red-400
+                            hover:bg-red-600
+                            transition-all duration-300
+                            z-20"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-6 h-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                            />
                         </svg>
                     </button>
 
-                    <!-- Gambar Poster -->
-                    <img :src="images[currentIndex]" class="w-auto h-auto max-w-[90vw] max-h-[90vh] object-contain rounded-xl" />
+                    <img
+                        :src="images[currentIndex]"
+                        alt="{{ __('index.sections.poster.image_alt') }}"
+                        class="w-auto h-auto max-w-[90vw] max-h-[90vh] object-contain rounded-xl"
+                    >
 
-                    <!-- Tombol Navigasi Kiri -->
-                    <button @click="goToPrevImage()" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/70 hover:bg-gray-300 p-2 rounded-full z-10">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    <button
+                        x-show="images.length > 1"
+                        x-transition
+                        @click="goToPrevImage()"
+                        aria-label="{{ __('index.sections.poster.previous') }}"
+                        class="
+                            absolute left-4 top-1/2 -translate-y-1/2
+                            w-12 h-12
+                            flex items-center justify-center
+                            rounded-full
+                            bg-white/95
+                            text-gray-800
+                            shadow-xl
+                            border border-gray-200
+                            hover:bg-blue-600
+                            hover:text-white
+                            transition-all duration-300
+                            z-20
+                        "
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-7 h-7"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M15 19l-7-7 7-7"
+                            />
                         </svg>
                     </button>
 
-                    <!-- Tombol Navigasi Kanan -->
-                    <button @click="goToNextImage()" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/70 hover:bg-gray-300 p-2 rounded-full z-10">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    <button
+                        x-show="images.length > 1"
+                        x-transition
+                        @click="goToNextImage()"
+                        aria-label="{{ __('index.sections.poster.next') }}"
+                        class="
+                            absolute right-4 top-1/2 -translate-y-1/2
+                            w-12 h-12
+                            flex items-center justify-center
+                            rounded-full
+                            bg-white/95
+                            text-gray-800
+                            shadow-xl
+                            border border-gray-200
+                            hover:bg-blue-600
+                            hover:text-white
+                            transition-all duration-300
+                            z-20
+                        "
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-7 h-7"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M9 5l7 7-7 7"
+                            />
                         </svg>
                     </button>
 
                 </div>
+
             </div>
 
         </section>
+
+        @endif
         <!-- end of poster -->
 
         <!-- Render Feather Icons -->
@@ -846,25 +1545,61 @@
                 const links = document.querySelectorAll('.category-link');
                 const articlesGrid = document.getElementById('articlesGrid');
 
-                links.forEach(link => {
-                    link.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        const slug = this.dataset.category;
+                if (!links.length || !articlesGrid) {
+                    return;
+                }
 
-                        // Tampilkan loading jika mau
-                        articlesGrid.innerHTML = '<p class="text-gray-500 col-span-3">Memuat artikel...</p>';
+                const loadingMessage = @json(__('index.sections.blog.loading'));
+                const errorMessage = @json(__('index.sections.blog.load_failed'));
+                const articlesUrl = @json(route('get.articles'));
 
-                        fetch(`/get-articles?category=${slug}`)
-                            .then(res => res.json())
-                            .then(data => {
+                links.forEach((link) => {
+                    link.addEventListener('click', function (event) {
+                        event.preventDefault();
+
+                        const slug = this.dataset.category ?? '';
+
+                        articlesGrid.innerHTML = `
+                            <p class="text-gray-500 col-span-3">
+                                ${loadingMessage}
+                            </p>
+                        `;
+
+                        const url = new URL(articlesUrl, window.location.origin);
+
+                        if (slug) {
+                            url.searchParams.set('category', slug);
+                        }
+
+                        fetch(url)
+                            .then((response) => {
+                                if (!response.ok) {
+                                    throw new Error('Request failed');
+                                }
+
+                                return response.json();
+                            })
+                            .then((data) => {
                                 articlesGrid.innerHTML = data.html;
 
-                                // Highlight kategori aktif
-                                links.forEach(l => l.classList.remove('text-blue-600', 'italic'));
-                                this.classList.add('text-blue-600', 'italic');
+                                links.forEach((categoryLink) => {
+                                    categoryLink.classList.remove(
+                                        'text-blue-600',
+                                        'italic',
+                                    );
+                                });
+
+                                this.classList.add(
+                                    'text-blue-600',
+                                    'italic',
+                                );
                             })
                             .catch(() => {
-                                articlesGrid.innerHTML = '<p class="text-red-500 col-span-3">Gagal memuat artikel.</p>';
+                                articlesGrid.innerHTML = `
+                                    <p class="text-red-500 col-span-3">
+                                        ${errorMessage}
+                                    </p>
+                                `;
                             });
                     });
                 });

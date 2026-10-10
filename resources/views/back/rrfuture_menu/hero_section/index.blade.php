@@ -41,7 +41,7 @@
                     <td class="text-center">{{ $loop->iteration }}.</td>
                     <td class="text-center">
                         @if ($item->bg_img)
-                            <img src="{{ asset('storage/back/rrfuture/hero/' . $item->bg_img) }}" alt="Hero Image" width="500">
+                            <img src="{{ asset('storage/' . $item->bg_img) }}" alt="Hero Image" width="500">
                         @else
                             <span class="text-muted">No Image</span>
                         @endif

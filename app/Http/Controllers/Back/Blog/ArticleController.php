@@ -37,14 +37,17 @@ class ArticleController extends Controller
                 })
 
                 ->editColumn('publish_date', function($row) {
-                    return \Carbon\Carbon::parse($row->publish_date)->translatedFormat('d F Y');
+                    return optional($row->publish_date)->translatedFormat('d F Y H:i') ?? '-';
                 })
 
                 ->addColumn('status', function($article){
-                    if ($article->status == 0){
-                        return '<span class="badge bg-danger px-3 py-2">Private</span>';
-                    } else {
-                        return '<span class="badge bg-primary px-3 py-2">Published</span>';
+                    switch ($article->publication_status) {
+                        case Article::PUBLICATION_PRIVATE:
+                            return '<span class="badge bg-danger px-3 py-2">Private</span>';
+                        case Article::PUBLICATION_SCHEDULED:
+                            return '<span class="badge bg-warning text-dark px-3 py-2">Scheduled</span>';
+                        default:
+                            return '<span class="badge bg-primary px-3 py-2">Published</span>';
                     }
                 })
 
@@ -99,14 +102,16 @@ class ArticleController extends Controller
         if ($request->hasFile('img')) {
             $file = $request->file('img');
             $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/blog/', $fileName); // Simpan ke direktori storage
-            $data['img'] = $fileName;
+            $path = $file->storeAs('back/blog', $fileName, 'public');
+
+            $data['img'] = $path;
         }
 
         $data['user_id'] = Auth::id();
         $data['created_by'] = Auth::id();
         $data['slug'] = Str::slug($data['title']);
-        $data['publish_date'] = now();
+        // Pakai tanggal terbit pilihan user (bisa di masa depan = terjadwal)
+        $data['publish_date'] = $data['publish_date'] ?? now();
 
         Article::create($data);
 
@@ -119,7 +124,7 @@ class ArticleController extends Controller
     public function show(string $id)
     {
         return view('back.article.show', [
-            'article' => Article::with(['User', 'Category'])->find($id)
+            'article' => Article::with(['User', 'Category'])->findOrFail($id)
         ]);
     }
 
@@ -129,7 +134,7 @@ class ArticleController extends Controller
     public function edit(string $id)
     {
         return view('back.article.update', [
-            'article' => Article::find($id),
+            'article' => Article::findOrFail($id),
             'categories' => Category::get()
         ]);
     }
@@ -141,27 +146,27 @@ class ArticleController extends Controller
     {
         $data = $request->validated();
 
-        $article = Article::findOrFail($id); // Pastikan artikel ada
+        $article = Article::findOrFail($id);
 
         if ($request->hasFile('img')) {
-            $file = $request->file('img');
-            $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/blog/', $fileName);
 
-            // Hapus gambar lama jika ada
-            if ($article->img && Storage::exists('public/back/blog/' . $article->img)) {
-                Storage::delete('public/back/blog/' . $article->img);
+            // Hapus gambar lama
+            if ($article->img) {
+                Storage::disk('public')->delete($article->img);
             }
 
-            $data['img'] = $fileName;
-        } else {
-            // Jika gambar tidak diupload ulang, gunakan gambar lama
-            $data['img'] = $article->img;
+            $file = $request->file('img');
+            $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+
+            $path = $file->storeAs('back/blog', $fileName, 'public');
+
+            $data['img'] = $path; // simpan path lengkap
         }
 
         $data['user_id'] = auth()->id();
         $data['slug'] = Str::slug($data['title']);
-        $data['publish_date'] = now();
+        // Pertahankan tanggal terbit lama bila field dikosongkan
+        $data['publish_date'] = $data['publish_date'] ?? $article->publish_date ?? now();
 
         $article->update($data);
 
@@ -173,12 +178,17 @@ class ArticleController extends Controller
      */
     public function destroy(string $id)
     {
-        $data = Article::find($id);
-        Storage::delete('public/back/blog/'.$data->img); // hapus di direktori baru
-        $data->delete();
-
+        $article = Article::findOrFail($id);
+    
+        if ($article->img) {
+            Storage::disk('public')->delete($article->img);
+        }
+    
+        $article->delete();
+    
         return response()->json([
             'message' => 'Data article has been deleted'
         ]);
     }
+
 }

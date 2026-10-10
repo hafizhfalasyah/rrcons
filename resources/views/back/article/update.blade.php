@@ -53,7 +53,7 @@
                     <input type="file" name="img" id="img" class="form-control">
                     <div class="mt-2">
                         <small class="text-muted">Current Image:</small><br>
-                        <img src="{{ asset('storage/back/blog/' . $article->img) }}" class="img-thumbnail img-preview" style="max-width: 300px;">
+                        <img src="{{ asset('storage/' . $article->img) }}" class="img-thumbnail img-preview" style="max-width: 300px;">
                     </div>
                 </div>
 
@@ -61,16 +61,18 @@
                     <div class="col-md-6">
                         <label for="status" class="form-label">Status</label>
                         <select name="status" id="status" class="form-select">
-                            <option value="0" {{ $article->status == 0 ? 'selected' : '' }}>Private</option>
-                            <option value="1" {{ $article->status == 1 ? 'selected' : '' }}>Publish</option>
+                            <option value="0" {{ old('status', $article->status) == 0 ? 'selected' : '' }}>Private</option>
+                            <option value="1" {{ old('status', $article->status) == 1 ? 'selected' : '' }}>Publish</option>
                         </select>
                     </div>
 
                     <div class="col-md-6">
-                        <label for="publish_date" class="form-label">Publish Date</label>
-                        <input type="date" name="publish_date" id="publish_date" class="form-control" value="{{ old('publish_date', $article->publish_date) }}">
+                        <label for="publish_date" class="form-label">Publish Date &amp; Time</label>
+                        <input type="datetime-local" name="publish_date" id="publish_date" class="form-control" value="{{ old('publish_date', optional($article->publish_date)->format('Y-m-d\TH:i')) }}">
                     </div>
                 </div>
+
+                @include('back.article.partials.schedule_hint')
 
                 <div class="d-flex justify-content-between mt-4">
                     <a href="{{ route('blog.articles.index') }}" class="btn btn-danger btn-sm me-1 d-flex align-items-center px-3 py-2 rounded-3">

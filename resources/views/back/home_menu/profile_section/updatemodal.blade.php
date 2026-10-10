@@ -30,7 +30,7 @@
                                 @if ($item->img)
                                     <div class="mt-2">
                                         <label class="form-label text-muted small">Current Image Preview:</label><br>
-                                        <img src="{{ asset('storage/back/home/profile/' . $item->img) }}" alt="Current Image" class="img-fluid rounded shadow-sm border" style="max-height: 200px;">
+                                        <img src="{{ asset('storage/' . $item->img) }}" alt="Current Image" class="img-fluid rounded shadow-sm border" style="max-height: 200px;">
                                     </div>
                                 @endif
                             </div>

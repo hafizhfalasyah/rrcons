@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\App;
-
 use App\Models\Home\HomeMenu;
 use App\Models\Home\PosterHome;
 use App\Models\Home\HeroHome;
@@ -21,6 +20,7 @@ use App\Models\Home\GalleryHome;
 class HomeMenuController extends Controller
 {
     /** ============================== HOME MENU CONTROLLERS ============================== **/
+
     public function homeMenu()
     {
         $lang = App::getLocale();
@@ -32,6 +32,7 @@ class HomeMenuController extends Controller
 
         return view('back.home_menu.index', compact('homeMenus', 'lastUpdated', 'lang'));
     }
+
     public function updateHomeMenu(Request $request, $id)
     {
         $validatedData = $request->validate([
@@ -40,13 +41,13 @@ class HomeMenuController extends Controller
         ]);
 
         $homeMenu = HomeMenu::findOrFail($id);
-
         $homeMenu->update($validatedData);
 
         return redirect()->route('home.menu')->with('success', 'Home Menu updated successfully.');
     }
 
     /** ============================== POSTER SECTION CONTROLLERS ============================== **/
+
     public function posterSection()
     {
         $posters = PosterHome::all();
@@ -57,6 +58,7 @@ class HomeMenuController extends Controller
             'lastUpdated' => $lastUpdated,
         ]);
     }
+
     public function createPosterSection(Request $request)
     {
         $validatedData = $request->validate([
@@ -70,61 +72,81 @@ class HomeMenuController extends Controller
         if ($request->hasFile('img')) {
             $file = $validatedData['img'];
             $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/home/poster/', $filename);
-            $newPoster->img = $filename;
+
+            $file->storeAs(
+                'back/home/poster',
+                $filename,
+                'public'
+            );
+
+            $newPoster->img = 'back/home/poster/' . $filename;
         }
 
+        // FIX: sebelumnya method ini tidak pernah memanggil save(),
+        // sehingga data poster tidak pernah tersimpan ke database
+        // meskipun file gambar sudah ter-upload ke storage.
         $newPoster->save();
 
         return redirect()->route('home.poster')->with('success', 'Poster section created successfully');
     }
+
     public function updatePosterSection(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'img' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'name' => 'required|string|max:255',
         ]);
 
         $poster = PosterHome::findOrFail($id);
 
-        // Pastikan name langsung dimasukkan ke dalam data yang akan diupdate
         $dataToUpdate = [
             'name' => $validatedData['name'],
         ];
 
-        // Handle upload image jika ada
         if ($request->hasFile('img')) {
-            if ($poster->img && Storage::exists('public/back/home/poster/' . $poster->img)) {
-                Storage::delete('public/back/home/poster/' . $poster->img);
+            // Hapus gambar lama
+            if ($poster->img && Storage::disk('public')->exists($poster->img)) {
+                Storage::disk('public')->delete($poster->img);
             }
 
+            // Upload gambar baru
             $file = $validatedData['img'];
             $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/home/poster/', $filename);
 
-            $dataToUpdate['img'] = $filename;
+            $file->storeAs(
+                'back/home/poster',
+                $filename,
+                'public'
+            );
+
+            // Simpan relative path ke database
+            $dataToUpdate['img'] = 'back/home/poster/' . $filename;
         }
 
-        // Update data
         $poster->update($dataToUpdate);
 
-        return redirect()->route('home.poster')->with('success', 'Poster section updated successfully');
+        return redirect()
+            ->route('home.poster')
+            ->with('success', 'Poster section updated successfully');
     }
+
     public function deletePosterSection($id)
     {
         $poster = PosterHome::findOrFail($id);
 
-        // Hapus file gambar jika ada
-        if ($poster->img && Storage::exists('public/back/home/poster/' . $poster->img)) {
-            Storage::delete('public/back/home/poster/' . $poster->img);
+        if ($poster->img && Storage::disk('public')->exists($poster->img)) {
+            Storage::disk('public')->delete($poster->img);
         }
 
         $poster->delete();
 
-        return redirect()->route('home.poster')->with('success', 'Poster section deleted successfully');
+        return redirect()
+            ->route('home.poster')
+            ->with('success', 'Poster section deleted successfully');
     }
 
     /** ============================== HERO SECTION CONTROLLERS ============================== **/
+
     public function heroSection()
     {
         $heroes = HeroHome::with('homeMenu')->get();
@@ -135,6 +157,7 @@ class HomeMenuController extends Controller
             'lastUpdated' => $lastUpdated,
         ]);
     }
+
     public function updateHeroSection(Request $request, $id)
     {
         $validatedData = $request->validate([
@@ -166,9 +189,11 @@ class HomeMenuController extends Controller
     }
 
     /** ============================== ABOUT CONTROLLERS ============================== **/
+
     public function aboutSection()
     {
-	    $lang = App::getLocale();
+        $lang = App::getLocale();
+
         $abouts = AboutHome::select('id', 'img', 'text_id', 'text_en', 'updated_at')->get();
         $lastUpdated = AboutHome::latest('updated_at')->value('updated_at');
 
@@ -178,6 +203,7 @@ class HomeMenuController extends Controller
             'lang' => $lang,
         ]);
     }
+
     public function updateAboutSection(Request $request, $id)
     {
         $validatedData = $request->validate([
@@ -214,9 +240,11 @@ class HomeMenuController extends Controller
     }
 
     /** ============================== SERVICE CONTROLLERS ============================== **/
+
     public function serviceSection()
     {
-	    $lang = App::getLocale();
+        $lang = App::getLocale();
+
         $services = ServiceHome::select('id', 'name_id', 'name_en', 'desc_id', 'desc_en', 'updated_at')->get();
         $lastUpdated = ServiceHome::latest('updated_at')->value('updated_at');
 
@@ -226,6 +254,7 @@ class HomeMenuController extends Controller
             'lang' => $lang,
         ]);
     }
+
     public function updateServiceSection(Request $request, $id)
     {
         $validatedData = $request->validate([
@@ -234,16 +263,17 @@ class HomeMenuController extends Controller
         ]);
 
         $services = ServiceHome::with('homeMenu')->findOrFail($id);
-
         $services->update($validatedData);
 
         return redirect()->route('home.service')->with('success', 'Service section updated successfully.');
     }
 
     /** ============================== ADVANTAGE CONTROLLERS ============================== **/
+
     public function advantageSection()
     {
-	    $lang = App::getLocale();
+        $lang = App::getLocale();
+
         $advantages = AdvantageHome::select('id', 'title_id', 'title_en', 'desc_id', 'desc_en', 'updated_at')->get();
         $lastUpdated = AdvantageHome::latest('updated_at')->value('updated_at');
 
@@ -253,6 +283,7 @@ class HomeMenuController extends Controller
             'lang' => $lang,
         ]);
     }
+
     public function updateAdvantageSection(Request $request, $id)
     {
         $validatedData = $request->validate([
@@ -261,13 +292,13 @@ class HomeMenuController extends Controller
         ]);
 
         $advantages = AdvantageHome::with('homeMenu')->findOrFail($id);
-
         $advantages->update($validatedData);
 
         return redirect()->route('home.advantage')->with('success', 'Advantage section updated successfully.');
     }
 
     /** ============================== PROFILE CONTROLLERS ============================== **/
+
     public function profileSection()
     {
         $profiles = ProfileHome::with('homeMenu')->get();
@@ -278,6 +309,7 @@ class HomeMenuController extends Controller
             'lastUpdated' => $lastUpdated,
         ]);
     }
+
     public function updateProfileSection(Request $request, $id)
     {
         $validatedData = $request->validate([
@@ -317,9 +349,11 @@ class HomeMenuController extends Controller
     }
 
     /** ============================== BUSINESS CONTROLLERS ============================== **/
+
     public function businessSection()
     {
-	    $lang = App::getLocale();
+        $lang = App::getLocale();
+
         $business = BusinessHome::select('id', 'img', 'title_id', 'title_en', 'desc_id', 'desc_en', 'form_link', 'updated_at')->get();
         $lastUpdated = BusinessHome::latest('updated_at')->value('updated_at');
 
@@ -329,6 +363,7 @@ class HomeMenuController extends Controller
             'lang' => $lang,
         ]);
     }
+
     public function updateBusinessSection(Request $request, $id)
     {
         $validatedData = $request->validate([
@@ -369,6 +404,7 @@ class HomeMenuController extends Controller
     }
 
     /** ============================== SOSMED CONTROLLERS ============================== **/
+
     public function sosmedSection()
     {
         $sosmed = SosmedHome::with('homeMenu')->get();
@@ -379,6 +415,7 @@ class HomeMenuController extends Controller
             'lastUpdated' => $lastUpdated,
         ]);
     }
+
     public function updateSosmedSection(Request $request, $id)
     {
         $validatedData = $request->validate([
@@ -419,6 +456,7 @@ class HomeMenuController extends Controller
     }
 
     /** ============================== GALLERY CONTROLLERS ============================== **/
+
     public function gallerySection()
     {
         $gallery = GalleryHome::all();
@@ -429,6 +467,7 @@ class HomeMenuController extends Controller
             'lastUpdated' => $lastUpdated,
         ]);
     }
+
     public function createGallerySection(Request $request)
     {
         $validatedData = $request->validate([
@@ -450,6 +489,7 @@ class HomeMenuController extends Controller
             $file = $validatedData['img'];
             $filename = uniqid() . '.' . $file->getClientOriginalExtension();
             $file->storeAs('public/back/home/gallery/', $filename);
+
             $newGallery->img = $filename;
         }
 
@@ -457,6 +497,7 @@ class HomeMenuController extends Controller
 
         return redirect()->route('home.gallery')->with('success', 'Gallery section created successfully');
     }
+
     public function updateGallerySection(Request $request, $id)
     {
         $validatedData = $request->validate([
@@ -493,6 +534,7 @@ class HomeMenuController extends Controller
 
         return redirect()->route('home.gallery')->with('success', 'Gallery section updated successfully');
     }
+
     public function deleteGallerySection($id)
     {
         $gallery = GalleryHome::findOrFail($id);
@@ -506,5 +548,4 @@ class HomeMenuController extends Controller
 
         return redirect()->route('home.gallery')->with('success', 'Gallery section deleted successfully');
     }
-
 }

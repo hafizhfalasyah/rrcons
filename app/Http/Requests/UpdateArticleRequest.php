@@ -26,8 +26,8 @@ class UpdateArticleRequest extends FormRequest
             'title' => 'required',
             'desc' => 'required',
             'img' => 'nullable|image|file|mimes:png,jpg,jpeg,webp|max:2048',
-            'status' => 'required',
-            'publish_date' => 'required',
+            'status' => 'required|in:0,1',
+            'publish_date' => 'nullable|date',
         ];
     }
 }

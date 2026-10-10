@@ -51,8 +51,8 @@ class DashboardController extends Controller
             'total_articles' => Article::count(),
             'total_categories' => Category::count(),
             'total_users' => User::count(),
-            'latest_article' => Article::with('Category')->whereStatus(1)->latest()->take(10)->get(),
-            'popular_article' => Article::with('Category')->whereStatus(1)->orderBy('views', 'desc')->take(5)->get(),
+            'latest_article' => Article::with('Category')->published()->latest('publish_date')->take(10)->get(),
+            'popular_article' => Article::with('Category')->published()->orderBy('views', 'desc')->take(5)->get(),
             'labels' => $labelList,
             'visitorStats' => $visitorStats,
         ]);

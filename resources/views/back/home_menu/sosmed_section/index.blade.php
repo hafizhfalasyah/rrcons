@@ -44,10 +44,10 @@
                     <td class="text-center">
                         @if ($item->video)
                             <video width="200" controls>
-                                <source src="{{ asset('storage/back/home/sosmed/' . $item->video) }}" type="video/mp4">
-                                <source src="{{ asset('storage/back/home/sosmed/' . $item->video) }}" type="video/mpeg">
-                                <source src="{{ asset('storage/back/home/sosmed/' . $item->video) }}" type="video/x-matroska"> <!-- untuk .mkv -->
-                                <source src="{{ asset('storage/back/home/sosmed/' . $item->video) }}" type="video/quicktime"> <!-- untuk .mov -->
+                                <source src="{{ asset('storage/' . $item->video) }}" type="video/mp4">
+                                <source src="{{ asset('storage/' . $item->video) }}" type="video/mpeg">
+                                <source src="{{ asset('storage/' . $item->video) }}" type="video/x-matroska"> <!-- untuk .mkv -->
+                                <source src="{{ asset('storage/' . $item->video) }}" type="video/quicktime"> <!-- untuk .mov -->
                                 Your browser does not support the video tag.
                             </video>
                         @else

@@ -31,10 +31,10 @@
                                     <div class="mt-2">
                                         <label class="form-label text-muted small">Current Video Preview:</label><br>
                                         <video controls class="rounded shadow-sm border" style="max-height: 200px; max-width: 100%;">
-                                            <source src="{{ asset('storage/back/home/business/' . $item->video) }}" type="video/mp4">
-                                            <source src="{{ asset('storage/back/home/business/' . $item->video) }}" type="video/mpeg">
-                                            <source src="{{ asset('storage/back/home/business/' . $item->video) }}" type="video/x-matroska">
-                                            <source src="{{ asset('storage/back/home/business/' . $item->video) }}" type="video/quicktime">
+                                            <source src="{{ asset('storage/' . $item->video) }}" type="video/mp4">
+                                            <source src="{{ asset('storage/' . $item->video) }}" type="video/mpeg">
+                                            <source src="{{ asset('storage/' . $item->video) }}" type="video/x-matroska">
+                                            <source src="{{ asset('storage/' . $item->video) }}" type="video/quicktime">
                                             Your browser does not support the video tag.
                                         </video>
                                     </div>
