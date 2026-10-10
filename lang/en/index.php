@@ -9,6 +9,7 @@ return [
     */
 
     'seo' => [
+        'services_heading' => 'RR Consultant Indonesia Services',
         'title' => 'RRCONS | Home - The Best Business Solutions for the Future',
         'description' => 'RR Consultant Indonesia provides reliable and sustainable business solutions. Discover our services, team profile, business training, blog, and event gallery.',
         'keywords' => 'RR Consultant, Business Consultant, Business Solutions, Training, Digital Transformation, Professional Services',

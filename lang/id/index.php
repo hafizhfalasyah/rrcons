@@ -9,6 +9,7 @@ return [
     */
 
     'seo' => [
+        'services_heading' => 'Layanan RR Consultant Indonesia',
         'title' => 'RRCONS | Beranda - Solusi Bisnis Terbaik untuk Masa Depan',
         'description' => 'RR Consultant Indonesia hadir untuk memberikan solusi bisnis yang memadai dan berkelanjutan. Temukan layanan kami, profil tim, pelatihan bisnis, serta blog dan galeri acara.',
         'keywords' => 'RR Consultant, Konsultan Bisnis, Solusi Bisnis, Pelatihan, Transformasi Digital, Layanan Profesional',

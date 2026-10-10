@@ -9,6 +9,7 @@ return [
     */
 
     'seo' => [
+        'breadcrumb' => 'Contact',
         'title' => 'RRCONS | Contact - Consultation and Fast Solutions',
         'description' => 'Would you like to consult with us or learn more about our services? Contact RR Group through the available contact form. We are ready to help you find the right solution.',
         'keywords' => 'contact us, RR Group, business consultation, fast solutions, contact form, customer support',

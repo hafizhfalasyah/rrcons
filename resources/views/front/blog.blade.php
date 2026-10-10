@@ -30,38 +30,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>{{ __('blog.seo.index.title') }}</title>
-
-    <!-- SEO Meta Tags -->
-    <meta
-        name="description"
-        content="{{ __('blog.seo.index.description') }}"
-    >
-
-    <meta
-        name="keywords"
-        content="{{ __('blog.seo.index.keywords') }}"
-    >
-
-    <meta
-        name="author"
-        content="{{ __('blog.seo.author') }}"
-    >
-
-    <meta
-        property="og:title"
-        content="{{ __('blog.seo.index.og_title') }}"
-    >
-
-    <meta
-        property="og:description"
-        content="{{ __('blog.seo.index.og_description') }}"
-    >
-
-    <meta
-        property="og:url"
-        content="{{ url()->current() }}"
-    >
+    @include('front.partials.seo', ['seo' => $seo])
 
     <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>

@@ -9,6 +9,7 @@ return [
     */
 
     'seo' => [
+        'breadcrumb' => 'Kontak',
         'title' => 'RRCONS | Kontak - Konsultasi dan Solusi Cepat',
         'description' => 'Ingin berkonsultasi atau membutuhkan layanan kami? Hubungi RR Group melalui formulir kontak yang tersedia. Kami siap membantu menemukan solusi yang sesuai dengan kebutuhan Anda.',
         'keywords' => 'hubungi kami, RR Group, konsultasi bisnis, solusi cepat, formulir kontak, bantuan pelanggan',

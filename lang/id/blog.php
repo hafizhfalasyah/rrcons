@@ -9,6 +9,10 @@ return [
     */
 
     'seo' => [
+        'breadcrumb' => [
+            'home' => 'Beranda',
+            'blog' => 'Blog',
+        ],
 
         'index' => [
             'title' => 'RRCONS | Blog - Wawasan Digital, Teknologi, dan Solusi Bisnis',

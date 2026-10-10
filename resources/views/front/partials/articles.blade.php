@@ -2,6 +2,8 @@
     <div>
         <a href="{{ route('detail_blog', $article->slug) }}">
             <img
+                loading="lazy"
+                decoding="async"
                 src="{{ asset('storage/' . $article->img) }}"
                 alt="{{ $article->title }}"
                 class="w-full h-64 object-cover rounded-lg shadow"

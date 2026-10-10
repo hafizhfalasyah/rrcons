@@ -32,48 +32,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>{{ $article->title }} | RRCONS</title>
-
-    <!-- SEO Meta Tags -->
-    <meta
-        name="description"
-        content="{{ Str::limit(strip_tags($article->desc), 160) }}"
-    >
-
-    <meta
-        name="keywords"
-        content="{{ __('blog.seo.detail.keywords') }}"
-    >
-
-    <meta
-        name="author"
-        content="{{ __('blog.seo.author') }}"
-    >
-
-    <meta
-        property="og:title"
-        content="{{ $article->title }} | RRCONS"
-    >
-
-    <meta
-        property="og:description"
-        content="{{ Str::limit(strip_tags($article->desc), 160) }}"
-    >
-
-    <meta
-        property="og:image"
-        content="{{ asset('storage/' . $article->img) }}"
-    >
-
-    <meta
-        property="og:url"
-        content="{{ url()->current() }}"
-    >
-
-    <meta
-        property="og:type"
-        content="article"
-    >
+    @include('front.partials.seo', ['seo' => $seo])
 
     <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
