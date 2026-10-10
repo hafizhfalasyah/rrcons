@@ -53,12 +53,16 @@ use App\Http\Controllers\TwoFactorController;
 
 // Route::get('category/{slug}', [FrontCategoryController::class, 'index']);
 
-Route::get('/set-language/{lang}', function ($lang) {
-    if (!in_array($lang, ['id', 'en'])) {
+Route::get('/set-language/{lang}', function (string $lang) {
+    if (!in_array($lang, ['id', 'en'], true)) {
         $lang = 'id';
     }
-    session(['app_locale' => $lang]);
-    return back();
+
+    session([
+        'app_locale' => $lang,
+    ]);
+
+    return redirect()->back();
 })->name('set.language');
 
 Route::middleware('auth')->group(function() {

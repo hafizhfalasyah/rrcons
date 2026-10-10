@@ -25,9 +25,12 @@ class ArticleController extends Controller
             'keyword' => $keyword
         ]);
     }
-    public function show($slug) {
+    
+    public function show($slug)
+    {
         $article = Article::whereSlug($slug)->firstOrFail();
         $article->increment('views');
+    
         return view('front.article.show', [
             'article' => $article,
         ]);

@@ -32,13 +32,20 @@ use App\Models\Blog\Comment;
 use App\Models\Contact\HeroContact;
 use App\Models\Contact\UsContact;
 
+use Illuminate\Support\Facades\Storage;
+
 class HomeController extends Controller
 {
     public function index(Request $request)
     {
         $locale = app()->getLocale();
 
-        $posters = PosterHome::all();
+        $posters = PosterHome::whereNotNull('img')
+            ->where('img', '<>', '')
+            ->get()
+            ->filter(function ($poster) {
+                return Storage::disk('public')->exists($poster->img);
+        });
 
         $heroes = HeroHome::with(['homeMenu:id,title_'.$locale.' as title,sub_title_'.$locale.' as sub_title'])->get();
         $abouts = AboutHome::with(['homeMenu:id,title_'.$locale.' as title,sub_title_'.$locale.' as sub_title'])->get();
@@ -117,11 +124,24 @@ class HomeController extends Controller
 
     public function show($slug)
     {
-        $article = Article::with(['category', 'comments'])->where('slug', $slug)->firstOrFail();
-        $recentPosts = Article::latest()->take(4)->get();
+        $article = Article::with(['category', 'comments'])
+            ->where('slug', $slug)
+            ->firstOrFail();
+    
+        $article->increment('views');
+    
+        $recentPosts = Article::latest()
+            ->where('id', '!=', $article->id)
+            ->take(4)
+            ->get();
+    
         $categories = Category::withCount('articles')->get();
-
-        return view('front.detail-blog', compact('article', 'recentPosts', 'categories'));
+    
+        return view('front.detail-blog', compact(
+            'article',
+            'recentPosts',
+            'categories'
+        ));
     }
 
     public function storeComment(Request $request, $slug)
