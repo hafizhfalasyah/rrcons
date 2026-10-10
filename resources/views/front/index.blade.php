@@ -1,17 +1,3 @@
-@php
-    if (!function_exists('highlightLastWord')) {
-        function highlightLastWord($text, $class = 'text-blue-500') {
-            $words = explode(' ', trim($text));
-            if (count($words) === 0) return '';
-
-            $lastWord = array_pop($words);
-            $firstPart = implode(' ', $words);
-
-            return $firstPart . ' <span class="' . $class . '">' . $lastWord . '</span>';
-        }
-    }
-@endphp
-
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ open: false }" xmlns="http://www.w3.org/1999/xhtml" >
     <head>
