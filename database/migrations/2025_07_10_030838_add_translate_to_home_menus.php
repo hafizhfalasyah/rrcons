@@ -13,9 +13,15 @@ return new class extends Migration
     {
         Schema::table('home_menus', function (Blueprint $table) {
             $table->renameColumn('title', 'title_id');
+        });
+
+        Schema::table('home_menus', function (Blueprint $table) {
             $table->renameColumn('sub_title', 'sub_title_id');
-            $table->string('title_en')->nullable()->after('title');
-            $table->string('sub_title_en')->nullable()->after('sub_title');
+        });
+
+        Schema::table('home_menus', function (Blueprint $table) {
+            $table->string('title_en')->nullable()->after('title_id');
+            $table->string('sub_title_en')->nullable()->after('sub_title_id');
         });
     }
 
@@ -25,7 +31,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('home_menus', function (Blueprint $table) {
+            $table->dropColumn(['title_en', 'sub_title_en']);
+        });
 
+        Schema::table('home_menus', function (Blueprint $table) {
+            $table->renameColumn('title_id', 'title');
+        });
+
+        Schema::table('home_menus', function (Blueprint $table) {
+            $table->renameColumn('sub_title_id', 'sub_title');
         });
     }
 };

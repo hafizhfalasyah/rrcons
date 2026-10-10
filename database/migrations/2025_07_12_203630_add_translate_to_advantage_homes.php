@@ -13,9 +13,15 @@ return new class extends Migration
     {
         Schema::table('advantage_homes', function (Blueprint $table) {
             $table->renameColumn('title', 'title_id');
+        });
+
+        Schema::table('advantage_homes', function (Blueprint $table) {
             $table->renameColumn('desc', 'desc_id');
-            $table->string('title_en')->nullable()->after('title');
-            $table->text('desc_en')->nullable()->after('desc');
+        });
+
+        Schema::table('advantage_homes', function (Blueprint $table) {
+            $table->string('title_en')->nullable()->after('title_id');
+            $table->text('desc_en')->nullable()->after('desc_id');
         });
     }
 
@@ -25,7 +31,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('advantage_homes', function (Blueprint $table) {
-            //
+            $table->dropColumn(['title_en', 'desc_en']);
+        });
+
+        Schema::table('advantage_homes', function (Blueprint $table) {
+            $table->renameColumn('title_id', 'title');
+        });
+
+        Schema::table('advantage_homes', function (Blueprint $table) {
+            $table->renameColumn('desc_id', 'desc');
         });
     }
 };
