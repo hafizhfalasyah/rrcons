@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Back\Contact;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\ValidatesTranslations;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,6 +13,8 @@ use App\Models\Contact\UsContact;
 
 class ContactMenuController extends Controller
 {
+    use ValidatesTranslations;
+
     /** ============================== CONTACT MENU CONTROLLERS ============================== **/
     public function contactMenu()
     {
@@ -25,7 +28,7 @@ class ContactMenuController extends Controller
     }
     public function updateContactMenu(Request $request, $id)
     {
-        $validatedData = $request->validate([
+        $validatedData = $this->validateWithTranslations($request, [
             'title' => 'required|string|max:255',
             'sub_title' => 'nullable|string|max:255',
         ]);
@@ -34,7 +37,7 @@ class ContactMenuController extends Controller
 
         $contactMenu->update($validatedData);
 
-        return redirect()->route('contact.menu')->with('success', 'Contact Menu updated successfully.');
+        return redirect()->route('contact.menu')->with('success', __('Contact Menu updated successfully.'));
     }
 
     /** ============================== HERO SECTION CONTROLLERS ============================== **/
@@ -75,7 +78,7 @@ class ContactMenuController extends Controller
 
         return redirect()
             ->route('contact.hero')
-            ->with('success', 'Hero section updated successfully');
+            ->with('success', __('Hero section updated successfully.'));
     }
 
     /** ============================== CONTACT US CONTROLLERS ============================== **/
@@ -91,15 +94,15 @@ class ContactMenuController extends Controller
     }
     public function updateUsSection(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'desc' => 'nullable|string'
+        // "title" (mis. Alamat) dipakai sebagai kunci di halaman Contact, jadi tidak diubah di sini
+        $validatedData = $this->validateWithTranslations($request, [
+            'desc' => 'required|string|max:255',
         ]);
 
         $us = UsContact::with('contactMenu')->findOrFail($id);
 
         $us->update($validatedData);
 
-        return redirect()->route('contact.usContact')->with('success', 'Contact Us section updated successfully.');
+        return redirect()->route('contact.usContact')->with('success', __('Contact Us section updated successfully.'));
     }
 }

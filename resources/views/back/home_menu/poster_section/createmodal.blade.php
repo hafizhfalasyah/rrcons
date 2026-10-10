@@ -6,9 +6,9 @@
             <!-- Header -->
             <div class="modal-header bg-primary text-white rounded-top-4">
                 <h5 class="modal-title d-flex align-items-center" id="create-poster-modal-label">
-                    <i data-feather="image" class="me-2" style="width: 20px; height: 20px;"></i> Add poster
+                    <i data-feather="image" class="me-2" style="width: 20px; height: 20px;"></i> {{ __('Add poster') }}
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
             </div>
 
             <!-- Form -->
@@ -19,7 +19,7 @@
 
                         <!-- Image -->
                         <div class="col-12">
-                            <label for="img" class="form-label fw-semibold">Poster Image</label>
+                            <label for="img" class="form-label fw-semibold">{{ __('Poster Image') }}</label>
                             <input type="file" name="img" id="img" class="form-control @error('img') is-invalid @enderror" accept="image/*">
 
                             @error('img')
@@ -29,10 +29,20 @@
 
                         <!-- Name -->
                         <div class="col-12">
-                            <label for="name" class="form-label fw-semibold">Poster Name</label>
-                            <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
+                            <label for="name_id" class="form-label fw-semibold">{{ __('Poster Name (Indonesia)') }}</label>
+                            <input type="text" name="name_id" id="name_id" class="form-control @error('name_id') is-invalid @enderror" value="{{ old('name_id') }}" required>
 
-                            @error('name')
+                            @error('name_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Name -->
+                        <div class="col-12">
+                            <label for="name_en" class="form-label fw-semibold">{{ __('Poster Name (English)') }}</label>
+                            <input type="text" name="name_en" id="name_en" class="form-control @error('name_en') is-invalid @enderror" value="{{ old('name_en') }}">
+
+                            @error('name_en')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -43,10 +53,10 @@
                 <!-- Footer -->
                 <div class="modal-footer bg-light border-top-0 rounded-bottom-4">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i data-feather="x" class="me-1"></i> Cancel
+                        <i data-feather="x" class="me-1"></i> {{ __('Cancel') }}
                     </button>
                     <button type="submit" class="btn btn-primary">
-                        <i data-feather="save" class="me-1"></i> Add Poster
+                        <i data-feather="save" class="me-1"></i> {{ __('Add Poster') }}
                     </button>
                 </div>
             </form>

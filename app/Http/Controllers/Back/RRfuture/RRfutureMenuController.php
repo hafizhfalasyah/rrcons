@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Back\RRfuture;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\ValidatesTranslations;
 use App\Http\Controllers\Concerns\ManagesPublicFiles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -13,6 +14,8 @@ use App\Models\RRfuture\ProductRRfuture;
 
 class RRfutureMenuController extends Controller
 {
+    use ValidatesTranslations;
+
     use ManagesPublicFiles;
 
     /** ============================== RRFUTURE MENU CONTROLLERS ============================== **/
@@ -28,7 +31,7 @@ class RRfutureMenuController extends Controller
     }
     public function updateRRfutureMenu(Request $request, $id)
     {
-        $validatedData = $request->validate([
+        $validatedData = $this->validateWithTranslations($request, [
             'title' => 'required|string|max:255',
             'sub_title' => 'nullable|string|max:255',
         ]);
@@ -37,7 +40,7 @@ class RRfutureMenuController extends Controller
 
         $rrfutureMenu->update($validatedData);
 
-        return redirect()->route('rrfuture.menu')->with('success', 'RRFuture Menu updated successfully.');
+        return redirect()->route('rrfuture.menu')->with('success', __('RRFuture Menu updated successfully.'));
     }
 
     /** ============================== HERO SECTION CONTROLLERS ============================== **/
@@ -70,7 +73,7 @@ class RRfutureMenuController extends Controller
             $hero->update($dataToUpdate);
         }
 
-        return redirect()->route('rrfuture.hero')->with('success', 'Hero section updated successfully');
+        return redirect()->route('rrfuture.hero')->with('success', __('Hero section updated successfully.'));
     }
 
     /** ============================== PRODUCT CONTROLLERS ============================== **/
@@ -86,15 +89,15 @@ class RRfutureMenuController extends Controller
     }
     public function updateProductSection(Request $request, $id)
     {
-        $validatedData = $request->validate([
+        $validatedData = $this->validateWithTranslations($request, [
             'name' => 'required|string|max:255',
-            'desc' => 'nullable|string'
+            'desc' => 'required|string',
         ]);
 
         $products = ProductRRfuture::with('rrfutureMenu')->findOrFail($id);
 
         $products->update($validatedData);
 
-        return redirect()->route('rrfuture.product')->with('success', 'Service section updated successfully.');
+        return redirect()->route('rrfuture.product')->with('success', __('Product section updated successfully.'));
     }
 }

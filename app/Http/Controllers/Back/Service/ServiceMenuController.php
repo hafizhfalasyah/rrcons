@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Back\Service;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\ValidatesTranslations;
 use App\Http\Controllers\Concerns\ManagesPublicFiles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -13,6 +14,8 @@ use App\Models\Service\OurService;
 
 class ServiceMenuController extends Controller
 {
+    use ValidatesTranslations;
+
     use ManagesPublicFiles;
 
     /** ============================== SERVICE MENU CONTROLLERS ============================== **/
@@ -28,7 +31,7 @@ class ServiceMenuController extends Controller
     }
     public function updateServiceMenu(Request $request, $id)
     {
-        $validatedData = $request->validate([
+        $validatedData = $this->validateWithTranslations($request, [
             'title' => 'required|string|max:255',
             'sub_title' => 'nullable|string|max:255',
         ]);
@@ -37,7 +40,7 @@ class ServiceMenuController extends Controller
 
         $serviceMenu->update($validatedData);
 
-        return redirect()->route('service.menu')->with('success', 'Service Menu updated successfully.');
+        return redirect()->route('service.menu')->with('success', __('Service Menu updated successfully.'));
     }
 
     /** ============================== HERO SECTION CONTROLLERS ============================== **/
@@ -70,7 +73,7 @@ class ServiceMenuController extends Controller
             $hero->update($dataToUpdate);
         }
 
-        return redirect()->route('service.hero')->with('success', 'Hero section updated successfully');
+        return redirect()->route('service.hero')->with('success', __('Hero section updated successfully.'));
     }
 
     /** ============================== OUR SERVICE CONTROLLERS ============================== **/
@@ -86,15 +89,15 @@ class ServiceMenuController extends Controller
     }
     public function updateOurSection(Request $request, $id)
     {
-        $validatedData = $request->validate([
+        $validatedData = $this->validateWithTranslations($request, [
             'name' => 'required|string|max:255',
-            'desc' => 'nullable|string'
+            'desc' => 'required|string',
         ]);
 
         $ours = OurService::with('serviceMenu')->findOrFail($id);
 
         $ours->update($validatedData);
 
-        return redirect()->route('service.ourService')->with('success', 'Our Service section updated successfully.');
+        return redirect()->route('service.ourService')->with('success', __('Our Service section updated successfully.'));
     }
 }

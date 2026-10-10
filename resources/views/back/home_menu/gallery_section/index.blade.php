@@ -1,14 +1,14 @@
 @extends('back.layout.template')
 
-@section('title', 'RRCONS Admin | Gallery Section')
+@section('title', 'RRCONS Admin | ' . __('Gallery Section'))
 
 @section('content')
 
     <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-        <h1 class="h3 fw-bold text-uppercase">Gallery Section</h1>
+        <h1 class="h3 fw-bold text-uppercase">{{ __('Gallery Section') }}</h1>
         @if (auth()->user()->isAdmin())
             <button class="btn btn-primary rounded shadow-sm px-3 d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#create-gallery-modal">
-                <i data-feather="plus" class="icon-sm"></i> Add Gallery
+                <i data-feather="plus" class="icon-sm"></i> {{ __('Add Gallery') }}
             </button>
         @endif
     </div>
@@ -34,14 +34,14 @@
         <table class="table table-hover table-bordered align-middle shadow-sm">
             <thead class="table-primary text-center">
                 <tr>
-                    <th style="width: 5%;">No</th>
-                    <th style="width: 20%;">Image</th>
-                    <th style="width: 10%;">Title</th>
-                    <th style="width: 15%;">Desc</th>
-                    <th style="width: 10%;">Month</th>
-                    <th style="width: 10%;">Year</th>
-                    <th style="width: 10%;">Last Updated</th>
-                    <th style="width: 10%;">Actions</th>
+                    <th style="width: 5%;">{{ __('No') }}</th>
+                    <th style="width: 20%;">{{ __('Image') }}</th>
+                    <th style="width: 10%;">{{ __('Title') }}</th>
+                    <th style="width: 15%;">{{ __('Desc') }}</th>
+                    <th style="width: 10%;">{{ __('Month') }}</th>
+                    <th style="width: 10%;">{{ __('Year') }}</th>
+                    <th style="width: 10%;">{{ __('Last Updated') }}</th>
+                    <th style="width: 10%;">{{ __('Actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,9 +50,9 @@
                         <td class="text-center">{{ $loop->iteration }}.</td>
                         <td class="text-center">
                             @if ($item->img)
-                                <img src="{{ asset('storage/' . $item->img) }}" alt="{{ $item->name }}" width="200">
+                                <img src="{{ asset('storage/' . $item->img) }}" alt="{{ $item->title }}" width="200">
                             @else
-                                <span class="text-muted">No Image</span>
+                                <span class="text-muted">{{ __('No Image') }}</span>
                             @endif
                         </td>
                         <td>{{ $item->title }}</td>
@@ -64,12 +64,12 @@
                             <div class="d-flex justify-content-center">
                                 <button class="btn btn-primary btn-sm me-1 d-flex align-items-center px-3" data-bs-toggle="modal"
                                     data-bs-target="#update-gallery-modal{{ $item->id }}">
-                                    <i data-feather="edit" class="icon-sm me-1"></i> Edit
+                                    <i data-feather="edit" class="icon-sm me-1"></i> {{ __('Edit') }}
                                 </button>
 
                                 <button class="btn btn-danger btn-sm d-flex align-items-center px-3" data-bs-toggle="modal"
                                     data-bs-target="#delete-gallery-modal{{ $item->id }}">
-                                    <i data-feather="trash-2" class="icon-sm me-1"></i> Delete
+                                    <i data-feather="trash-2" class="icon-sm me-1"></i> {{ __('Delete') }}
                                 </button>
                             </div>
                         </td>

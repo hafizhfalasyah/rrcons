@@ -6,9 +6,9 @@
             <!-- Header -->
             <div class="modal-header bg-primary text-white rounded-top-4">
                 <h5 class="modal-title d-flex align-items-center" id="create-gallery-modal-label">
-                    <i data-feather="image" class="me-2" style="width: 20px; height: 20px;"></i> Add Gallery
+                    <i data-feather="image" class="me-2" style="width: 20px; height: 20px;"></i> {{ __('Add Gallery') }}
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
             </div>
 
             <!-- Form -->
@@ -19,7 +19,7 @@
 
                         <!-- Image -->
                         <div class="col-12">
-                            <label for="img" class="form-label fw-semibold">Image</label>
+                            <label for="img" class="form-label fw-semibold">{{ __('Image') }}</label>
                             <input type="file" name="img" id="img" class="form-control @error('img') is-invalid @enderror" accept="image/*">
 
                             @error('img')
@@ -29,29 +29,49 @@
 
                         <!-- Title -->
                         <div class="col-12">
-                            <label for="title" class="form-label fw-semibold">Title</label>
-                            <input type="text" name="title" id="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}" required>
+                            <label for="title_id" class="form-label fw-semibold">{{ __('Title (Indonesia)') }}</label>
+                            <input type="text" name="title_id" id="title_id" class="form-control @error('title_id') is-invalid @enderror" value="{{ old('title_id') }}" required>
 
-                            @error('title')
+                            @error('title_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Title -->
+                        <div class="col-12">
+                            <label for="title_en" class="form-label fw-semibold">{{ __('Title (English)') }}</label>
+                            <input type="text" name="title_en" id="title_en" class="form-control @error('title_en') is-invalid @enderror" value="{{ old('title_en') }}">
+
+                            @error('title_en')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <!-- Desc as Textarea -->
                         <div class="col-12">
-                            <label for="desc" class="form-label fw-semibold">Desc</label>
-                            <textarea name="desc" id="desc" class="form-control @error('desc') is-invalid @enderror" rows="4">{{ old('desc') }}</textarea>
+                            <label for="desc_id" class="form-label fw-semibold">{{ __('Desc (Indonesia)') }}</label>
+                            <textarea name="desc_id" id="desc_id" class="form-control @error('desc_id') is-invalid @enderror" rows="4">{{ old('desc_id') }}</textarea>
 
-                            @error('desc')
+                            @error('desc_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Desc as Textarea -->
+                        <div class="col-12">
+                            <label for="desc_en" class="form-label fw-semibold">{{ __('Desc (English)') }}</label>
+                            <textarea name="desc_en" id="desc_en" class="form-control @error('desc_en') is-invalid @enderror" rows="4">{{ old('desc_en') }}</textarea>
+
+                            @error('desc_en')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <!-- Month -->
                         <div class="col-md-6">
-                            <label for="month" class="form-label fw-semibold">Month</label>
+                            <label for="month" class="form-label fw-semibold">{{ __('Month') }}</label>
                             <select name="month" id="month" class="form-select @error('month') is-invalid @enderror" required>
-                                <option value="">-- Select Month --</option>
+                                <option value="">{{ __('-- Select Month --') }}</option>
                                 @foreach (range(1, 12) as $m)
                                     <option value="{{ $m }}" {{ old('month') == $m ? 'selected' : '' }}>
                                         {{ \Carbon\Carbon::create()->month($m)->format('F') }}
@@ -65,9 +85,9 @@
 
                         <!-- Year -->
                         <div class="col-md-6">
-                            <label for="year" class="form-label fw-semibold">Year</label>
+                            <label for="year" class="form-label fw-semibold">{{ __('Year') }}</label>
                             <select name="year" id="year" class="form-select @error('year') is-invalid @enderror" required>
-                                <option value="">-- Select Year --</option>
+                                <option value="">{{ __('-- Select Year --') }}</option>
                                 @for ($y = now()->year; $y >= 2000; $y--)
                                     <option value="{{ $y }}" {{ old('year') == $y ? 'selected' : '' }}>
                                         {{ $y }}
@@ -85,10 +105,10 @@
                 <!-- Footer -->
                 <div class="modal-footer bg-light border-top-0 rounded-bottom-4">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i data-feather="x" class="me-1"></i> Cancel
+                        <i data-feather="x" class="me-1"></i> {{ __('Cancel') }}
                     </button>
                     <button type="submit" class="btn btn-primary">
-                        <i data-feather="save" class="me-1"></i> Add Gallery
+                        <i data-feather="save" class="me-1"></i> {{ __('Add Gallery') }}
                     </button>
                 </div>
             </form>

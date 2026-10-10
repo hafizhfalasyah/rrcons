@@ -4,9 +4,14 @@ namespace App\Models\Home;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\HasTranslations;
 
 class ServiceHome extends Model
 {
+    use HasTranslations;
+
+    protected $translatable = ['name', 'desc'];
+
     protected $table = 'service_homes';
 
     protected $fillable = [
@@ -20,18 +25,6 @@ class ServiceHome extends Model
     public function homeMenu()
     {
         return $this->belongsTo(HomeMenu::class, 'home_menu_id', 'id');
-    }
-
-    public function getNameAttribute()
-    {
-        $locale = app()->getLocale();
-        return $this->{'name_'.$locale};
-    }
-
-    public function getDescAttribute()
-    {
-        $locale = app()->getLocale();
-        return $this->{'desc_'.$locale};
     }
 
 }
