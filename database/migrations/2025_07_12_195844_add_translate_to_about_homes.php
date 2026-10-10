@@ -6,18 +6,40 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    private string $table = 'about_homes';
+
+    /**
+     * Kolom => tipe. Kolom lama di-rename menjadi <kolom>_id dan ditambah <kolom>_en.
+     */
+    private array $fields = [
+        'text' => 'text',
+    ];
+
     /**
      * Run the migrations.
+     *
+     * Idempoten: rename & penambahan kolom hanya dilakukan bila belum ada, karena di
+     * beberapa database perubahan ini sudah dilakukan manual tanpa tercatat.
      */
     public function up(): void
     {
-        Schema::table('about_homes', function (Blueprint $table) {
-            $table->renameColumn('text', 'text_id');
-        });
+        // Satu rename per Schema::table: SQLite tidak mendukung beberapa rename sekaligus
+        foreach (array_keys($this->fields) as $field) {
+            if (Schema::hasColumn($this->table, $field) && !Schema::hasColumn($this->table, "{$field}_id")) {
+                Schema::table($this->table, function (Blueprint $table) use ($field) {
+                    $table->renameColumn($field, "{$field}_id");
+                });
+            }
+        }
 
-        Schema::table('about_homes', function (Blueprint $table) {
-            $table->text('text_en')->nullable()->after('text_id');
-        });
+        // Kolom baru ditambahkan setelah rename agar after() merujuk kolom yang sudah ada
+        foreach ($this->fields as $field => $type) {
+            if (!Schema::hasColumn($this->table, "{$field}_en")) {
+                Schema::table($this->table, function (Blueprint $table) use ($field, $type) {
+                    $table->{$type}("{$field}_en")->nullable()->after("{$field}_id");
+                });
+            }
+        }
     }
 
     /**
@@ -25,12 +47,18 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('about_homes', function (Blueprint $table) {
-            $table->dropColumn(['text_en']);
-        });
+        foreach (array_keys($this->fields) as $field) {
+            if (Schema::hasColumn($this->table, "{$field}_en")) {
+                Schema::table($this->table, function (Blueprint $table) use ($field) {
+                    $table->dropColumn("{$field}_en");
+                });
+            }
 
-        Schema::table('about_homes', function (Blueprint $table) {
-            $table->renameColumn('text_id', 'text');
-        });
+            if (Schema::hasColumn($this->table, "{$field}_id") && !Schema::hasColumn($this->table, $field)) {
+                Schema::table($this->table, function (Blueprint $table) use ($field) {
+                    $table->renameColumn("{$field}_id", $field);
+                });
+            }
+        }
     }
 };
