@@ -54,28 +54,28 @@ class ContactMenuController extends Controller
             'bg_img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $hero = HeroContact::with('contactMenu')->findOrFail($id);
+        $hero = HeroContact::findOrFail($id);
 
-        $dataToUpdate = [];
+        if ($request->hasFile('bg_img')) {
 
-        if (isset($validatedData['bg_img'])) {
-            if ($hero->bg_img && Storage::exists('public/back/contact/hero/' . $hero->bg_img)) {
-                Storage::delete('public/back/contact/hero/' . $hero->bg_img);
+            // Hapus gambar lama
+            if ($hero->bg_img) {
+                Storage::disk('public')->delete($hero->bg_img);
             }
 
-            $file = $validatedData['bg_img'];
+            $file = $request->file('bg_img');
             $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/contact/hero/', $filename);
 
-            $dataToUpdate['bg_img'] = $filename;
+            $path = $file->storeAs('back/contact/hero', $filename, 'public');
+
+            $hero->update([
+                'bg_img' => $path // simpan path lengkap
+            ]);
         }
 
-        // Jika ada data untuk diupdate, panggil update()
-        if (!empty($dataToUpdate)) {
-            $hero->update($dataToUpdate);
-        }
-
-        return redirect()->route('contact.hero')->with('success', 'Hero section updated successfully');
+        return redirect()
+            ->route('contact.hero')
+            ->with('success', 'Hero section updated successfully');
     }
 
     /** ============================== CONTACT US CONTROLLERS ============================== **/

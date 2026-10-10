@@ -29,7 +29,7 @@
                                 @if ($item->bg_img)
                                     <div class="mt-2">
                                         <label class="form-label text-muted small">Current Background Image Preview:</label><br>
-                                        <img src="{{ asset('storage/back/contact/hero/' . $item->bg_img) }}" alt="Current Image" class="img-fluid rounded shadow-sm border" style="max-height: 200px;">
+                                        <img src="{{ asset('storage/' . $item->bg_img) }}" alt="Current Image" class="img-fluid rounded shadow-sm border" style="max-height: 200px;">
                                     </div>
                                 @endif
                             </div>

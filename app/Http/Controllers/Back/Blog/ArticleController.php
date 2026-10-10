@@ -99,8 +99,9 @@ class ArticleController extends Controller
         if ($request->hasFile('img')) {
             $file = $request->file('img');
             $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/blog/', $fileName); // Simpan ke direktori storage
-            $data['img'] = $fileName;
+            $path = $file->storeAs('back/blog', $fileName, 'public');
+
+            $data['img'] = $path;
         }
 
         $data['user_id'] = Auth::id();
@@ -119,7 +120,7 @@ class ArticleController extends Controller
     public function show(string $id)
     {
         return view('back.article.show', [
-            'article' => Article::with(['User', 'Category'])->find($id)
+            'article' => Article::with(['User', 'Category'])->findOrFail($id)
         ]);
     }
 
@@ -141,22 +142,21 @@ class ArticleController extends Controller
     {
         $data = $request->validated();
 
-        $article = Article::findOrFail($id); // Pastikan artikel ada
+        $article = Article::findOrFail($id);
 
         if ($request->hasFile('img')) {
-            $file = $request->file('img');
-            $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/blog/', $fileName);
 
-            // Hapus gambar lama jika ada
-            if ($article->img && Storage::exists('public/back/blog/' . $article->img)) {
-                Storage::delete('public/back/blog/' . $article->img);
+            // Hapus gambar lama
+            if ($article->img) {
+                Storage::disk('public')->delete($article->img);
             }
 
-            $data['img'] = $fileName;
-        } else {
-            // Jika gambar tidak diupload ulang, gunakan gambar lama
-            $data['img'] = $article->img;
+            $file = $request->file('img');
+            $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+
+            $path = $file->storeAs('back/blog', $fileName, 'public');
+
+            $data['img'] = $path; // simpan path lengkap
         }
 
         $data['user_id'] = auth()->id();
@@ -173,12 +173,17 @@ class ArticleController extends Controller
      */
     public function destroy(string $id)
     {
-        $data = Article::find($id);
-        Storage::delete('public/back/blog/'.$data->img); // hapus di direktori baru
-        $data->delete();
-
+        $article = Article::findOrFail($id);
+    
+        if ($article->img) {
+            Storage::disk('public')->delete($article->img);
+        }
+    
+        $article->delete();
+    
         return response()->json([
             'message' => 'Data article has been deleted'
         ]);
     }
+
 }

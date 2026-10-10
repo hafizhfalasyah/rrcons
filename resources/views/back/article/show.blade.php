@@ -36,8 +36,8 @@
                 <tr>
                     <th class="bg-light">Image</th>
                     <td>
-                        <a href="{{ asset('storage/back/blog/' . $article->img) }}" target="_blank">
-                            <img src="{{ asset('storage/back/blog/' . $article->img) }}" class="img-fluid rounded" style="max-width: 50%;">
+                        <a href="{{ asset('storage/' . $article->img) }}" target="_blank">
+                            <img src="{{ asset('storage/' . $article->img) }}" class="img-fluid rounded" style="max-width: 50%;">
                         </a>
                     </td>
                 </tr>

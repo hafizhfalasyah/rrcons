@@ -53,7 +53,7 @@
                     <input type="file" name="img" id="img" class="form-control">
                     <div class="mt-2">
                         <small class="text-muted">Current Image:</small><br>
-                        <img src="{{ asset('storage/back/blog/' . $article->img) }}" class="img-thumbnail img-preview" style="max-width: 300px;">
+                        <img src="{{ asset('storage/' . $article->img) }}" class="img-thumbnail img-preview" style="max-width: 300px;">
                     </div>
                 </div>
 

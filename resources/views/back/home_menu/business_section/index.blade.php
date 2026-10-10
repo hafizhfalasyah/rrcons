@@ -44,7 +44,7 @@
                     <td class="text-center">{{ $loop->iteration }}.</td>
                     <td class="text-center">
                         @if ($item->img)
-                            <img src="{{ asset('storage/back/home/business/' . $item->img) }}" alt="Hero Image" width="100">
+                            <img src="{{ asset('storage/' . $item->img) }}" alt="Hero Image" width="100">
                         @else
                             <span class="text-muted">No Image</span>
                         @endif

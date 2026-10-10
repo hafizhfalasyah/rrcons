@@ -29,7 +29,7 @@
                                 @if ($item->img)
                                     <div class="mt-2">
                                         <label class="form-label text-muted small">Current Poster Image Preview:</label><br>
-                                        <img src="{{ asset('storage/back/home/poster/' . $item->img) }}" alt="Current Image" class="img-fluid rounded shadow-sm border" style="max-height: 200px;">
+                                        <img src="{{ asset('storage/' . $item->img) }}" alt="Current Image" class="img-fluid rounded shadow-sm border" style="max-height: 200px;">
                                     </div>
                                 @endif
                             </div>
@@ -52,7 +52,7 @@
                             <i data-feather="x" class="me-1"></i> Cancel
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            <i data-feather="save" class="me-1"></i> Update Hero Section
+                            <i data-feather="save" class="me-1"></i> Update Poster
                         </button>
                     </div>
                 </form>
