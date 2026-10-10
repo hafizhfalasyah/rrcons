@@ -160,6 +160,10 @@ class ArticleController extends Controller
             'title_en' => $validated['title_en'] ?? null,
             'desc_id' => HtmlSanitizer::clean($validated['desc_id']),
             'desc_en' => filled($validated['desc_en'] ?? null) ? HtmlSanitizer::clean($validated['desc_en']) : null,
+            'meta_title_id' => $validated['meta_title_id'] ?? null,
+            'meta_title_en' => $validated['meta_title_en'] ?? null,
+            'meta_description_id' => $validated['meta_description_id'] ?? null,
+            'meta_description_en' => $validated['meta_description_en'] ?? null,
         ];
 
         return $data + Article::publicationAttributes($validated['publication'], $validated['publish_date'] ?? null, $current);
