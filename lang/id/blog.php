@@ -168,6 +168,8 @@ return [
 
                     'empty' => 'Belum ada komentar.',
 
+                    'success' => 'Komentar berhasil dikirim!',
+
                 ],
 
                 'sidebar' => [

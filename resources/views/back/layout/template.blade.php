@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -214,7 +214,7 @@
                 <div class="d-flex align-items-center gap-3 me-3">
                     <!-- Kanan: Language Selector & Profile -->
                     @php
-                        $currentLang = session('app_locale', 'id'); // Default ke 'id'
+                        $currentLang = app()->getLocale();
                         $flag = $currentLang === 'en' ? 'us' : 'id';
                         $label = $currentLang === 'en' ? 'English' : 'Indonesia';
                     @endphp
@@ -228,12 +228,12 @@
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('set.language', 'id') }}">
-                                    <img src="https://flagcdn.com/w40/id.png" width="20" alt="Indonesia"> Indonesia
+                                    <img src="https://flagcdn.com/w40/id.png" width="20" alt="{{ __('Indonesia') }}"> {{ __('Indonesia') }}
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('set.language', 'en') }}">
-                                    <img src="https://flagcdn.com/w40/us.png" width="20" alt="English"> English
+                                    <img src="https://flagcdn.com/w40/us.png" width="20" alt="{{ __('English') }}"> {{ __('English') }}
                                 </a>
                             </li>
                         </ul>
@@ -244,17 +244,17 @@
                     <div class="dropdown">
                         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                         id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="https://i.pravatar.cc/40" alt="profile" width="36" height="36" class="rounded-circle">
+                            <span class="rounded-circle bg-light text-primary fw-bold d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="{{ auth()->user()->name }}">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                            <li><a class="dropdown-item" href="#">My Profile</a></li>
-                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                            <li class="px-3 py-2 small text-muted">{{ auth()->user()->name }}<br><span class="badge bg-secondary">{{ __(ucfirst((string) auth()->user()->role)) }}</span></li>
+                            <li><a class="dropdown-item" href="{{ url('users') }}">{{ __('My Profile') }}</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                     @csrf
                                 </form>
-                                <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+                                <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('Logout') }}</a>
                             </li>
                         </ul>
                     </div>

@@ -7,9 +7,9 @@
                 <!-- Header -->
                 <div class="modal-header bg-primary text-white rounded-top-4">
                     <h5 class="modal-title d-flex align-items-center" id="update-hero-modal-label">
-                        <i data-feather="edit" class="me-2" style="width: 20px; height: 20px;"></i> Edit Hero Section
+                        <i data-feather="edit" class="me-2" style="width: 20px; height: 20px;"></i> {{ __('Edit Hero Section') }}
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                 </div>
 
                 <!-- Form -->
@@ -20,7 +20,7 @@
 
                             <!-- Image Upload + Preview -->
                             <div class="col-12">
-                                <label for="bg_img-{{ $item->id }}" class="form-label fw-semibold">Background Image</label>
+                                <label for="bg_img-{{ $item->id }}" class="form-label fw-semibold">{{ __('Background Image') }}</label>
                                 <input type="file" name="bg_img" id="bg_img-{{ $item->id }}" class="form-control @error('bg_img') is-invalid @enderror" accept="image/*">
                                 @error('bg_img')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -28,8 +28,8 @@
 
                                 @if ($item->bg_img)
                                     <div class="mt-2">
-                                        <label class="form-label text-muted small">Current Background Image Preview:</label><br>
-                                        <img src="{{ asset('storage/' . $item->bg_img) }}" alt="Current Image" class="img-fluid rounded shadow-sm border" style="max-height: 200px;">
+                                        <label class="form-label text-muted small">{{ __('Current Background Image Preview:') }}</label><br>
+                                        <img src="{{ asset('storage/' . $item->bg_img) }}" alt="{{ __('Current Image') }}" class="img-fluid rounded shadow-sm border" style="max-height: 200px;">
                                     </div>
                                 @endif
                             </div>
@@ -40,10 +40,10 @@
                     <!-- Footer -->
                     <div class="modal-footer bg-light border-top-0 rounded-bottom-4">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                            <i data-feather="x" class="me-1"></i> Cancel
+                            <i data-feather="x" class="me-1"></i> {{ __('Cancel') }}
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            <i data-feather="save" class="me-1"></i> Update Hero Section
+                            <i data-feather="save" class="me-1"></i> {{ __('Update Hero Section') }}
                         </button>
                     </div>
                 </form>

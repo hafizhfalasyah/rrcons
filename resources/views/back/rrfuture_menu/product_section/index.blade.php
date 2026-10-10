@@ -1,11 +1,11 @@
 @extends('back.layout.template')
 
-@section('title', 'RRCONS Admin | Product Section')
+@section('title', 'RRCONS Admin | ' . __('Product Section'))
 
 @section('content')
 
 <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-    <h1 class="h3 fw-bold text-uppercase">Product Section</h1>
+    <h1 class="h3 fw-bold text-uppercase">{{ __('Product Section') }}</h1>
 </div>
 
 {{-- Flash & Error Messages --}}
@@ -29,11 +29,11 @@
     <table class="table table-hover table-bordered align-middle shadow-sm">
         <thead class="table-primary text-center">
             <tr>
-                <th style="width: 5%;">No</th>
-                <th style="width: 15%;">Name</th>
-                <th style="width: 30%;">Desc</th>
-                <th style="width: 10%;">Last Updated</th>
-                <th style="width: 10%;">Actions</th>
+                <th style="width: 5%;">{{ __('No') }}</th>
+                <th style="width: 15%;">{{ __('Name') }}</th>
+                <th style="width: 30%;">{{ __('Desc') }}</th>
+                <th style="width: 10%;">{{ __('Last Updated') }}</th>
+                <th style="width: 10%;">{{ __('Actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -48,7 +48,7 @@
                     <td class="text-center">
                         <button class="btn btn-primary btn-sm px-3" data-bs-toggle="modal"
                             data-bs-target="#update-product-modal{{ $item->id }}">
-                            <i data-feather="edit" class="icon-sm me-1"></i> Edit
+                            <i data-feather="edit" class="icon-sm me-1"></i> {{ __('Edit') }}
                         </button>
                     </td>
                 </tr>

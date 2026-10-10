@@ -7,9 +7,9 @@
                 <!-- Header -->
                 <div class="modal-header bg-primary text-white rounded-top-4">
                     <h5 class="modal-title d-flex align-items-center" id="update-config-modal-label">
-                        <i data-feather="edit" class="me-2" style="width: 20px; height: 20px;"></i> Edit Config
+                        <i data-feather="edit" class="me-2" style="width: 20px; height: 20px;"></i> {{ __('Edit Config') }}
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                 </div>
 
                 <!-- Form -->
@@ -20,7 +20,7 @@
                         <div class="row g-3">
                             <!-- Name -->
                             <div class="col-12">
-                                <label for="name-{{ $item->id }}" class="form-label fw-semibold">Config Name</label>
+                                <label for="name-{{ $item->id }}" class="form-label fw-semibold">{{ __('Config Name') }}</label>
                                 <input type="text" name="name" id="name-{{ $item->id }}" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $item->name) }}" required>
 
                                 @error('name')
@@ -30,7 +30,7 @@
 
                             <!-- Value -->
                             <div class="col-12">
-                                <label for="value-{{ $item->id }}" class="form-label fw-semibold">Value</label>
+                                <label for="value-{{ $item->id }}" class="form-label fw-semibold">{{ __('Value') }}</label>
                                 <input type="text" name="value" id="value-{{ $item->id }}" class="form-control @error('value') is-invalid @enderror" value="{{ old('value', $item->value) }}" required>
 
                                 @error('value')
@@ -43,10 +43,10 @@
                     <!-- Footer -->
                     <div class="modal-footer bg-light border-top-0 rounded-bottom-4">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                            <i data-feather="x" class="me-1"></i> Cancel
+                            <i data-feather="x" class="me-1"></i> {{ __('Cancel') }}
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            <i data-feather="save" class="me-1"></i> Update Config
+                            <i data-feather="save" class="me-1"></i> {{ __('Update Config') }}
                         </button>
                     </div>
                 </form>

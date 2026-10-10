@@ -27,7 +27,7 @@ class DashboardController extends Controller
 
         $labels = collect(range(6, 0))->map(fn($daysAgo) => [
             'query' => Carbon::now()->subDays($daysAgo)->toDateString(),
-            'label' => Carbon::now()->subDays($daysAgo)->format('d F Y'),
+            'label' => Carbon::now()->subDays($daysAgo)->translatedFormat('d F Y'),
         ]);
 
         $labelList = $labels->pluck('label');
@@ -47,7 +47,7 @@ class DashboardController extends Controller
             });
 
             $visitorStats[] = [
-                'label' => $labelMap[$path],
+                'label' => __($labelMap[$path]),
                 'data' => $data,
             ];
         }

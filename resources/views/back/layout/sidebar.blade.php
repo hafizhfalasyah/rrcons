@@ -5,7 +5,7 @@
             @if (auth()->user()->hasAnyRole(['admin', 'writer', 'uploader']))
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('dashboard*') ? 'active' : '' }}" href="{{ url('dashboard') }}">
-                        <i data-feather="grid" class="me-2"></i> Dashboard
+                        <i data-feather="grid" class="me-2"></i> {{ __('Dashboard') }}
                     </a>
                 </li>
             @endif
@@ -14,7 +14,7 @@
             @if (auth()->user()->hasAnyRole(['admin', 'writer', 'uploader']))
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('users*') ? 'active' : '' }}" href="{{ url('users') }}">
-                        <i data-feather="user" class="me-2"></i> Users
+                        <i data-feather="user" class="me-2"></i> {{ __('Users') }}
                     </a>
                 </li>
             @endif
@@ -47,7 +47,7 @@
                         aria-controls="homeSubmenu">
                         <div class="d-flex align-items-center">
                             <i data-feather="home" class="me-2"></i>
-                            <span>Home</span>
+                            <span>{{ __('Home') }}</span>
                         </div>
                         <i data-feather="chevron-down" class="dropdown-icon {{ $isHomeActive ? 'rotate-180' : '' }}"></i>
                     </a>
@@ -67,7 +67,7 @@
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs($routeName) ? 'active' : '' }}"
                                             href="{{ route($routeName) }}">
-                                            {{ $label }}
+                                            {{ __($label) }}
                                         </a>
                                     </li>
                                 @endif
@@ -97,7 +97,7 @@
                         aria-controls="rrfutureSubmenu">
                         <div class="d-flex align-items-center">
                             <i data-feather="trending-up" class="me-2"></i>
-                            <span>RR Future</span>
+                            <span>{{ __('RR Future') }}</span>
                         </div>
                         <i data-feather="chevron-down" class="dropdown-icon {{ $isRRfutureActive ? 'rotate-180' : '' }}"></i>
                     </a>
@@ -107,7 +107,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs($routeName) ? 'active' : '' }}"
                                     href="{{ route($routeName) }}">
-                                        {{ $label }}
+                                        {{ __($label) }}
                                     </a>
                                 </li>
                             @endforeach
@@ -136,7 +136,7 @@
                         aria-controls="serviceSubmenu">
                         <div class="d-flex align-items-center">
                             <i data-feather="briefcase" class="me-2"></i>
-                            <span>Service</span>
+                            <span>{{ __('Service') }}</span>
                         </div>
                         <i data-feather="chevron-down" class="dropdown-icon {{ $isServiceActive ? 'rotate-180' : '' }}"></i>
                     </a>
@@ -146,7 +146,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs($routeName) ? 'active' : '' }}"
                                     href="{{ route($routeName) }}">
-                                        {{ $label }}
+                                        {{ __($label) }}
                                     </a>
                                 </li>
                             @endforeach
@@ -213,7 +213,7 @@
                         aria-controls="blogSubmenu">
                         <div class="d-flex align-items-center">
                             <i data-feather="file-text" class="me-2"></i>
-                            <span>Blog</span>
+                            <span>{{ __('Blog') }}</span>
                         </div>
                         <i data-feather="chevron-down" class="dropdown-icon {{ $isBlogActive ? 'rotate-180' : '' }}"></i>
                     </a>
@@ -223,7 +223,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs($routeName) ? 'active' : '' }}"
                                         href="{{ route($routeName) }}">
-                                        {{ $label }}
+                                        {{ __($label) }}
                                     </a>
                                 </li>
                             @endforeach
@@ -252,7 +252,7 @@
                         aria-controls="contactSubmenu">
                         <div class="d-flex align-items-center">
                             <i data-feather="mail" class="me-2"></i>
-                            <span>Contact</span>
+                            <span>{{ __('Contact') }}</span>
                         </div>
                         <i data-feather="chevron-down" class="dropdown-icon {{ $isContactActive ? 'rotate-180' : '' }}"></i>
                     </a>
@@ -262,7 +262,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs($routeName) ? 'active' : '' }}"
                                     href="{{ route($routeName) }}">
-                                        {{ $label }}
+                                        {{ __($label) }}
                                     </a>
                                 </li>
                             @endforeach
@@ -278,7 +278,7 @@
                         @csrf
                     </form>
                     <a class="nav-link logout-btn" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i data-feather="log-out" class="me-2"></i> Logout
+                        <i data-feather="log-out" class="me-2"></i> {{ __('Logout') }}
                     </a>
                 </li>
             @endif

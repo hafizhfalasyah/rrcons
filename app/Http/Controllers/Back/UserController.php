@@ -32,7 +32,7 @@ class UserController extends Controller
         $data['password'] = bcrypt($data['password']);
         User::create($data);
 
-        return back()->with('success', 'User has been created');
+        return back()->with('success', __('User has been created.'));
     }
 
     public function update(UserUpdateRequest $request, $id)
@@ -62,7 +62,7 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return back()->with('success', 'User has been updated');
+        return back()->with('success', __('User has been updated.'));
     }
 
     public function destroy(Request $request, string $id) {
@@ -74,6 +74,6 @@ class UserController extends Controller
 
         $user->delete();
 
-        return back()->with('success', 'User has been deleted');
+        return back()->with('success', __('User has been deleted.'));
     }
 }
