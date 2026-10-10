@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Back\Blog;
 
 use App\Http\Controllers\Controller;
-use illuminate\Support\Str;
 use App\Models\Blog\Category;
 use Illuminate\Http\Request;
 
@@ -28,7 +27,7 @@ class CategoryController extends Controller
             'name' => 'required|min:3'
         ]);
 
-        $data['slug'] = Str::slug($data['name']);
+        $data['slug'] = Category::uniqueSlug($data['name']);
 
         Category::create($data);
 
@@ -45,9 +44,11 @@ class CategoryController extends Controller
             'name' => 'required|min:3'
         ]);
 
-        $data['slug'] = Str::slug($data['name']);
+        $category = Category::findOrFail($id);
 
-        Category::find($id)->update($data);
+        $data['slug'] = Category::uniqueSlug($data['name'], $category->id);
+
+        $category->update($data);
 
         return back()->with('success', 'Categories has been update');
     }
@@ -57,7 +58,16 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        Category::find($id)->delete();
+        $category = Category::withCount('articles')->findOrFail($id);
+
+        // articles.category_id adalah foreign key tanpa cascade
+        if ($category->articles_count > 0) {
+            return back()->withErrors([
+                'category' => "Category \"{$category->name}\" still has {$category->articles_count} article(s). Move or delete them first.",
+            ]);
+        }
+
+        $category->delete();
 
         return back()->with('success', 'Categories has been deleted');
     }
