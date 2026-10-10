@@ -7,9 +7,9 @@
                 <!-- Header -->
                 <div class="modal-header bg-primary text-white rounded-top-4">
                     <h5 class="modal-title d-flex align-items-center" id="update-sosmed-modal-label">
-                        <i data-feather="edit" class="me-2" style="width: 20px; height: 20px;"></i> Edit Sosmed Section
+                        <i data-feather="edit" class="me-2" style="width: 20px; height: 20px;"></i> {{ __('Edit Sosmed Section') }}
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                 </div>
 
                 <!-- Form -->
@@ -21,7 +21,7 @@
 
                             <!-- Video Upload + Current Preview -->
                             <div class="col-12">
-                                <label for="video-{{ $item->id }}" class="form-label fw-semibold">Video</label>
+                                <label for="video-{{ $item->id }}" class="form-label fw-semibold">{{ __('Video') }}</label>
                                 <input type="file" name="video" id="video-{{ $item->id }}" class="form-control @error('video') is-invalid @enderror" accept="video/mp4,video/mpeg,video/x-matroska,video/quicktime">
                                 @error('video')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -29,13 +29,13 @@
 
                                 @if ($item->video)
                                     <div class="mt-2">
-                                        <label class="form-label text-muted small">Current Video Preview:</label><br>
+                                        <label class="form-label text-muted small">{{ __('Current Video Preview:') }}</label><br>
                                         <video controls class="rounded shadow-sm border" style="max-height: 200px; max-width: 100%;">
                                             <source src="{{ asset('storage/' . $item->video) }}" type="video/mp4">
                                             <source src="{{ asset('storage/' . $item->video) }}" type="video/mpeg">
                                             <source src="{{ asset('storage/' . $item->video) }}" type="video/x-matroska">
                                             <source src="{{ asset('storage/' . $item->video) }}" type="video/quicktime">
-                                            Your browser does not support the video tag.
+                                            {{ __('Your browser does not support the video tag.') }}
                                         </video>
                                     </div>
                                 @endif
@@ -43,17 +43,27 @@
 
                             <!-- Title -->
                             <div class="col-12">
-                                <label for="title-{{ $item->id }}" class="form-label fw-semibold">Title</label>
-                                <input type="text" name="title" id="title-{{ $item->id }}" class="form-control @error('title') is-invalid @enderror"
-                                    value="{{ old('title', $item->title) }}" required>
-                                @error('title')
+                                <label for="title_id-{{ $item->id }}" class="form-label fw-semibold">{{ __('Title (Indonesia)') }}</label>
+                                <input type="text" name="title_id" id="title_id-{{ $item->id }}" class="form-control @error('title_id') is-invalid @enderror"
+                                    value="{{ old('title_id', $item->title_id) }}" required>
+                                @error('title_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Title -->
+                            <div class="col-12">
+                                <label for="title_en-{{ $item->id }}" class="form-label fw-semibold">{{ __('Title (English)') }}</label>
+                                <input type="text" name="title_en" id="title_en-{{ $item->id }}" class="form-control @error('title_en') is-invalid @enderror"
+                                    value="{{ old('title_en', $item->title_en) }}">
+                                @error('title_en')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <!-- Sosmed Link -->
                             <div class="col-12">
-                                <label for="sosmed_link-{{ $item->id }}" class="form-label fw-semibold">Sosmed Link</label>
+                                <label for="sosmed_link-{{ $item->id }}" class="form-label fw-semibold">{{ __('Sosmed Link') }}</label>
                                 <input type="url" name="sosmed_link" id="sosmed_link-{{ $item->id }}" class="form-control @error('sosmed_link') is-invalid @enderror"
                                     value="{{ old('sosmed_link', $item->sosmed_link) }}" required>
                                 @error('sosmed_link')
@@ -67,10 +77,10 @@
                     <!-- Footer -->
                     <div class="modal-footer bg-light border-top-0 rounded-bottom-4">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                            <i data-feather="x" class="me-1"></i> Cancel
+                            <i data-feather="x" class="me-1"></i> {{ __('Cancel') }}
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            <i data-feather="save" class="me-1"></i> Update Sosmed Section
+                            <i data-feather="save" class="me-1"></i> {{ __('Update Sosmed Section') }}
                         </button>
                     </div>
                 </form>

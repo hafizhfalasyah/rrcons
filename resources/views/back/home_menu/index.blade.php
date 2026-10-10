@@ -1,11 +1,11 @@
 @extends('back.layout.template')
 
-@section('title', 'RRCONS Admin | List Home Menus')
+@section('title', 'RRCONS Admin | ' . __('List Home Menus'))
 
 @section('content')
 
 <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-    <h1 class="h3 fw-bold text-uppercase">Home Menus</h1>
+    <h1 class="h3 fw-bold text-uppercase">{{ __('Home Menus') }}</h1>
 </div>
 
 {{-- Flash & Error Messages --}}
@@ -29,11 +29,11 @@
     <table class="table table-hover table-bordered align-middle shadow-sm">
         <thead class="table-primary text-center">
             <tr>
-                <th style="width: 5%;">No</th>
-                <th style="width: 20%;">Title</th>
-                <th style="width: 35%;">Sub Title</th>
-                <th style="width: 20%;">Last Updated</th>
-                <th style="width: 20%;">Actions</th>
+                <th style="width: 5%;">{{ __('No') }}</th>
+                <th style="width: 20%;">{{ __('Title') }}</th>
+                <th style="width: 35%;">{{ __('Sub Title') }}</th>
+                <th style="width: 20%;">{{ __('Last Updated') }}</th>
+                <th style="width: 20%;">{{ __('Actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -46,7 +46,7 @@
                     <td class="text-center">
                         <button class="btn btn-primary btn-sm px-3" data-bs-toggle="modal"
                             data-bs-target="#update-homeMenu-modal{{ $item->id }}">
-                            <i data-feather="edit" class="icon-sm me-1"></i> Edit
+                            <i data-feather="edit" class="icon-sm me-1"></i> {{ __('Edit') }}
                         </button>
                     </td>
                 </tr>

@@ -1,11 +1,11 @@
 @extends('back.layout.template')
 
-@section('title', 'RRCONS Admin | Sosmed Section')
+@section('title', 'RRCONS Admin | ' . __('Sosmed Section'))
 
 @section('content')
 
 <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-    <h1 class="h3 fw-bold text-uppercase">Sosmed Section</h1>
+    <h1 class="h3 fw-bold text-uppercase">{{ __('Sosmed Section') }}</h1>
 </div>
 
 {{-- Flash & Error Messages --}}
@@ -29,12 +29,12 @@
     <table class="table table-hover table-bordered align-middle shadow-sm">
         <thead class="table-primary text-center">
             <tr>
-                <th style="width: 5%;">No</th>
-                <th style="width: 15%;">Video</th>
-                <th style="width: 15%;">Title</th>
-                <th style="width: 20%;">Sosmed Link</th>
-                <th style="width: 10%;">Last Updated</th>
-                <th style="width: 10%;">Actions</th>
+                <th style="width: 5%;">{{ __('No') }}</th>
+                <th style="width: 15%;">{{ __('Video') }}</th>
+                <th style="width: 15%;">{{ __('Title') }}</th>
+                <th style="width: 20%;">{{ __('Sosmed Link') }}</th>
+                <th style="width: 10%;">{{ __('Last Updated') }}</th>
+                <th style="width: 10%;">{{ __('Actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -48,10 +48,10 @@
                                 <source src="{{ asset('storage/' . $item->video) }}" type="video/mpeg">
                                 <source src="{{ asset('storage/' . $item->video) }}" type="video/x-matroska"> <!-- untuk .mkv -->
                                 <source src="{{ asset('storage/' . $item->video) }}" type="video/quicktime"> <!-- untuk .mov -->
-                                Your browser does not support the video tag.
+                                {{ __('Your browser does not support the video tag.') }}
                             </video>
                         @else
-                            <span class="text-muted">No Video</span>
+                            <span class="text-muted">{{ __('No Video') }}</span>
                         @endif
                     </td>
                     <td>{{ $item->title }}</td>
@@ -62,7 +62,7 @@
                     <td class="text-center">
                         <button class="btn btn-primary btn-sm px-3" data-bs-toggle="modal"
                             data-bs-target="#update-sosmed-modal{{ $item->id }}">
-                            <i data-feather="edit" class="icon-sm me-1"></i> Edit
+                            <i data-feather="edit" class="icon-sm me-1"></i> {{ __('Edit') }}
                         </button>
                     </td>
                 </tr>

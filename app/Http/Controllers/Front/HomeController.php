@@ -38,8 +38,6 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        $locale = app()->getLocale();
-
         $posters = PosterHome::whereNotNull('img')
             ->where('img', '<>', '')
             ->get()
@@ -47,14 +45,14 @@ class HomeController extends Controller
                 return Storage::disk('public')->exists($poster->img);
         });
 
-        $heroes = HeroHome::with(['homeMenu:id,title_'.$locale.' as title,sub_title_'.$locale.' as sub_title'])->get();
-        $abouts = AboutHome::with(['homeMenu:id,title_'.$locale.' as title,sub_title_'.$locale.' as sub_title'])->get();
-        $services = ServiceHome::with(['homeMenu:id,title_'.$locale.' as title,sub_title_'.$locale.' as sub_title'])->get();
-        $advantages = AdvantageHome::with(['homeMenu:id,title_'.$locale.' as title,sub_title_'.$locale.' as sub_title'])->get();
-        $profiles = ProfileHome::with(['homeMenu:id,title_'.$locale.' as title,sub_title_'.$locale.' as sub_title'])->get();
-        $business = BusinessHome::with(['homeMenu:id,title_'.$locale.' as title,sub_title_'.$locale.' as sub_title'])->get();
-        $sosmed = SosmedHome::with(['homeMenu:id,title_'.$locale.' as title,sub_title_'.$locale.' as sub_title'])->get();
-        $gallery = GalleryHome::with(['homeMenu:id,title_'.$locale.' as title,sub_title_'.$locale.' as sub_title'])->get();
+        $heroes = HeroHome::with('homeMenu')->get();
+        $abouts = AboutHome::with('homeMenu')->get();
+        $services = ServiceHome::with('homeMenu')->get();
+        $advantages = AdvantageHome::with('homeMenu')->get();
+        $profiles = ProfileHome::with('homeMenu')->get();
+        $business = BusinessHome::with('homeMenu')->get();
+        $sosmed = SosmedHome::with('homeMenu')->get();
+        $gallery = GalleryHome::with('homeMenu')->get();
 
         $months = DB::table('gallery_homes')->distinct()->orderBy('month')->pluck('month');
         $years  = DB::table('gallery_homes')->distinct()->orderByDesc('year')->pluck('year');
@@ -110,9 +108,7 @@ class HomeController extends Controller
 
         $articles = Article::published()
             ->with('category')
-            ->when($query, function($q) use ($query) {
-                $q->where('title', 'like', "%{$query}%");
-            })
+            ->searchTitle($query)
             ->when($categorySlug, function($q) use ($categorySlug) {
                 $q->whereHas('category', fn($c) => $c->where('slug', $categorySlug));
             })
@@ -161,7 +157,7 @@ class HomeController extends Controller
 
         $article->comments()->create($validated);
 
-        return back()->with('success', 'Komentar berhasil dikirim!');
+        return back()->with('success', __('blog.sections.blog.detail.comments.success'));
     }
 
     public function rrfuture() {

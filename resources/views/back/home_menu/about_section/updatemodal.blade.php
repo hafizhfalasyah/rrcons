@@ -7,9 +7,9 @@
                 <!-- Header -->
                 <div class="modal-header bg-primary text-white rounded-top-4">
                     <h5 class="modal-title d-flex align-items-center" id="update-about-modal-label">
-                        <i data-feather="edit" class="me-2" style="width: 20px; height: 20px;"></i> Edit About Section
+                        <i data-feather="edit" class="me-2" style="width: 20px; height: 20px;"></i> {{ __('Edit About Section') }}
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                 </div>
 
                 <!-- Form -->
@@ -21,7 +21,7 @@
 
                             <!-- Image Upload + Current Preview -->
                             <div class="col-12">
-                                <label for="img-{{ $item->id }}" class="form-label fw-semibold">Image</label>
+                                <label for="img-{{ $item->id }}" class="form-label fw-semibold">{{ __('Image') }}</label>
                                 <input type="file" name="img" id="img-{{ $item->id }}" class="form-control @error('img') is-invalid @enderror" accept="image/*">
                                 @error('img')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -29,15 +29,15 @@
 
                                 @if ($item->img)
                                     <div class="mt-2">
-                                        <label class="form-label text-muted small">Current Image Preview:</label><br>
-                                        <img src="{{ asset('storage/' . $item->img) }}" alt="Current Image" class="img-fluid rounded shadow-sm border" style="max-height: 200px;">
+                                        <label class="form-label text-muted small">{{ __('Current Image Preview:') }}</label><br>
+                                        <img src="{{ asset('storage/' . $item->img) }}" alt="{{ __('Current Image') }}" class="img-fluid rounded shadow-sm border" style="max-height: 200px;">
                                     </div>
                                 @endif
                             </div>
 
                             <!-- Text as Textarea -->
                             <div class="col-12">
-                                <label for="text_id-{{ $item->id }}" class="form-label fw-semibold">Text (Indonesia)</label>
+                                <label for="text_id-{{ $item->id }}" class="form-label fw-semibold">{{ __('Text (Indonesia)') }}</label>
                                 <textarea name="text_id" id="text_id-{{ $item->id }}" class="form-control @error('text_id') is-invalid @enderror" rows="4" required>{{ old('text_id', $item->text_id) }}</textarea>
                                 @error('text_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -46,7 +46,7 @@
 
                             <!-- Text as Textarea -->
                             <div class="col-12">
-                                <label for="text_en-{{ $item->id }}" class="form-label fw-semibold">Text (English)</label>
+                                <label for="text_en-{{ $item->id }}" class="form-label fw-semibold">{{ __('Text (English)') }}</label>
                                 <textarea name="text_en" id="text_en-{{ $item->id }}" class="form-control @error('text_en') is-invalid @enderror" rows="4">{{ old('text_en', $item->text_en) }}</textarea>
                                 @error('text_en')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -59,10 +59,10 @@
                     <!-- Footer -->
                     <div class="modal-footer bg-light border-top-0 rounded-bottom-4">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                            <i data-feather="x" class="me-1"></i> Cancel
+                            <i data-feather="x" class="me-1"></i> {{ __('Cancel') }}
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            <i data-feather="save" class="me-1"></i> Update About Section
+                            <i data-feather="save" class="me-1"></i> {{ __('Update About Section') }}
                         </button>
                     </div>
                 </form>

@@ -4,9 +4,14 @@ namespace App\Models\Home;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\HasTranslations;
 
 class AdvantageHome extends Model
 {
+    use HasTranslations;
+
+    protected $translatable = ['title', 'desc'];
+
     protected $table = 'advantage_homes';
 
     protected $fillable = [
@@ -20,18 +25,6 @@ class AdvantageHome extends Model
     public function homeMenu()
     {
         return $this->belongsTo(HomeMenu::class, 'home_menu_id', 'id');
-    }
-
-    public function getTitleAttribute()
-    {
-        $locale = app()->getLocale();
-        return $this->{'title_'.$locale};
-    }
-
-    public function getDescAttribute()
-    {
-        $locale = app()->getLocale();
-        return $this->{'desc_'.$locale};
     }
 
 }

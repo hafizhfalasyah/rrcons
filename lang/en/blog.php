@@ -163,6 +163,8 @@ return [
 
                     'empty' => 'There are no comments yet.',
 
+                    'success' => 'Your comment has been submitted!',
+
                 ],
 
                 'sidebar' => [

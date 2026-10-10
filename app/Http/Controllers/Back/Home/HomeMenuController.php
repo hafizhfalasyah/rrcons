@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Back\Home;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Concerns\ManagesPublicFiles;
+use App\Http\Controllers\Concerns\ValidatesTranslations;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\App;
 use App\Models\Home\HomeMenu;
 use App\Models\Home\PosterHome;
@@ -20,7 +20,7 @@ use App\Models\Home\GalleryHome;
 
 class HomeMenuController extends Controller
 {
-    use ManagesPublicFiles;
+    use ManagesPublicFiles, ValidatesTranslations;
 
     /** ============================== HOME MENU CONTROLLERS ============================== **/
 
@@ -35,17 +35,14 @@ class HomeMenuController extends Controller
 
     public function updateHomeMenu(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'title_id' => 'required|string|max:255',
-            'title_en' => 'nullable|string|max:255',
-            'sub_title_id' => 'nullable|string|max:255',
-            'sub_title_en' => 'nullable|string|max:255',
+        $validatedData = $this->validateWithTranslations($request, [
+            'title' => 'required|string|max:255',
+            'sub_title' => 'nullable|string|max:255',
         ]);
 
-        $homeMenu = HomeMenu::findOrFail($id);
-        $homeMenu->update($validatedData);
+        HomeMenu::findOrFail($id)->update($validatedData);
 
-        return redirect()->route('home.menu')->with('success', 'Home Menu updated successfully.');
+        return redirect()->route('home.menu')->with('success', __('Home Menu updated successfully.'));
     }
 
     /** ============================== POSTER SECTION CONTROLLERS ============================== **/
@@ -63,88 +60,59 @@ class HomeMenuController extends Controller
 
     public function createPosterSection(Request $request)
     {
-        $validatedData = $request->validate([
-            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        $validatedData = $this->validateWithTranslations($request, [
             'name' => 'required|string|max:255',
+        ], [
+            'img' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $newPoster = new PosterHome();
-        $newPoster->name = $validatedData['name'];
+        $poster = new PosterHome([
+            'name_id' => $validatedData['name_id'],
+            'name_en' => $validatedData['name_en'],
+        ]);
 
         if ($request->hasFile('img')) {
-            $file = $validatedData['img'];
-            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-
-            $file->storeAs(
-                'back/home/poster',
-                $filename,
-                'public'
-            );
-
-            $newPoster->img = 'back/home/poster/' . $filename;
+            $poster->img = $this->storePublicFile($validatedData['img'], 'back/home/poster');
         }
 
-        // FIX: sebelumnya method ini tidak pernah memanggil save(),
-        // sehingga data poster tidak pernah tersimpan ke database
-        // meskipun file gambar sudah ter-upload ke storage.
-        $newPoster->save();
+        $poster->save();
 
-        return redirect()->route('home.poster')->with('success', 'Poster section created successfully');
+        return redirect()->route('home.poster')->with('success', __('Poster section created successfully.'));
     }
 
     public function updatePosterSection(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'img' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        $validatedData = $this->validateWithTranslations($request, [
             'name' => 'required|string|max:255',
+        ], [
+            'img' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $poster = PosterHome::findOrFail($id);
 
         $dataToUpdate = [
-            'name' => $validatedData['name'],
+            'name_id' => $validatedData['name_id'],
+            'name_en' => $validatedData['name_en'],
         ];
 
         if ($request->hasFile('img')) {
-            // Hapus gambar lama
-            if ($poster->img && Storage::disk('public')->exists($poster->img)) {
-                Storage::disk('public')->delete($poster->img);
-            }
-
-            // Upload gambar baru
-            $file = $validatedData['img'];
-            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-
-            $file->storeAs(
-                'back/home/poster',
-                $filename,
-                'public'
-            );
-
-            // Simpan relative path ke database
-            $dataToUpdate['img'] = 'back/home/poster/' . $filename;
+            $dataToUpdate['img'] = $this->replacePublicFile($poster->img, $validatedData['img'], 'back/home/poster');
         }
 
         $poster->update($dataToUpdate);
 
-        return redirect()
-            ->route('home.poster')
-            ->with('success', 'Poster section updated successfully');
+        return redirect()->route('home.poster')->with('success', __('Poster section updated successfully.'));
     }
 
     public function deletePosterSection($id)
     {
         $poster = PosterHome::findOrFail($id);
 
-        if ($poster->img && Storage::disk('public')->exists($poster->img)) {
-            Storage::disk('public')->delete($poster->img);
-        }
+        $this->deletePublicFile($poster->img, 'back/home/poster');
 
         $poster->delete();
 
-        return redirect()
-            ->route('home.poster')
-            ->with('success', 'Poster section deleted successfully');
+        return redirect()->route('home.poster')->with('success', __('Poster section deleted successfully.'));
     }
 
     /** ============================== HERO SECTION CONTROLLERS ============================== **/
@@ -163,23 +131,18 @@ class HomeMenuController extends Controller
     public function updateHeroSection(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'bg_img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'bg_img' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-        $hero = HeroHome::with('homeMenu')->findOrFail($id);
-
-        $dataToUpdate = [];
+        $hero = HeroHome::findOrFail($id);
 
         if (isset($validatedData['bg_img'])) {
-            $dataToUpdate['bg_img'] = $this->replacePublicFile($hero->bg_img, $validatedData['bg_img'], 'back/home/hero');
+            $hero->update([
+                'bg_img' => $this->replacePublicFile($hero->bg_img, $validatedData['bg_img'], 'back/home/hero'),
+            ]);
         }
 
-        // Jika ada data untuk diupdate, panggil update()
-        if (!empty($dataToUpdate)) {
-            $hero->update($dataToUpdate);
-        }
-
-        return redirect()->route('home.hero')->with('success', 'Hero section updated successfully');
+        return redirect()->route('home.hero')->with('success', __('Hero section updated successfully.'));
     }
 
     /** ============================== ABOUT CONTROLLERS ============================== **/
@@ -188,7 +151,7 @@ class HomeMenuController extends Controller
     {
         $lang = App::getLocale();
 
-        $abouts = AboutHome::select('id', 'img', 'text_id', 'text_en', 'updated_at')->get();
+        $abouts = AboutHome::all();
         $lastUpdated = AboutHome::latest('updated_at')->value('updated_at');
 
         return view('back.home_menu.about_section.index', [
@@ -200,17 +163,17 @@ class HomeMenuController extends Controller
 
     public function updateAboutSection(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'text_id' => 'required|string',
-            'text_en' => 'nullable|string',
+        $validatedData = $this->validateWithTranslations($request, [
+            'text' => 'required|string',
+        ], [
+            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-        $about = AboutHome::with('homeMenu')->findOrFail($id);
+        $about = AboutHome::findOrFail($id);
 
         $dataToUpdate = [
             'text_id' => $validatedData['text_id'],
-            'text_en' => $validatedData['text_en'] ?? null,
+            'text_en' => $validatedData['text_en'],
         ];
 
         if (isset($validatedData['img'])) {
@@ -219,7 +182,7 @@ class HomeMenuController extends Controller
 
         $about->update($dataToUpdate);
 
-        return redirect()->route('home.about')->with('success', 'About section updated successfully');
+        return redirect()->route('home.about')->with('success', __('About section updated successfully.'));
     }
 
     /** ============================== SERVICE CONTROLLERS ============================== **/
@@ -228,7 +191,7 @@ class HomeMenuController extends Controller
     {
         $lang = App::getLocale();
 
-        $services = ServiceHome::select('id', 'name_id', 'name_en', 'desc_id', 'desc_en', 'updated_at')->get();
+        $services = ServiceHome::all();
         $lastUpdated = ServiceHome::latest('updated_at')->value('updated_at');
 
         return view('back.home_menu.service_section.index', [
@@ -240,17 +203,14 @@ class HomeMenuController extends Controller
 
     public function updateServiceSection(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'name_id' => 'required|string|max:255',
-            'name_en' => 'nullable|string|max:255',
-            'desc_id' => 'required|string',
-            'desc_en' => 'nullable|string',
+        $validatedData = $this->validateWithTranslations($request, [
+            'name' => 'required|string|max:255',
+            'desc' => 'required|string',
         ]);
 
-        $services = ServiceHome::with('homeMenu')->findOrFail($id);
-        $services->update($validatedData);
+        ServiceHome::findOrFail($id)->update($validatedData);
 
-        return redirect()->route('home.service')->with('success', 'Service section updated successfully.');
+        return redirect()->route('home.service')->with('success', __('Service section updated successfully.'));
     }
 
     /** ============================== ADVANTAGE CONTROLLERS ============================== **/
@@ -259,7 +219,7 @@ class HomeMenuController extends Controller
     {
         $lang = App::getLocale();
 
-        $advantages = AdvantageHome::select('id', 'title_id', 'title_en', 'desc_id', 'desc_en', 'updated_at')->get();
+        $advantages = AdvantageHome::all();
         $lastUpdated = AdvantageHome::latest('updated_at')->value('updated_at');
 
         return view('back.home_menu.advantage_section.index', [
@@ -271,17 +231,14 @@ class HomeMenuController extends Controller
 
     public function updateAdvantageSection(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'title_id' => 'required|string|max:255',
-            'title_en' => 'nullable|string|max:255',
-            'desc_id' => 'required|string',
-            'desc_en' => 'nullable|string',
+        $validatedData = $this->validateWithTranslations($request, [
+            'title' => 'required|string|max:255',
+            'desc' => 'required|string',
         ]);
 
-        $advantages = AdvantageHome::with('homeMenu')->findOrFail($id);
-        $advantages->update($validatedData);
+        AdvantageHome::findOrFail($id)->update($validatedData);
 
-        return redirect()->route('home.advantage')->with('success', 'Advantage section updated successfully.');
+        return redirect()->route('home.advantage')->with('success', __('Advantage section updated successfully.'));
     }
 
     /** ============================== PROFILE CONTROLLERS ============================== **/
@@ -299,32 +256,29 @@ class HomeMenuController extends Controller
 
     public function updateProfileSection(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'name' => 'nullable|string',
-            'position' => 'nullable|string',
+        // Nama orang tidak diterjemahkan, jabatan (position) diterjemahkan
+        $validatedData = $this->validateWithTranslations($request, [
+            'position' => 'nullable|string|max:255',
+        ], [
+            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'name' => 'required|string|max:255',
         ]);
 
-        $profile = ProfileHome::with('homeMenu')->findOrFail($id);
+        $profile = ProfileHome::findOrFail($id);
 
-        $dataToUpdate = [];
-
-        // Update text hanya kalau ada input text baru (tidak null)
-        foreach (['name', 'position'] as $field) {
-            if (isset($validatedData[$field])) {
-                $dataToUpdate[$field] = $validatedData[$field];
-            }
-        }
+        $dataToUpdate = [
+            'name' => $validatedData['name'],
+            'position_id' => $validatedData['position_id'] ?? null,
+            'position_en' => $validatedData['position_en'],
+        ];
 
         if (isset($validatedData['img'])) {
             $dataToUpdate['img'] = $this->replacePublicFile($profile->img, $validatedData['img'], 'back/home/profile');
         }
 
-        if (!empty($dataToUpdate)) {
-            $profile->update($dataToUpdate);
-        }
+        $profile->update($dataToUpdate);
 
-        return redirect()->route('home.profile')->with('success', 'Profile section updated successfully');
+        return redirect()->route('home.profile')->with('success', __('Profile section updated successfully.'));
     }
 
     /** ============================== BUSINESS CONTROLLERS ============================== **/
@@ -333,7 +287,7 @@ class HomeMenuController extends Controller
     {
         $lang = App::getLocale();
 
-        $business = BusinessHome::select('id', 'img', 'title_id', 'title_en', 'desc_id', 'desc_en', 'form_link', 'updated_at')->get();
+        $business = BusinessHome::all();
         $lastUpdated = BusinessHome::latest('updated_at')->value('updated_at');
 
         return view('back.home_menu.business_section.index', [
@@ -345,30 +299,23 @@ class HomeMenuController extends Controller
 
     public function updateBusinessSection(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'title_id' => 'required|string|max:255',
-            'title_en' => 'nullable|string|max:255',
-            'desc_id' => 'required|string|max:255',
-            'desc_en' => 'nullable|string|max:255',
+        $validatedData = $this->validateWithTranslations($request, [
+            'title' => 'required|string|max:255',
+            'desc' => 'required|string|max:255',
+        ], [
+            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'form_link' => 'required|url|max:255',
         ]);
 
-        $business = BusinessHome::with('homeMenu')->findOrFail($id);
-
-        $dataToUpdate = [];
-
-        foreach (['title_id', 'title_en', 'desc_id', 'desc_en', 'form_link'] as $field) {
-            $dataToUpdate[$field] = $validatedData[$field] ?? null;
-        }
+        $business = BusinessHome::findOrFail($id);
 
         if (isset($validatedData['img'])) {
-            $dataToUpdate['img'] = $this->replacePublicFile($business->img, $validatedData['img'], 'back/home/business');
+            $validatedData['img'] = $this->replacePublicFile($business->img, $validatedData['img'], 'back/home/business');
         }
 
-        $business->update($dataToUpdate);
+        $business->update($validatedData);
 
-        return redirect()->route('home.business')->with('success', 'Business section updated successfully');
+        return redirect()->route('home.business')->with('success', __('Business section updated successfully.'));
     }
 
     /** ============================== SOSMED CONTROLLERS ============================== **/
@@ -386,33 +333,28 @@ class HomeMenuController extends Controller
 
     public function updateSosmedSection(Request $request, $id)
     {
-        $validatedData = $request->validate([
+        $validatedData = $this->validateWithTranslations($request, [
+            'title' => 'required|string|max:255',
+        ], [
             'video' => 'nullable|mimetypes:video/mp4,video/mpeg,video/x-matroska,video/quicktime|max:51200', // 50MB
-            'title' => 'required|string',
-            'sosmed_link' => 'nullable|url',
+            'sosmed_link' => 'nullable|url|max:255',
         ]);
 
-        $sosmed = SosmedHome::with('homeMenu')->findOrFail($id);
+        $sosmed = SosmedHome::findOrFail($id);
 
-        $dataToUpdate = [];
+        $dataToUpdate = [
+            'title_id' => $validatedData['title_id'],
+            'title_en' => $validatedData['title_en'],
+            'sosmed_link' => $validatedData['sosmed_link'] ?? null,
+        ];
 
-        // Update field teks
-        foreach (['title', 'sosmed_link'] as $field) {
-            if (isset($validatedData[$field])) {
-                $dataToUpdate[$field] = $validatedData[$field];
-            }
-        }
-
-        // Update file video
         if (isset($validatedData['video'])) {
             $dataToUpdate['video'] = $this->replacePublicFile($sosmed->video, $validatedData['video'], 'back/home/sosmed');
         }
 
-        if (!empty($dataToUpdate)) {
-            $sosmed->update($dataToUpdate);
-        }
+        $sosmed->update($dataToUpdate);
 
-        return redirect()->route('home.sosmed')->with('success', 'Sosmed section updated successfully');
+        return redirect()->route('home.sosmed')->with('success', __('Social media section updated successfully.'));
     }
 
     /** ============================== GALLERY CONTROLLERS ============================== **/
@@ -428,70 +370,78 @@ class HomeMenuController extends Controller
         ]);
     }
 
-    public function createGallerySection(Request $request)
+    private function galleryRules(bool $imageRequired): array
     {
-        $validatedData = $request->validate([
-            'img'   => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'title' => 'required|string',
-            'desc'  => 'nullable|string',
+        return [
+            'img'   => ($imageRequired ? 'required' : 'nullable') . '|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'month' => 'required|integer|between:1,12',
             'year'  => 'required|integer|digits:4',
+        ];
+    }
+
+    public function createGallerySection(Request $request)
+    {
+        // kolom img wajib (NOT NULL), jadi gambar harus diunggah saat membuat item baru
+        $validatedData = $this->validateWithTranslations($request, [
+            'title' => 'required|string|max:255',
+            'desc'  => 'nullable|string|max:255',
+        ], $this->galleryRules(true));
+
+        $gallery = new GalleryHome([
+            'title_id' => $validatedData['title_id'],
+            'title_en' => $validatedData['title_en'],
+            'desc_id' => $validatedData['desc_id'] ?? null,
+            'desc_en' => $validatedData['desc_en'],
+            'month' => $validatedData['month'],
+            'year' => $validatedData['year'],
         ]);
 
-        $newGallery = new GalleryHome();
-        $newGallery->home_menu_id = 8;
-        $newGallery->title = $validatedData['title'];
-        $newGallery->desc = $validatedData['desc'] ?? null;
-        $newGallery->month = $validatedData['month'];
-        $newGallery->year = $validatedData['year'];
+        // Ikut menu yang dipakai item gallery lain (menu Gallery di tabel home_menus)
+        $gallery->home_menu_id = GalleryHome::value('home_menu_id')
+            ?? HomeMenu::where('title_id', 'like', '%galeri%')->orWhere('title_en', 'like', '%gallery%')->value('id')
+            ?? 8;
+        $gallery->img = $this->storePublicFile($validatedData['img'], 'back/home/gallery');
 
-        if ($request->hasFile('img')) {
-            $newGallery->img = $this->storePublicFile($validatedData['img'], 'back/home/gallery');
-        }
+        $gallery->save();
 
-        $newGallery->save();
-
-        return redirect()->route('home.gallery')->with('success', 'Gallery section created successfully');
+        return redirect()->route('home.gallery')->with('success', __('Gallery item created successfully.'));
     }
 
     public function updateGallerySection(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'img'   => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'title' => 'required|string',
-            'desc'  => 'nullable|string',
-            'month' => 'required|integer|between:1,12',
-            'year'  => 'required|integer|digits:4',
-        ]);
+        $validatedData = $this->validateWithTranslations($request, [
+            'title' => 'required|string|max:255',
+            'desc'  => 'nullable|string|max:255',
+        ], $this->galleryRules(false));
 
         $gallery = GalleryHome::findOrFail($id);
 
         $dataToUpdate = [
-            'title' => $validatedData['title'],
-            'desc'  => $validatedData['desc'] ?? null,
+            'title_id' => $validatedData['title_id'],
+            'title_en' => $validatedData['title_en'],
+            'desc_id' => $validatedData['desc_id'] ?? null,
+            'desc_en' => $validatedData['desc_en'],
             'month' => $validatedData['month'],
-            'year'  => $validatedData['year'],
+            'year' => $validatedData['year'],
         ];
 
-        // Handle upload image jika ada
         if ($request->hasFile('img')) {
             $dataToUpdate['img'] = $this->replacePublicFile($gallery->img, $validatedData['img'], 'back/home/gallery');
         }
 
         $gallery->update($dataToUpdate);
 
-        return redirect()->route('home.gallery')->with('success', 'Gallery section updated successfully');
+        return redirect()->route('home.gallery')->with('success', __('Gallery item updated successfully.'));
     }
 
     public function deleteGallerySection($id)
     {
         $gallery = GalleryHome::findOrFail($id);
 
-        // Hapus file gambar jika ada
         $this->deletePublicFile($gallery->img, 'back/home/gallery');
 
         $gallery->delete();
 
-        return redirect()->route('home.gallery')->with('success', 'Gallery section deleted successfully');
+        return redirect()->route('home.gallery')->with('success', __('Gallery item deleted successfully.'));
     }
 }

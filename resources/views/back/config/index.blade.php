@@ -1,11 +1,11 @@
 @extends('back.layout.template')
 
-@section('title', 'RRCONS Admin | List Configs')
+@section('title', 'RRCONS Admin | ' . __('List Configs'))
 
 @section('content')
 
     <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-        <h1 class="h3 fw-bold text-uppercase">List Configs</h1>
+        <h1 class="h3 fw-bold text-uppercase">{{ __('List Configs') }}</h1>
     </div>
 
     {{-- Flash & Error Messages --}}
@@ -29,10 +29,10 @@
         <table class="table table-hover table-bordered align-middle shadow-sm">
             <thead class="table-primary text-center">
                 <tr>
-                    <th style="width: 5%;">No</th>
-                    <th style="width: 20%;">Config Name</th>
-                    <th style="width: 35%;">Value</th>
-                    <th style="width: 25%;">Actions</th>
+                    <th style="width: 5%;">{{ __('No') }}</th>
+                    <th style="width: 20%;">{{ __('Config Name') }}</th>
+                    <th style="width: 35%;">{{ __('Value') }}</th>
+                    <th style="width: 25%;">{{ __('Actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -45,7 +45,7 @@
                             <div class="d-flex justify-content-center">
                                 <button class="btn btn-primary btn-sm me-1 d-flex align-items-center px-3" data-bs-toggle="modal"
                                     data-bs-target="#update-config-modal{{ $key->id }}">
-                                    <i data-feather="edit" class="icon-sm me-1"></i> Edit
+                                    <i data-feather="edit" class="icon-sm me-1"></i> {{ __('Edit') }}
                                 </button>
                             </div>
                         </td>

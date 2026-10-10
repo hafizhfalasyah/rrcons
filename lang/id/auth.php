@@ -2,6 +2,12 @@
 
 return [
 
+    // Dipakai langsung oleh Laravel (AuthenticatesUsers / ThrottlesLogins)
+    'failed' => 'Email atau kata sandi yang Anda masukkan tidak sesuai.',
+    'password' => 'Kata sandi yang diberikan tidak benar.',
+    'throttle' => 'Terlalu banyak percobaan login. Silakan coba lagi dalam :seconds detik.',
+
+
     /*
     |--------------------------------------------------------------------------
     | SEO

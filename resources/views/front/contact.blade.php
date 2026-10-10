@@ -674,9 +674,10 @@
                             <i data-feather="phone"></i>
                         </div>
                         <p>
-                            <span class="font-semibold">Telepon:</span><br>
-                            <a href="https://wa.me/6281252624284" target="_blank" class="hover:text-blue-500">
-                                +62 812-5262-4284
+                            <span class="font-semibold">{{ __('contact.sections.contact.information.phone') }}:</span><br>
+                            <a href="https://wa.me/6281252624284" target="_blank" rel="noopener" class="hover:text-blue-500"
+                               aria-label="{{ __('contact.sections.contact.information.open_whatsapp') }}">
+                                {{ __('contact.sections.contact.information.phone_number') }}
                             </a>
                         </p>
                     </div>
@@ -686,9 +687,10 @@
                             <i data-feather="mail"></i>
                         </div>
                         <p>
-                            <span class="font-semibold">Email:</span><br>
-                            <a href="mailto:ritarussoconsultant@gmail.com" target="_blank" class="hover:text-blue-500">
-                                ritarussoconsultant@gmail.com
+                            <span class="font-semibold">{{ __('contact.sections.contact.information.email') }}:</span><br>
+                            <a href="mailto:{{ __('contact.sections.contact.information.email_address') }}" class="hover:text-blue-500"
+                               aria-label="{{ __('contact.sections.contact.information.send_email') }}">
+                                {{ __('contact.sections.contact.information.email_address') }}
                             </a>
                         </p>
                     </div>

@@ -4,9 +4,14 @@ namespace App\Models\Home;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\HasTranslations;
 
 class HomeMenu extends Model
 {
+    use HasTranslations;
+
+    protected $translatable = ['title', 'sub_title'];
+
     protected $table = 'home_menus';
 
     protected $fillable = [

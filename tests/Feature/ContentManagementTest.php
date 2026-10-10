@@ -39,9 +39,9 @@ class ContentManagementTest extends TestCase
             'user_id' => $this->admin->id,
             'created_by' => $this->admin->id,
             'category_id' => $category->id,
-            'title' => $title,
+            'title_id' => $title,
             'slug' => $slug,
-            'desc' => 'Body',
+            'desc_id' => 'Body',
             'img' => 'back/blog/x.jpg',
             'status' => Article::STATUS_PUBLISH,
             'publish_date' => now()->subDay(),
@@ -50,7 +50,7 @@ class ContentManagementTest extends TestCase
 
     public function test_article_slugs_are_unique_and_avoid_admin_routes(): void
     {
-        $category = Category::create(['name' => 'News', 'slug' => 'news']);
+        $category = Category::create(['name_id' => 'News', 'slug' => 'news']);
         $this->article($category, 'Hello', 'hello');
 
         $this->assertSame('hello-2', Article::uniqueSlug('Hello'));
@@ -62,16 +62,15 @@ class ContentManagementTest extends TestCase
     public function test_admin_store_generates_a_unique_slug(): void
     {
         Storage::fake('public');
-        $category = Category::create(['name' => 'News', 'slug' => 'news']);
+        $category = Category::create(['name_id' => 'News', 'slug' => 'news']);
         $this->article($category, 'Same Title', 'same-title');
 
         $this->actingAs($this->admin)->post(route('blog.articles.store'), [
-            'title' => 'Same Title',
+            'title_id' => 'Same Title',
             'category_id' => $category->id,
-            'desc' => '<p>Body</p>',
+            'desc_id' => '<p>Body</p>',
             'img' => UploadedFile::fake()->image('cover.jpg'),
-            'status' => Article::STATUS_PUBLISH,
-            'publish_date' => now()->subMinute()->format('Y-m-d\TH:i'),
+            'publication' => Article::CHOICE_PUBLISH,
         ])->assertRedirect();
 
         $this->assertDatabaseHas('articles', ['slug' => 'same-title-2']);
@@ -80,9 +79,9 @@ class ContentManagementTest extends TestCase
 
     public function test_category_with_articles_cannot_be_deleted(): void
     {
-        $category = Category::create(['name' => 'News', 'slug' => 'news']);
+        $category = Category::create(['name_id' => 'News', 'slug' => 'news']);
         $this->article($category, 'Hello', 'hello');
-        $empty = Category::create(['name' => 'Empty', 'slug' => 'empty']);
+        $empty = Category::create(['name_id' => 'Empty', 'slug' => 'empty']);
 
         $this->actingAs($this->admin)
             ->delete(route('blog.categories.destroy', $category->id))
@@ -95,9 +94,9 @@ class ContentManagementTest extends TestCase
 
     public function test_category_slugs_are_unique(): void
     {
-        Category::create(['name' => 'News', 'slug' => 'news']);
+        Category::create(['name_id' => 'News', 'slug' => 'news']);
 
-        $this->actingAs($this->admin)->post(route('blog.categories.store'), ['name' => 'News'])->assertRedirect();
+        $this->actingAs($this->admin)->post(route('blog.categories.store'), ['name_id' => 'News'])->assertRedirect();
 
         $this->assertDatabaseHas('categories', ['slug' => 'news-2']);
     }

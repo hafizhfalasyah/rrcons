@@ -22,6 +22,6 @@ class ConfigController extends Controller
 
         Config::findOrFail($id)->update($data);
 
-        return back()->with('success', 'Config has been updated.');
+        return back()->with('success', __('Config has been updated.'));
     }
 }

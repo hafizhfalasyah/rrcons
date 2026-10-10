@@ -1,13 +1,13 @@
 @extends('back.layout.template')
 
-@section('title', 'RRCONS Admin | List Categories')
+@section('title', 'RRCONS Admin | ' . __('List Categories'))
 
 @section('content')
 
     <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-        <h1 class="h3 fw-bold text-uppercase">List Categories</h1>
+        <h1 class="h3 fw-bold text-uppercase">{{ __('List Categories') }}</h1>
         <button class="btn btn-primary rounded shadow-sm px-3 d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#create-category-modal">
-            <i data-feather="plus" class="icon-sm"></i> Add Category
+            <i data-feather="plus" class="icon-sm"></i> {{ __('Add Category') }}
         </button>
     </div>
 
@@ -32,11 +32,11 @@
         <table class="table table-hover table-bordered align-middle shadow-sm">
             <thead class="table-primary text-center">
                 <tr>
-                    <th style="width: 5%;">No</th>
-                    <th style="width: 20%;">Category Name</th>
-                    <th style="width: 20%;">Slug</th>
-                    <th style="width: 20%;">Created At</th>
-                    <th style="width: 25%;">Actions</th>
+                    <th style="width: 5%;">{{ __('No') }}</th>
+                    <th style="width: 20%;">{{ __('Category Name') }}</th>
+                    <th style="width: 20%;">{{ __('Slug') }}</th>
+                    <th style="width: 20%;">{{ __('Created At') }}</th>
+                    <th style="width: 25%;">{{ __('Actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,11 +50,11 @@
                             <div class="d-flex justify-content-center">
                                 <button class="btn btn-primary btn-sm me-1 d-flex align-items-center px-3" data-bs-toggle="modal"
                                     data-bs-target="#update-category-modal{{ $item->id }}">
-                                    <i data-feather="edit" class="icon-sm me-1"></i> Edit
+                                    <i data-feather="edit" class="icon-sm me-1"></i> {{ __('Edit') }}
                                 </button>
                                 <button class="btn btn-danger btn-sm d-flex align-items-center px-3" data-bs-toggle="modal"
                                     data-bs-target="#delete-category-modal{{ $item->id }}">
-                                    <i data-feather="trash-2" class="icon-sm me-1"></i> Delete
+                                    <i data-feather="trash-2" class="icon-sm me-1"></i> {{ __('Delete') }}
                                 </button>
                             </div>
                         </td>

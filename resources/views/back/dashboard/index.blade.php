@@ -1,19 +1,19 @@
 @extends('back.layout.template')
 
-@section('title', 'RRCONS Admin | Dashboard')
+@section('title', 'RRCONS Admin | ' . __('Dashboard'))
 
 @section('content')
 
     <!-- Heading -->
     <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-        <h1 class="h3 fw-bold text-uppercase">Dashboard</h1>
+        <h1 class="h3 fw-bold text-uppercase">{{ __('Dashboard') }}</h1>
 
         <div class="text-end">
             <span class="d-block fw-semibold">
-                Halo, {{ auth()->user()->name }} 👋
+                {{ __('Hello, :name', ['name' => auth()->user()->name]) }} 👋
             </span>
             <small class="text-muted text-capitalize">
-                You are logged in as <strong>{{ auth()->user()->role }}</strong>
+                {!! __('You are logged in as :role', ['role' => '<strong>' . e(__(ucfirst((string) auth()->user()->role))) . '</strong>']) !!}
             </small>
         </div>
     </div>
@@ -25,7 +25,7 @@
             <div class="card glass shadow-sm border-0 text-white bg-gradient-success p-2">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div>
-                        <h5 class="card-title mb-2">Total Users</h5>
+                        <h5 class="card-title mb-2">{{ __('Total Users') }}</h5>
                         <h2 class="fw-bold">{{ $total_users }}</h2>
                     </div>
                     <i class="bi bi-people-fill display-5 opacity-75"></i>
@@ -38,7 +38,7 @@
             <div class="card glass shadow-sm border-0 text-white bg-gradient-info p-2">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div>
-                        <h5 class="card-title mb-2">Total Galleries</h5>
+                        <h5 class="card-title mb-2">{{ __('Total Galleries') }}</h5>
                         <h2 class="fw-bold">0</h2>
                     </div>
                     <i class="bi bi-images display-5 opacity-75"></i>
@@ -51,7 +51,7 @@
             <div class="card glass shadow-sm border-0 text-white bg-gradient-primary p-2">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div>
-                        <h5 class="card-title mb-2">Total Articles</h5>
+                        <h5 class="card-title mb-2">{{ __('Total Articles') }}</h5>
                         <h2 class="fw-bold">{{ $total_articles }}</h2>
                     </div>
                     <i class="bi bi-file-earmark-text-fill display-5 opacity-75"></i>
@@ -64,7 +64,7 @@
             <div class="card glass shadow-sm border-0 text-white bg-gradient-secondary p-2">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div>
-                        <h5 class="card-title mb-2">Total Categories</h5>
+                        <h5 class="card-title mb-2">{{ __('Total Categories') }}</h5>
                         <h2 class="fw-bold">{{ $total_categories }}</h2>
                     </div>
                     <i class="bi bi-tags-fill display-5 opacity-75"></i>
@@ -78,19 +78,19 @@
         <div class="col-lg-6">
             <div class="card shadow-sm border-0 rounded-4">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <span><i class="bi bi-clock-history me-2"></i>Latest Articles</span>
+                    <span><i class="bi bi-clock-history me-2"></i>{{ __('Latest Articles') }}</span>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>No</th>
-                                    <th>Title</th>
-                                    <th>Category</th>
-                                    <th>Date</th>
+                                    <th>{{ __('No') }}</th>
+                                    <th>{{ __('Title') }}</th>
+                                    <th>{{ __('Category') }}</th>
+                                    <th>{{ __('Date') }}</th>
                                     @if (auth()->user()->hasAnyRole(['admin', 'writer']))
-                                        <th>Action</th>
+                                        <th>{{ __('Action') }}</th>
                                     @endif
                                 </tr>
                             </thead>
@@ -105,7 +105,7 @@
                                             <td>
                                                 <a href="{{ route('blog.articles.show', $item->id) }}"
                                                    class="btn btn-sm btn-outline-primary">
-                                                    Detail
+                                                    {{ __('Detail') }}
                                                 </a>
                                             </td>
                                         @endif
@@ -121,19 +121,19 @@
         <div class="col-lg-6">
             <div class="card shadow-sm border-0 rounded-4">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <span><i class="bi bi-fire me-2"></i>Popular Articles</span>
+                    <span><i class="bi bi-fire me-2"></i>{{ __('Popular Articles') }}</span>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>No</th>
-                                    <th>Title</th>
-                                    <th>Category</th>
-                                    <th>Views</th>
+                                    <th>{{ __('No') }}</th>
+                                    <th>{{ __('Title') }}</th>
+                                    <th>{{ __('Category') }}</th>
+                                    <th>{{ __('Views') }}</th>
                                     @if (auth()->user()->hasAnyRole(['admin', 'writer']))
-                                        <th>Action</th>
+                                        <th>{{ __('Action') }}</th>
                                     @endif
                                 </tr>
                             </thead>
@@ -148,7 +148,7 @@
                                             <td>
                                                 <a href="{{ route('blog.articles.show', $item->id) }}"
                                                    class="btn btn-sm btn-outline-primary">
-                                                    Detail
+                                                    {{ __('Detail') }}
                                                 </a>
                                             </td>
                                         @endif
@@ -166,7 +166,7 @@
     <div class="mt-5">
         <div class="card shadow-sm border-0 rounded-4">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-graph-up me-2"></i>Visitor Statistics (Per Page - Last 7 Days)</span>
+                <span><i class="bi bi-graph-up me-2"></i>{{ __('Visitor Statistics (Per Page - Last 7 Days)') }}</span>
             </div>
             <div class="card-body">
                 <canvas id="visitorChart" height="120"></canvas>
@@ -264,7 +264,7 @@
                     },
                     title: {
                         display: true,
-                        text: 'Jumlah Pengunjung',
+                        text: @json(__('Number of Visitors')),
                         font: {
                             size: 14,
                             weight: 'bold'

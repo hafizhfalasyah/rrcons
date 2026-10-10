@@ -6,9 +6,9 @@
             <!-- Header -->
             <div class="modal-header bg-primary text-white rounded-top-4">
                 <h5 class="modal-title d-flex align-items-center" id="create-user-modal-label">
-                    <i data-feather="user-plus" class="me-2" style="width: 20px; height: 20px;"></i> Add User
+                    <i data-feather="user-plus" class="me-2" style="width: 20px; height: 20px;"></i> {{ __('Add User') }}
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
             </div>
 
             <!-- Form -->
@@ -18,7 +18,7 @@
                     <div class="row g-3">
                         <!-- Name -->
                         <div class="col-12">
-                            <label for="name" class="form-label fw-semibold">User Name</label>
+                            <label for="name" class="form-label fw-semibold">{{ __('User Name') }}</label>
                             <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
 
                             @error('name')
@@ -28,7 +28,7 @@
 
                         <!-- Email -->
                         <div class="col-12">
-                            <label for="email" class="form-label fw-semibold">Email Address</label>
+                            <label for="email" class="form-label fw-semibold">{{ __('Email Address') }}</label>
                             <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required>
 
                             @error('email')
@@ -38,12 +38,12 @@
 
                         <!-- Role -->
                         <div class="col-12">
-                            <label for="role" class="form-label fw-semibold text-primary">Role</label>
+                            <label for="role" class="form-label fw-semibold text-primary">{{ __('Role') }}</label>
                             <select name="role" id="role" class="form-select @error('role') is-invalid @enderror" required>
-                                <option value="" selected disabled>-- Pilih Role --</option>
-                                <option value="admin">Admin</option>
-                                <option value="writer">Writer</option>
-                                <option value="uploader">Uploader</option>
+                                <option value="" selected disabled>{{ __('-- Select Role --') }}</option>
+                                <option value="admin">{{ __('Admin') }}</option>
+                                <option value="writer">{{ __('Writer') }}</option>
+                                <option value="uploader">{{ __('Uploader') }}</option>
                             </select>
 
                             @error('role')
@@ -53,7 +53,7 @@
 
                         <!-- Password -->
                         <div class="col-md-6">
-                            <label for="password" class="form-label fw-semibold">Password</label>
+                            <label for="password" class="form-label fw-semibold">{{ __('Password') }}</label>
                             <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" required>
 
                             @error('password')
@@ -63,7 +63,7 @@
 
                         <!-- Confirm Password -->
                         <div class="col-md-6">
-                            <label for="password_confirmation" class="form-label fw-semibold">Confirm Password</label>
+                            <label for="password_confirmation" class="form-label fw-semibold">{{ __('Confirm Password') }}</label>
                             <input type="password" name="password_confirmation" id="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" required>
 
                             @error('password_confirmation')
@@ -76,10 +76,10 @@
                 <!-- Footer -->
                 <div class="modal-footer bg-light border-top-0 rounded-bottom-4">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i data-feather="x" class="me-1"></i> Cancel
+                        <i data-feather="x" class="me-1"></i> {{ __('Cancel') }}
                     </button>
                     <button type="submit" class="btn btn-primary">
-                        <i data-feather="save" class="me-1"></i> Add User
+                        <i data-feather="save" class="me-1"></i> {{ __('Add User') }}
                     </button>
                 </div>
             </form>

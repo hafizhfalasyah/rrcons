@@ -7,9 +7,9 @@
                 <!-- Header -->
                 <div class="modal-header bg-primary text-white rounded-top-4">
                     <h5 class="modal-title d-flex align-items-center" id="update-business-modal-label">
-                        <i data-feather="edit" class="me-2" style="width: 20px; height: 20px;"></i> Edit Business Section
+                        <i data-feather="edit" class="me-2" style="width: 20px; height: 20px;"></i> {{ __('Edit Business Section') }}
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                 </div>
 
                 <!-- Form -->
@@ -21,7 +21,7 @@
 
                             <!-- Image Upload + Current Preview -->
                             <div class="col-12">
-                                <label for="img-{{ $item->id }}" class="form-label fw-semibold">Image</label>
+                                <label for="img-{{ $item->id }}" class="form-label fw-semibold">{{ __('Image') }}</label>
                                 <input type="file" name="img" id="img-{{ $item->id }}" class="form-control @error('img') is-invalid @enderror" accept="image/*">
                                 @error('img')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -29,15 +29,15 @@
 
                                 @if ($item->img)
                                     <div class="mt-2">
-                                        <label class="form-label text-muted small">Current Image Preview:</label><br>
-                                        <img src="{{ asset('storage/' . $item->img) }}" alt="Current Image" class="img-fluid rounded shadow-sm border" style="max-height: 200px;">
+                                        <label class="form-label text-muted small">{{ __('Current Image Preview:') }}</label><br>
+                                        <img src="{{ asset('storage/' . $item->img) }}" alt="{{ __('Current Image') }}" class="img-fluid rounded shadow-sm border" style="max-height: 200px;">
                                     </div>
                                 @endif
                             </div>
 
                             <!-- Title -->
                             <div class="col-12">
-                                <label for="title_id-{{ $item->id }}" class="form-label fw-semibold">Title (Indonesia)</label>
+                                <label for="title_id-{{ $item->id }}" class="form-label fw-semibold">{{ __('Title (Indonesia)') }}</label>
                                 <input type="text" name="title_id" id="title_id-{{ $item->id }}" class="form-control @error('title_id') is-invalid @enderror"
                                     value="{{ old('title_id', $item->title_id) }}" required>
                                 @error('title_id')
@@ -47,7 +47,7 @@
 
                             <!-- Title -->
                             <div class="col-12">
-                                <label for="title_en-{{ $item->id }}" class="form-label fw-semibold">Title (English)</label>
+                                <label for="title_en-{{ $item->id }}" class="form-label fw-semibold">{{ __('Title (English)') }}</label>
                                 <input type="text" name="title_en" id="title_en-{{ $item->id }}" class="form-control @error('title_en') is-invalid @enderror"
                                     value="{{ old('title_en', $item->title_en) }}">
                                 @error('title_en')
@@ -57,7 +57,7 @@
 
                             <!-- Desc as Textarea -->
                             <div class="col-12">
-                                <label for="desc_id-{{ $item->id }}" class="form-label fw-semibold">Desc (Indonesia)</label>
+                                <label for="desc_id-{{ $item->id }}" class="form-label fw-semibold">{{ __('Desc (Indonesia)') }}</label>
                                 <textarea name="desc_id" id="desc_id-{{ $item->id }}" class="form-control @error('desc_id') is-invalid @enderror" rows="4" required>{{ old('desc_id', $item->desc_id) }}</textarea>
                                 @error('desc_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -66,7 +66,7 @@
 
                             <!-- Desc as Textarea -->
                             <div class="col-12">
-                                <label for="desc_en-{{ $item->id }}" class="form-label fw-semibold">Desc (English)</label>
+                                <label for="desc_en-{{ $item->id }}" class="form-label fw-semibold">{{ __('Desc (English)') }}</label>
                                 <textarea name="desc_en" id="desc_en-{{ $item->id }}" class="form-control @error('desc_en') is-invalid @enderror" rows="4">{{ old('desc_en', $item->desc_en) }}</textarea>
                                 @error('desc_en')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -75,7 +75,7 @@
 
                             <!-- Form Link -->
                             <div class="col-12">
-                                <label for="form_link-{{ $item->id }}" class="form-label fw-semibold">Form Link</label>
+                                <label for="form_link-{{ $item->id }}" class="form-label fw-semibold">{{ __('Form Link') }}</label>
                                 <input type="url" name="form_link" id="form_link-{{ $item->id }}" class="form-control @error('form_link') is-invalid @enderror"
                                     value="{{ old('form_link', $item->form_link) }}" required>
                                 @error('form_link')
@@ -89,10 +89,10 @@
                     <!-- Footer -->
                     <div class="modal-footer bg-light border-top-0 rounded-bottom-4">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                            <i data-feather="x" class="me-1"></i> Cancel
+                            <i data-feather="x" class="me-1"></i> {{ __('Cancel') }}
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            <i data-feather="save" class="me-1"></i> Update Business Section
+                            <i data-feather="save" class="me-1"></i> {{ __('Update Business Section') }}
                         </button>
                     </div>
                 </form>
