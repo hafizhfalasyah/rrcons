@@ -123,7 +123,7 @@ class ArticleController extends Controller
     public function show(string $id)
     {
         return view('back.article.show', [
-            'article' => Article::with(['User', 'Category'])->findOrFail($id)
+            'article' => Article::with(['User', 'Creator', 'Category'])->findOrFail($id)
         ]);
     }
 

@@ -603,7 +603,7 @@
                 ></span>
 
                 <span>
-                    {{ $article->author
+                    {{ $article->Creator?->name
                         ?? __('blog.sections.blog.detail.author.default') }}
                 </span>
             </div>
@@ -843,7 +843,7 @@
                             </li>
                         @empty
                             <li class="text-gray-500">
-                                {{ __('articles.empty.general') }}
+                                {{ __('article.sections.article.empty.general') }}
                             </li>
                         @endforelse
                     </ul>
