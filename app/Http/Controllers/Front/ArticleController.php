@@ -13,7 +13,7 @@ class ArticleController extends Controller
         if ($keyword) {
             $articles = Article::with('Category')
                         ->published()
-                        ->where('title', 'like', '%' .$keyword. '%')
+                        ->searchTitle($keyword)
                         ->latest('publish_date')
                         ->paginate(6);
         } else {

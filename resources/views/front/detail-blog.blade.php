@@ -623,7 +623,7 @@
 
                 <!-- Article Content -->
                 <article class="article-content space-y-5 text-md text-gray-800 leading-relaxed text-justify">
-                    {!! $article->desc !!}
+                    {!! $article->safe_desc !!}
                 </article>
 
                 <!-- Tags -->

@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Back\Blog;
 
+use App\Http\Controllers\Concerns\ValidatesTranslations;
 use App\Http\Controllers\Controller;
 use App\Models\Blog\Category;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    use ValidatesTranslations;
+
     /**
      * Display a listing of the resource.
      */
@@ -23,15 +26,15 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required|min:3'
+        $data = $this->validateWithTranslations($request, [
+            'name' => 'required|string|min:3|max:255',
         ]);
 
-        $data['slug'] = Category::uniqueSlug($data['name']);
+        $data['slug'] = Category::uniqueSlug($data['name_id']);
 
         Category::create($data);
 
-        return back()->with('success', 'Categories has been created');
+        return back()->with('success', __('Category has been created.'));
 
     }
 
@@ -40,17 +43,17 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $data = $request->validate([
-            'name' => 'required|min:3'
+        $data = $this->validateWithTranslations($request, [
+            'name' => 'required|string|min:3|max:255',
         ]);
 
         $category = Category::findOrFail($id);
 
-        $data['slug'] = Category::uniqueSlug($data['name'], $category->id);
+        $data['slug'] = Category::uniqueSlug($data['name_id'], $category->id);
 
         $category->update($data);
 
-        return back()->with('success', 'Categories has been update');
+        return back()->with('success', __('Category has been updated.'));
     }
 
     /**
@@ -63,12 +66,12 @@ class CategoryController extends Controller
         // articles.category_id adalah foreign key tanpa cascade
         if ($category->articles_count > 0) {
             return back()->withErrors([
-                'category' => "Category \"{$category->name}\" still has {$category->articles_count} article(s). Move or delete them first.",
+                'category' => __('Category ":name" still has :count article(s). Move or delete them first.', ['name' => $category->name, 'count' => $category->articles_count]),
             ]);
         }
 
         $category->delete();
 
-        return back()->with('success', 'Categories has been deleted');
+        return back()->with('success', __('Category has been deleted.'));
     }
 }

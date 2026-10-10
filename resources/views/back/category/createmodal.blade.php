@@ -6,9 +6,9 @@
             <!-- Header -->
             <div class="modal-header bg-primary text-white rounded-top-4">
                 <h5 class="modal-title d-flex align-items-center" id="create-category-modal-label">
-                    <i data-feather="user-plus" class="me-2" style="width: 20px; height: 20px;"></i> Add Category
+                    <i data-feather="user-plus" class="me-2" style="width: 20px; height: 20px;"></i> {{ __('Add Category') }}
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
             </div>
 
             <!-- Form -->
@@ -18,10 +18,20 @@
                     <div class="row g-3">
                         <!-- Name -->
                         <div class="col-12">
-                            <label for="name" class="form-label fw-semibold">Category Name</label>
-                            <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
+                            <label for="name_id" class="form-label fw-semibold">{{ __('Category Name (Indonesia)') }}</label>
+                            <input type="text" name="name_id" id="name_id" class="form-control @error('name_id') is-invalid @enderror" value="{{ old('name_id') }}" required>
 
-                            @error('name')
+                            @error('name_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Name -->
+                        <div class="col-12">
+                            <label for="name_en" class="form-label fw-semibold">{{ __('Category Name (English)') }}</label>
+                            <input type="text" name="name_en" id="name_en" class="form-control @error('name_en') is-invalid @enderror" value="{{ old('name_en') }}">
+
+                            @error('name_en')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -31,10 +41,10 @@
                 <!-- Footer -->
                 <div class="modal-footer bg-light border-top-0 rounded-bottom-4">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i data-feather="x" class="me-1"></i> Cancel
+                        <i data-feather="x" class="me-1"></i> {{ __('Cancel') }}
                     </button>
                     <button type="submit" class="btn btn-primary">
-                        <i data-feather="save" class="me-1"></i> Add Category
+                        <i data-feather="save" class="me-1"></i> {{ __('Add Category') }}
                     </button>
                 </div>
             </form>
