@@ -1,0 +1,108 @@
+name: rrcons
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${RRCONS_APP_PORT:-8082}:80"
+    environment:
+      APP_NAME: ${RRCONS_APP_NAME:-RRCONS}
+      APP_ENV: ${RRCONS_APP_ENV:-local}
+      APP_KEY: ${RRCONS_APP_KEY}
+      APP_DEBUG: ${RRCONS_APP_DEBUG:-true}
+      APP_URL: ${RRCONS_APP_URL:-http://localhost:8082}
+
+      LOG_CHANNEL: ${RRCONS_LOG_CHANNEL:-stack}
+      LOG_LEVEL: ${RRCONS_LOG_LEVEL:-debug}
+
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${RRCONS_DB_DATABASE:-rrcons}
+      DB_USERNAME: ${RRCONS_DB_USERNAME:-rrcons}
+      DB_PASSWORD: ${RRCONS_DB_PASSWORD:-change-me}
+
+      CACHE_DRIVER: file
+      SESSION_DRIVER: file
+      QUEUE_CONNECTION: sync
+      FILESYSTEM_DISK: public
+
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      MAIL_USERNAME: null
+      MAIL_PASSWORD: null
+      MAIL_ENCRYPTION: null
+      MAIL_FROM_ADDRESS: ${RRCONS_MAIL_FROM_ADDRESS:-noreply@rrcons.local}
+      MAIL_FROM_NAME: ${RRCONS_MAIL_FROM_NAME:-RRCONS}
+    volumes:
+      - ./:/var/www/html
+      - rrcons-composer-cache:/tmp/composer-cache
+    depends_on:
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    networks:
+      - rrcons-network
+
+  db:
+    image: mariadb:10.6.27
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${RRCONS_DB_DATABASE:-rrcons}
+      MARIADB_USER: ${RRCONS_DB_USERNAME:-rrcons}
+      MARIADB_PASSWORD: ${RRCONS_DB_PASSWORD:-change-me}
+      MARIADB_ROOT_PASSWORD: ${RRCONS_DB_ROOT_PASSWORD:-change-root-me}
+    volumes:
+      - rrcons-db-data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "healthcheck.sh",
+          "--connect",
+          "--innodb_initialized"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - rrcons-network
+
+  node:
+    image: node:18-bookworm-slim
+    working_dir: /var/www/html
+    environment:
+      NODE_ENV: development
+    ports:
+      - "${RRCONS_VITE_PORT:-5173}:5173"
+    volumes:
+      - ./:/var/www/html
+      - rrcons-node-modules:/var/www/html/node_modules
+      - rrcons-npm-cache:/home/node/.npm
+    command: npm run dev -- --host 0.0.0.0
+    networks:
+      - rrcons-network
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "${RRCONS_MAILPIT_SMTP_PORT:-1025}:1025"
+      - "${RRCONS_MAILPIT_UI_PORT:-8025}:8025"
+    networks:
+      - rrcons-network
+
+volumes:
+  rrcons-db-data:
+  rrcons-composer-cache:
+  rrcons-node-modules:
+  rrcons-npm-cache:
+
+networks:
+  rrcons-network:
+    driver: bridge
