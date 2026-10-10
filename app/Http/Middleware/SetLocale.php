@@ -19,10 +19,21 @@ class SetLocale
         Request $request,
         Closure $next,
     ): Response {
-        $locale = session(
-            'app_locale',
-            config('app.locale', 'id'),
-        );
+        // ?lang=id|en membuat setiap versi bahasa punya URL sendiri yang bisa diindeks
+        // mesin pencari (hreflang). Pilihan itu juga diingat untuk halaman berikutnya.
+        $requested = $request->query('lang');
+
+        if (is_string($requested) && in_array($requested, ['id', 'en'], true)) {
+            if ($request->hasSession()) {
+                $request->session()->put('app_locale', $requested);
+            }
+
+            $locale = $requested;
+        } else {
+            $locale = $request->hasSession()
+                ? $request->session()->get('app_locale', config('app.locale', 'id'))
+                : config('app.locale', 'id');
+        }
 
         if (!in_array($locale, ['id', 'en'], true)) {
             $locale = config('app.locale', 'id');

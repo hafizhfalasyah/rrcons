@@ -9,6 +9,10 @@ return [
     */
 
     'seo' => [
+        'breadcrumb' => [
+            'home' => 'Home',
+            'blog' => 'Blog',
+        ],
 
         'index' => [
             'title' => 'RRCONS | Blog - Digital Insights, Technology, and Business Solutions',

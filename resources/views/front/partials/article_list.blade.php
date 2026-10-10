@@ -9,6 +9,8 @@
             class="block group"
         >
             <img
+                loading="lazy"
+                decoding="async"
                 src="{{ asset('storage/' . $article->img) }}"
                 alt="{{ $article->title }}"
                 class="w-full h-48 object-cover rounded transition duration-300 group-hover:scale-[1.02]"

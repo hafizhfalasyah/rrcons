@@ -33,6 +33,7 @@ use App\Models\Contact\HeroContact;
 use App\Models\Contact\UsContact;
 
 use Illuminate\Support\Facades\Storage;
+use App\Support\Seo;
 
 class HomeController extends Controller
 {
@@ -82,7 +83,7 @@ class HomeController extends Controller
             'posters', 'heroes', 'abouts', 'services', 'advantages',
             'profiles', 'business', 'sosmed', 'gallery', 'months', 'years',
             'articles', 'categories', 'categorySlug'
-        ));
+        ) + ['seo' => Seo::home($services)]);
     }
 
     public function getArticles(Request $request) {
@@ -142,7 +143,7 @@ class HomeController extends Controller
             'article',
             'recentPosts',
             'categories'
-        ));
+        ) + ['seo' => Seo::article($article)]);
     }
 
     public function storeComment(Request $request, $slug)
@@ -167,6 +168,7 @@ class HomeController extends Controller
         return view('front.rrfuture', [
             'heroes' => $heroes,
             'products' => $products,
+            'seo' => Seo::rrfuture($products),
         ]);
     }
 
@@ -177,6 +179,7 @@ class HomeController extends Controller
         return view('front.service', [
             'heroes' => $heroes,
             'ours' => $ours,
+            'seo' => Seo::service($ours),
         ]);
     }
 
@@ -184,23 +187,26 @@ class HomeController extends Controller
     {
         $categories = Category::all();
         $categorySlug = $request->query('category');
+        $search = trim((string) $request->query('q', ''));
 
         $articles = Article::published()
             ->with('category')
+            // ?q= dipakai juga oleh SearchAction (structured data) mesin pencari
+            ->searchTitle($search)
             ->when($categorySlug, function ($query) use ($categorySlug) {
                 $query->whereHas('category', function ($q) use ($categorySlug) {
                     $q->where('slug', $categorySlug);
                 });
             })
             ->latest('publish_date')
-            ->paginate(9); // bisa diganti get() jika tidak ingin pagination
+            ->paginate(9)
+            ->withQueryString();
 
-        return view('front.blog', compact('categories', 'articles'));
+        return view('front.blog', compact('categories', 'articles') + [
+            'seo' => Seo::blogIndex($articles, $categorySlug, $search),
+        ]);
     }
 
-    public function detail_blog() {
-        return view('front.detail-blog');
-    }
 
     public function contact() {
         $heroes = HeroContact::with('contactMenu')->get();
@@ -212,6 +218,7 @@ class HomeController extends Controller
             'heroes' => $heroes,
             'usCollection' => $usCollection,
             'us' => $usData,
+            'seo' => Seo::contact(),
         ]);
     }
 

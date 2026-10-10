@@ -18,6 +18,10 @@ return new class extends Migration
         Schema::table('articles', function (Blueprint $table) {
             $table->dateTime('publish_date')->nullable()->default(null)->change();
         });
+
+        // Migrasi ini dirilis bersama pergantian timezone UTC -> Asia/Jakarta. Penanda ini
+        // memberi tahu migrasi koreksi timestamp lama bahwa pergantian terjadi di run ini.
+        app()->instance('rrcons.timezone_switched_at', now());
     }
 
     /**

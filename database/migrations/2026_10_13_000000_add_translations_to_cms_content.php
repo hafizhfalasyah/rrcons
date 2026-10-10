@@ -32,17 +32,22 @@ return new class extends Migration
     {
         foreach ($this->columns as $tableName => $fields) {
             // Satu rename per Schema::table: SQLite tidak mendukung beberapa rename sekaligus
+            // idempoten: lewati kolom yang sudah diubah (mis. manual atau run sebelumnya yang terhenti)
             foreach (array_keys($fields) as $field) {
-                Schema::table($tableName, function (Blueprint $table) use ($field) {
-                    $table->renameColumn($field, "{$field}_id");
-                });
+                if (Schema::hasColumn($tableName, $field) && !Schema::hasColumn($tableName, "{$field}_id")) {
+                    Schema::table($tableName, function (Blueprint $table) use ($field) {
+                        $table->renameColumn($field, "{$field}_id");
+                    });
+                }
             }
 
-            Schema::table($tableName, function (Blueprint $table) use ($fields) {
-                foreach ($fields as $field => $type) {
-                    $table->{$type}("{$field}_en")->nullable()->after("{$field}_id");
+            foreach ($fields as $field => $type) {
+                if (!Schema::hasColumn($tableName, "{$field}_en")) {
+                    Schema::table($tableName, function (Blueprint $table) use ($field, $type) {
+                        $table->{$type}("{$field}_en")->nullable()->after("{$field}_id");
+                    });
                 }
-            });
+            }
         }
 
         // Form mengizinkan field ini kosong, tetapi kolomnya NOT NULL sehingga

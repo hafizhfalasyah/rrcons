@@ -28,6 +28,7 @@ use App\Http\Controllers\Back\Contact\ContactMenuController;
 use App\Http\Controllers\Front\HomeController;
 use App\Http\Controllers\Front\ArticleController as FrontArticleController;
 use App\Http\Controllers\Front\CategoryController as FrontCategoryController;
+use App\Http\Controllers\Front\SeoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -175,6 +176,14 @@ Route::middleware(['auth', 'UserAccess:admin,writer,uploader'])->group(function(
     Route::group(['prefix' => 'laravel-filemanager', 'middleware' => 'UserAccess:admin,writer'], function () {
         \UniSharp\LaravelFilemanager\Lfm::routes();
     });
+});
+
+/** SEO & GEO: sitemap, robots, llms.txt (mesin AI) dan RSS — tidak dihitung sebagai kunjungan **/
+Route::controller(SeoController::class)->group(function () {
+    Route::get('/sitemap.xml', 'sitemap')->name('sitemap');
+    Route::get('/robots.txt', 'robots')->name('robots');
+    Route::get('/llms.txt', 'llms')->name('llms');
+    Route::get('/feed', 'feed')->name('feed');
 });
 
 Route::middleware('countPageVisitor')->controller(HomeController::class)->group(function () {

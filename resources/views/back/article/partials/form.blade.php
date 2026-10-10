@@ -81,6 +81,44 @@
         </div>
     </div>
 
+    {{-- SEO: opsional, bila kosong otomatis memakai judul & cuplikan isi --}}
+    <div class="card mb-3">
+        <div class="card-header bg-white d-flex align-items-center gap-2">
+            <i data-feather="search" class="icon-sm"></i>
+            <span class="fw-semibold">{{ __('SEO (search engines & AI)') }}</span>
+            <small class="text-muted">({{ __('optional') }})</small>
+        </div>
+        <div class="card-body">
+            <p class="small text-muted mb-3">{{ __('Controls how this article appears on Google and in AI answers. Leave empty to use the article title and the beginning of its content automatically.') }}</p>
+            <div class="row g-4">
+                @foreach (['id' => __('Indonesian'), 'en' => __('English')] as $lang => $langLabel)
+                    <div class="col-lg-6 seo-group" data-lang="{{ $lang }}">
+                        <p class="fw-semibold small mb-2">{{ $langLabel }}</p>
+                        <div class="mb-2">
+                            <label for="meta_title_{{ $lang }}" class="form-label small mb-1">{{ __('SEO title') }}</label>
+                            <input type="text" name="meta_title_{{ $lang }}" id="meta_title_{{ $lang }}" maxlength="70"
+                                class="form-control form-control-sm seo-title @error('meta_title_' . $lang) is-invalid @enderror"
+                                value="{{ old('meta_title_' . $lang, $article->{'meta_title_' . $lang} ?? '') }}">
+                            <div class="form-text"><span class="seo-count" data-for="meta_title_{{ $lang }}" data-ideal="60">0</span>/60 · {{ __('ideal 50–60 characters') }}</div>
+                        </div>
+                        <div class="mb-2">
+                            <label for="meta_description_{{ $lang }}" class="form-label small mb-1">{{ __('Meta description') }}</label>
+                            <textarea name="meta_description_{{ $lang }}" id="meta_description_{{ $lang }}" rows="2" maxlength="320"
+                                class="form-control form-control-sm seo-description @error('meta_description_' . $lang) is-invalid @enderror">{{ old('meta_description_' . $lang, $article->{'meta_description_' . $lang} ?? '') }}</textarea>
+                            <div class="form-text"><span class="seo-count" data-for="meta_description_{{ $lang }}" data-ideal="160">0</span>/160 · {{ __('ideal 120–160 characters, summarise the answer the article gives') }}</div>
+                        </div>
+                        <div class="border rounded p-2 bg-light">
+                            <div class="small text-muted mb-1">{{ __('Google preview') }}</div>
+                            <div class="seo-preview-url small text-success text-truncate">{{ url('/blog') }}/…</div>
+                            <div class="seo-preview-title text-primary fw-semibold text-truncate"></div>
+                            <div class="seo-preview-description small text-muted"></div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
     <div class="mb-4">
         <label for="img" class="form-label fw-semibold">{{ __('Image') }} @unless ($isEdit)<span class="text-danger">*</span>@endunless <small class="text-muted">(JPG, PNG, WEBP · {{ __('max 2MB') }})</small></label>
         <input class="form-control @error('img') is-invalid @enderror" type="file" id="img" name="img" accept="image/png,image/jpeg,image/webp">
@@ -276,6 +314,47 @@
                     }
                 });
             });
+
+            // SEO: penghitung karakter & pratinjau hasil pencarian
+            const siteName = @json(config('seo.site_name'));
+            const plain = html => {
+                const div = document.createElement('div');
+                div.innerHTML = html || '';
+                return (div.textContent || '').replace(/\s+/g, ' ').trim();
+            };
+            const truncate = (text, max) => text.length > max ? text.slice(0, max - 1).trimEnd() + '…' : text;
+
+            function renderSeo() {
+                form.querySelectorAll('.seo-count').forEach(counter => {
+                    const length = document.getElementById(counter.dataset.for).value.length;
+                    counter.textContent = length;
+                    counter.classList.toggle('text-danger', length > Number(counter.dataset.ideal));
+                });
+
+                form.querySelectorAll('.seo-group').forEach(group => {
+                    const lang = group.dataset.lang;
+                    const title = group.querySelector('.seo-title').value.trim()
+                        || document.getElementById('title_' + lang).value.trim()
+                        || document.getElementById('title_id').value.trim();
+                    const content = editors[lang] ? editors[lang].getData() : document.getElementById('editor-' + lang).value;
+                    const fallbackContent = editors.id ? editors.id.getData() : document.getElementById('editor-id').value;
+                    const description = group.querySelector('.seo-description').value.trim()
+                        || plain(content) || plain(fallbackContent);
+
+                    group.querySelector('.seo-preview-title').textContent = title ? truncate(title, 60) + ' | ' + siteName : '—';
+                    group.querySelector('.seo-preview-description').textContent = truncate(description, 160) || '—';
+                });
+            }
+
+            form.addEventListener('input', renderSeo);
+            const waitForEditors = setInterval(() => {
+                if (editors.id && editors.en) {
+                    clearInterval(waitForEditors);
+                    Object.values(editors).forEach(editor => editor.model.document.on('change:data', renderSeo));
+                    renderSeo();
+                }
+            }, 300);
+            renderSeo();
 
             // Preview gambar
             document.getElementById('img').addEventListener('change', function (e) {

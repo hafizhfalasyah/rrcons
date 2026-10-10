@@ -35,7 +35,7 @@ class Article extends Model
     const CHOICE_SCHEDULE = 'schedule';
     const PUBLICATION_CHOICES = [self::CHOICE_PRIVATE, self::CHOICE_PUBLISH, self::CHOICE_SCHEDULE];
 
-    protected $fillable = ['user_id', 'category_id', 'title_id', 'title_en', 'slug', 'desc_id', 'desc_en', 'img', 'views', 'created_by', 'status', 'publish_date'];
+    protected $fillable = ['user_id', 'category_id', 'title_id', 'title_en', 'slug', 'desc_id', 'desc_en', 'meta_title_id', 'meta_title_en', 'meta_description_id', 'meta_description_en', 'img', 'views', 'created_by', 'status', 'publish_date'];
 
     protected $casts = [
         'publish_date' => 'datetime',
@@ -129,6 +129,23 @@ class Article extends Model
         };
     }
 
+    /**
+     * Judul untuk mesin pencari: judul SEO bahasa aktif, bila kosong judul artikel.
+     * (Tidak fallback ke judul SEO bahasa lain supaya halaman English tidak bertitel Indonesia.)
+     */
+    public function seoTitle(): string
+    {
+        return $this->attributes['meta_title_' . app()->getLocale()] ?? null ?: $this->title;
+    }
+
+    /**
+     * Deskripsi untuk mesin pencari: meta description bahasa aktif, bila kosong cuplikan isi.
+     */
+    public function seoDescription(): string
+    {
+        return $this->attributes['meta_description_' . app()->getLocale()] ?? null
+            ?: \App\Support\Seo::clean($this->desc, 160);
+    }
     // cari judul di kedua bahasa
     public function scopeSearchTitle(Builder $query, ?string $term): Builder
     {

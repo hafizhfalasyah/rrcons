@@ -29,6 +29,11 @@ class ArticleRequest extends FormRequest
             'title_en' => 'nullable|string|max:255',
             'desc_id' => 'required|string',
             'desc_en' => 'nullable|string',
+            // SEO opsional; batas mengikuti panjang yang ditampilkan mesin pencari
+            'meta_title_id' => 'nullable|string|max:70',
+            'meta_title_en' => 'nullable|string|max:70',
+            'meta_description_id' => 'nullable|string|max:320',
+            'meta_description_en' => 'nullable|string|max:320',
             'img' => $this->imageRule(),
             // private = tidak tampil, publish = tampil sekarang, schedule = tampil otomatis pada publish_date
             'publication' => 'required|in:' . implode(',', Article::PUBLICATION_CHOICES),

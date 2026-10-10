@@ -5,33 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>{{ __('index.seo.title') }}</title>
-
-        <!-- SEO Meta Tag -->
-        <meta
-            name="description"
-            content="{{ __('index.seo.description') }}"
-        >
-        <meta
-            name="keywords"
-            content="{{ __('index.seo.keywords') }}"
-        >
-        <meta
-            name="author"
-            content="{{ __('index.seo.author') }}"
-        >
-        <meta
-            property="og:title"
-            content="{{ __('index.seo.og_title') }}"
-        >
-        <meta
-            property="og:description"
-            content="{{ __('index.seo.og_description') }}"
-        >
-        <meta
-            property="og:url"
-            content="{{ url()->current() }}"
-        >
+        @include('front.partials.seo', ['seo' => $seo])
 
         <!-- Tailwind CDN -->
         <script src="https://cdn.tailwindcss.com"></script>

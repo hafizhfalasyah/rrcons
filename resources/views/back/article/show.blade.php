@@ -53,6 +53,19 @@
                         @endif
                     </td>
                 </tr>
+                @foreach (['id' => 'ID', 'en' => 'EN'] as $lang => $code)
+                    <tr>
+                        <th class="bg-light">{{ __('SEO title & description') }} ({{ $code }})</th>
+                        <td>
+                            @if (filled($article->{'meta_title_' . $lang}) || filled($article->{'meta_description_' . $lang}))
+                                <div class="fw-semibold">{{ $article->{'meta_title_' . $lang} ?: '—' }}</div>
+                                <div class="small text-muted">{{ $article->{'meta_description_' . $lang} ?: '—' }}</div>
+                            @else
+                                <span class="text-muted fst-italic">{{ __('Automatic (article title & content)') }}</span>
+                            @endif
+                        </td>
+                    </tr>
+                @endforeach
                 <tr>
                     <th class="bg-light">{{ __('Category') }}</th>
                     <td>{{ $article->Category?->name ?? '-' }}</td>

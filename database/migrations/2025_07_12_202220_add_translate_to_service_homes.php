@@ -6,23 +6,41 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    private string $table = 'service_homes';
+
+    /**
+     * Kolom => tipe. Kolom lama di-rename menjadi <kolom>_id dan ditambah <kolom>_en.
+     */
+    private array $fields = [
+        'name' => 'string',
+        'desc' => 'text',
+    ];
+
     /**
      * Run the migrations.
+     *
+     * Idempoten: rename & penambahan kolom hanya dilakukan bila belum ada, karena di
+     * beberapa database perubahan ini sudah dilakukan manual tanpa tercatat.
      */
     public function up(): void
     {
-        Schema::table('service_homes', function (Blueprint $table) {
-            $table->renameColumn('name', 'name_id');
-        });
+        // Satu rename per Schema::table: SQLite tidak mendukung beberapa rename sekaligus
+        foreach (array_keys($this->fields) as $field) {
+            if (Schema::hasColumn($this->table, $field) && !Schema::hasColumn($this->table, "{$field}_id")) {
+                Schema::table($this->table, function (Blueprint $table) use ($field) {
+                    $table->renameColumn($field, "{$field}_id");
+                });
+            }
+        }
 
-        Schema::table('service_homes', function (Blueprint $table) {
-            $table->renameColumn('desc', 'desc_id');
-        });
-
-        Schema::table('service_homes', function (Blueprint $table) {
-            $table->string('name_en')->nullable()->after('name_id');
-            $table->text('desc_en')->nullable()->after('desc_id');
-        });
+        // Kolom baru ditambahkan setelah rename agar after() merujuk kolom yang sudah ada
+        foreach ($this->fields as $field => $type) {
+            if (!Schema::hasColumn($this->table, "{$field}_en")) {
+                Schema::table($this->table, function (Blueprint $table) use ($field, $type) {
+                    $table->{$type}("{$field}_en")->nullable()->after("{$field}_id");
+                });
+            }
+        }
     }
 
     /**
@@ -30,16 +48,18 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('service_homes', function (Blueprint $table) {
-            $table->dropColumn(['name_en', 'desc_en']);
-        });
+        foreach (array_keys($this->fields) as $field) {
+            if (Schema::hasColumn($this->table, "{$field}_en")) {
+                Schema::table($this->table, function (Blueprint $table) use ($field) {
+                    $table->dropColumn("{$field}_en");
+                });
+            }
 
-        Schema::table('service_homes', function (Blueprint $table) {
-            $table->renameColumn('name_id', 'name');
-        });
-
-        Schema::table('service_homes', function (Blueprint $table) {
-            $table->renameColumn('desc_id', 'desc');
-        });
+            if (Schema::hasColumn($this->table, "{$field}_id") && !Schema::hasColumn($this->table, $field)) {
+                Schema::table($this->table, function (Blueprint $table) use ($field) {
+                    $table->renameColumn("{$field}_id", $field);
+                });
+            }
+        }
     }
 };
