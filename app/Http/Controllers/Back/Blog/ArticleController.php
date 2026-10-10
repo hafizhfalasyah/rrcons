@@ -37,14 +37,17 @@ class ArticleController extends Controller
                 })
 
                 ->editColumn('publish_date', function($row) {
-                    return \Carbon\Carbon::parse($row->publish_date)->translatedFormat('d F Y');
+                    return optional($row->publish_date)->translatedFormat('d F Y H:i') ?? '-';
                 })
 
                 ->addColumn('status', function($article){
-                    if ($article->status == 0){
-                        return '<span class="badge bg-danger px-3 py-2">Private</span>';
-                    } else {
-                        return '<span class="badge bg-primary px-3 py-2">Published</span>';
+                    switch ($article->publication_status) {
+                        case Article::PUBLICATION_PRIVATE:
+                            return '<span class="badge bg-danger px-3 py-2">Private</span>';
+                        case Article::PUBLICATION_SCHEDULED:
+                            return '<span class="badge bg-warning text-dark px-3 py-2">Scheduled</span>';
+                        default:
+                            return '<span class="badge bg-primary px-3 py-2">Published</span>';
                     }
                 })
 
@@ -107,7 +110,8 @@ class ArticleController extends Controller
         $data['user_id'] = Auth::id();
         $data['created_by'] = Auth::id();
         $data['slug'] = Str::slug($data['title']);
-        $data['publish_date'] = now();
+        // Pakai tanggal terbit pilihan user (bisa di masa depan = terjadwal)
+        $data['publish_date'] = $data['publish_date'] ?? now();
 
         Article::create($data);
 
@@ -130,7 +134,7 @@ class ArticleController extends Controller
     public function edit(string $id)
     {
         return view('back.article.update', [
-            'article' => Article::find($id),
+            'article' => Article::findOrFail($id),
             'categories' => Category::get()
         ]);
     }
@@ -161,7 +165,8 @@ class ArticleController extends Controller
 
         $data['user_id'] = auth()->id();
         $data['slug'] = Str::slug($data['title']);
-        $data['publish_date'] = now();
+        // Pertahankan tanggal terbit lama bila field dikosongkan
+        $data['publish_date'] = $data['publish_date'] ?? $article->publish_date ?? now();
 
         $article->update($data);
 

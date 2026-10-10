@@ -48,8 +48,10 @@
                 <tr>
                     <th class="bg-light">Status</th>
                     <td>
-                        @if ($article->status == 0)
-                            <span class="badge bg-danger">Private</span>
+                        @if ($article->publication_status === \App\Models\Blog\Article::PUBLICATION_PRIVATE)
+                            <span class="badge bg-danger px-3 py-2">Private</span>
+                        @elseif ($article->publication_status === \App\Models\Blog\Article::PUBLICATION_SCHEDULED)
+                            <span class="badge bg-warning text-dark px-3 py-2">Scheduled</span>
                         @else
                             <span class="badge bg-primary px-3 py-2">Published</span>
                         @endif
@@ -57,7 +59,7 @@
                 </tr>
                 <tr>
                     <th class="bg-light">Publish Date</th>
-                    <td>{{ $article->publish_date }}</td>
+                    <td>{{ optional($article->publish_date)->translatedFormat('d F Y H:i') ?? '-' }}</td>
                 </tr>
                 <tr>
                     <th class="bg-light">Writer</th>

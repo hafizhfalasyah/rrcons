@@ -581,8 +581,8 @@
             </h1>
 
             <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
-                <time datetime="{{ $article->created_at->toIso8601String() }}">
-                    {{ $article->created_at
+                <time datetime="{{ ($article->publish_date ?? $article->created_at)->toIso8601String() }}">
+                    {{ ($article->publish_date ?? $article->created_at)
                         ->locale($currentLocale)
                         ->translatedFormat(__('blog.sections.blog.detail.date.format')) }}
                 </time>
@@ -833,10 +833,10 @@
                                 </a>
 
                                 <time
-                                    datetime="{{ $post->created_at->toIso8601String() }}"
+                                    datetime="{{ ($post->publish_date ?? $post->created_at)->toIso8601String() }}"
                                     class="block text-xs text-gray-500 mt-1"
                                 >
-                                    {{ $post->created_at
+                                    {{ ($post->publish_date ?? $post->created_at)
                                         ->locale($currentLocale)
                                         ->translatedFormat(__('blog.sections.blog.detail.date.format')) }}
                                 </time>

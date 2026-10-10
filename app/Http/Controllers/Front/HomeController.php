@@ -67,16 +67,17 @@ class HomeController extends Controller
             $category = Category::where('slug', $categorySlug)->first();
 
             if ($category) {
-                $articles = Article::where('category_id', $category->id)
+                $articles = Article::published()
+                    ->where('category_id', $category->id)
                     ->with('category')
-                    ->latest()
+                    ->latest('publish_date')
                     ->take(6)
                     ->get();
             } else {
                 $articles = collect(); // kategori tidak ditemukan
             }
         } else {
-            $articles = Article::with('category')->latest()->take(6)->get();
+            $articles = Article::published()->with('category')->latest('publish_date')->take(6)->get();
         }
 
         return view('front.index', compact(
@@ -91,10 +92,10 @@ class HomeController extends Controller
         if ($categorySlug) {
             $category = Category::where('slug', $categorySlug)->first();
             $articles = $category
-                ? Article::where('category_id', $category->id)->with('category')->latest()->take(6)->get()
+                ? Article::published()->where('category_id', $category->id)->with('category')->latest('publish_date')->take(6)->get()
                 : collect();
         } else {
-            $articles = Article::with('category')->latest()->take(6)->get();
+            $articles = Article::published()->with('category')->latest('publish_date')->take(6)->get();
         }
 
         return response()->json([
@@ -107,14 +108,15 @@ class HomeController extends Controller
         $query = $request->query('q');
         $categorySlug = $request->query('category');
 
-        $articles = Article::with('category')
+        $articles = Article::published()
+            ->with('category')
             ->when($query, function($q) use ($query) {
                 $q->where('title', 'like', "%{$query}%");
             })
             ->when($categorySlug, function($q) use ($categorySlug) {
                 $q->whereHas('category', fn($c) => $c->where('slug', $categorySlug));
             })
-            ->latest()
+            ->latest('publish_date')
             ->get();
 
         $html = view('front.partials.article_list', compact('articles'))->render();
@@ -124,18 +126,21 @@ class HomeController extends Controller
 
     public function show($slug)
     {
-        $article = Article::with(['category', 'comments'])
+        // Artikel Private / terjadwal (belum waktunya) tidak boleh bisa diakses publik
+        $article = Article::published()
+            ->with(['category', 'comments'])
             ->where('slug', $slug)
             ->firstOrFail();
-    
+
         $article->increment('views');
-    
-        $recentPosts = Article::latest()
+
+        $recentPosts = Article::published()
+            ->latest('publish_date')
             ->where('id', '!=', $article->id)
             ->take(4)
             ->get();
-    
-        $categories = Category::withCount('articles')->get();
+
+        $categories = Category::withCount(['articles' => fn($q) => $q->published()])->get();
     
         return view('front.detail-blog', compact(
             'article',
@@ -146,7 +151,7 @@ class HomeController extends Controller
 
     public function storeComment(Request $request, $slug)
     {
-        $article = Article::where('slug', $slug)->firstOrFail();
+        $article = Article::published()->where('slug', $slug)->firstOrFail();
 
         $validated = $request->validate([
             'name' => 'required|string|max:100',
@@ -184,13 +189,14 @@ class HomeController extends Controller
         $categories = Category::all();
         $categorySlug = $request->query('category');
 
-        $articles = Article::with('category')
+        $articles = Article::published()
+            ->with('category')
             ->when($categorySlug, function ($query) use ($categorySlug) {
                 $query->whereHas('category', function ($q) use ($categorySlug) {
                     $q->where('slug', $categorySlug);
                 });
             })
-            ->latest()
+            ->latest('publish_date')
             ->paginate(9); // bisa diganti get() jika tidak ingin pagination
 
         return view('front.blog', compact('categories', 'articles'));

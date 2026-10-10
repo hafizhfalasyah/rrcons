@@ -12,12 +12,12 @@ class ArticleController extends Controller
 
         if ($keyword) {
             $articles = Article::with('Category')
-                        ->whereStatus(1)
+                        ->published()
                         ->where('title', 'like', '%' .$keyword. '%')
-                        ->latest()
+                        ->latest('publish_date')
                         ->paginate(6);
         } else {
-            $articles = Article::with('Category')->whereStatus(1)->latest()->paginate(6);
+            $articles = Article::with('Category')->published()->latest('publish_date')->paginate(6);
         }
 
         return view('front.article.index', [
@@ -28,7 +28,7 @@ class ArticleController extends Controller
     
     public function show($slug)
     {
-        $article = Article::whereSlug($slug)->firstOrFail();
+        $article = Article::published()->whereSlug($slug)->firstOrFail();
         $article->increment('views');
     
         return view('front.article.show', [

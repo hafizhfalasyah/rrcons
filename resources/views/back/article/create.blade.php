@@ -54,17 +54,19 @@
             <div class="col-md-6">
                 <label for="status" class="form-label">Status</label>
                 <select name="status" id="status" class="form-select">
-                    <option value="" selected disabled>-- Choose --</option>
-                    <option value="0">Private</option>
-                    <option value="1">Publish</option>
+                    <option value="" {{ old('status') === null ? 'selected' : '' }} disabled>-- Choose --</option>
+                    <option value="0" {{ old('status') === '0' ? 'selected' : '' }}>Private</option>
+                    <option value="1" {{ old('status') === '1' ? 'selected' : '' }}>Publish</option>
                 </select>
             </div>
 
             <div class="col-md-6">
-                <label for="publish_date" class="form-label">Publish Date</label>
-                <input type="date" name="publish_date" id="publish_date" class="form-control">
+                <label for="publish_date" class="form-label">Publish Date &amp; Time</label>
+                <input type="datetime-local" name="publish_date" id="publish_date" class="form-control" value="{{ old('publish_date', now()->format('Y-m-d\TH:i')) }}">
             </div>
         </div>
+
+        @include('back.article.partials.schedule_hint')
 
         <div class="d-flex justify-content-between mt-4">
             <a href="{{ route('blog.articles.index') }}" class="btn btn-danger btn-sm me-1 d-flex align-items-center px-3 py-2 rounded-3">
