@@ -10,8 +10,10 @@ class HomeMenu extends Model
     protected $table = 'home_menus';
 
     protected $fillable = [
-        'title',
-        'sub_title',
+        'title_id',
+        'title_en',
+        'sub_title_id',
+        'sub_title_en',
     ];
 
     public function heroSections()

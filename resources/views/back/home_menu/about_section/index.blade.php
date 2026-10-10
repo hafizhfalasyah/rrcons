@@ -47,7 +47,7 @@
                             <span class="text-muted">No Image</span>
                         @endif
                     </td>
-                    <td>{{ $item->text }}</td>
+                    <td>{{ $item->{'text_' . $lang} }}</td>
                     <td>
                         {{ $item->updated_at ? \Carbon\Carbon::parse($item->updated_at)->translatedFormat('d F Y') : '-' }}
                     </td>

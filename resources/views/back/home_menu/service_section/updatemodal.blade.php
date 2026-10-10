@@ -21,19 +21,38 @@
 
                             <!-- Name -->
                             <div class="col-12">
-                                <label for="name-{{ $item->id }}" class="form-label fw-semibold">Name</label>
-                                <input type="text" name="name" id="name-{{ $item->id }}" class="form-control @error('name') is-invalid @enderror"
-                                    value="{{ old('name', $item->name) }}" required>
-                                @error('name')
+                                <label for="name_id-{{ $item->id }}" class="form-label fw-semibold">Name (Indonesia)</label>
+                                <input type="text" name="name_id" id="name_id-{{ $item->id }}" class="form-control @error('name_id') is-invalid @enderror"
+                                    value="{{ old('name_id', $item->name_id) }}" required>
+                                @error('name_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Name -->
+                            <div class="col-12">
+                                <label for="name_en-{{ $item->id }}" class="form-label fw-semibold">Name (English)</label>
+                                <input type="text" name="name_en" id="name_en-{{ $item->id }}" class="form-control @error('name_en') is-invalid @enderror"
+                                    value="{{ old('name_en', $item->name_en) }}">
+                                @error('name_en')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <!-- Desc as Textarea -->
                             <div class="col-12">
-                                <label for="desc-{{ $item->id }}" class="form-label fw-semibold">Desc</label>
-                                <textarea name="desc" id="desc-{{ $item->id }}" class="form-control @error('desc') is-invalid @enderror" rows="4" required>{{ old('desc', $item->desc) }}</textarea>
-                                @error('desc')
+                                <label for="desc_id-{{ $item->id }}" class="form-label fw-semibold">Desc (Indonesia)</label>
+                                <textarea name="desc_id" id="desc_id-{{ $item->id }}" class="form-control @error('desc_id') is-invalid @enderror" rows="4" required>{{ old('desc_id', $item->desc_id) }}</textarea>
+                                @error('desc_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Desc as Textarea -->
+                            <div class="col-12">
+                                <label for="desc_en-{{ $item->id }}" class="form-label fw-semibold">Desc (English)</label>
+                                <textarea name="desc_en" id="desc_en-{{ $item->id }}" class="form-control @error('desc_en') is-invalid @enderror" rows="4">{{ old('desc_en', $item->desc_en) }}</textarea>
+                                @error('desc_en')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

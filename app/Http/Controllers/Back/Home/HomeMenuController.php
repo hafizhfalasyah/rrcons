@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Back\Home;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\ManagesPublicFiles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\App;
@@ -19,15 +20,14 @@ use App\Models\Home\GalleryHome;
 
 class HomeMenuController extends Controller
 {
+    use ManagesPublicFiles;
+
     /** ============================== HOME MENU CONTROLLERS ============================== **/
 
     public function homeMenu()
     {
         $lang = App::getLocale();
-        $titleCol = 'title_' . $lang;
-        $subTitleCol = 'sub_title_' . $lang;
-
-        $homeMenus = HomeMenu::select('id', "$titleCol as title", "$subTitleCol as sub_title", 'updated_at')->get();
+        $homeMenus = HomeMenu::all();
         $lastUpdated = HomeMenu::latest('updated_at')->value('updated_at');
 
         return view('back.home_menu.index', compact('homeMenus', 'lastUpdated', 'lang'));
@@ -36,8 +36,10 @@ class HomeMenuController extends Controller
     public function updateHomeMenu(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'sub_title' => 'nullable|string|max:255',
+            'title_id' => 'required|string|max:255',
+            'title_en' => 'nullable|string|max:255',
+            'sub_title_id' => 'nullable|string|max:255',
+            'sub_title_en' => 'nullable|string|max:255',
         ]);
 
         $homeMenu = HomeMenu::findOrFail($id);
@@ -169,15 +171,7 @@ class HomeMenuController extends Controller
         $dataToUpdate = [];
 
         if (isset($validatedData['bg_img'])) {
-            if ($hero->bg_img && Storage::exists('public/back/home/hero/' . $hero->bg_img)) {
-                Storage::delete('public/back/home/hero/' . $hero->bg_img);
-            }
-
-            $file = $validatedData['bg_img'];
-            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/home/hero/', $filename);
-
-            $dataToUpdate['bg_img'] = $filename;
+            $dataToUpdate['bg_img'] = $this->replacePublicFile($hero->bg_img, $validatedData['bg_img'], 'back/home/hero');
         }
 
         // Jika ada data untuk diupdate, panggil update()
@@ -208,33 +202,22 @@ class HomeMenuController extends Controller
     {
         $validatedData = $request->validate([
             'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'text' => 'nullable|string',
+            'text_id' => 'required|string',
+            'text_en' => 'nullable|string',
         ]);
 
         $about = AboutHome::with('homeMenu')->findOrFail($id);
 
-        $dataToUpdate = [];
-
-        // Update text hanya kalau ada input text baru (tidak null)
-        if (isset($validatedData['text'])) {
-            $dataToUpdate['text'] = $validatedData['text'];
-        }
+        $dataToUpdate = [
+            'text_id' => $validatedData['text_id'],
+            'text_en' => $validatedData['text_en'] ?? null,
+        ];
 
         if (isset($validatedData['img'])) {
-            if ($about->img && Storage::exists('public/back/home/about/' . $about->img)) {
-                Storage::delete('public/back/home/about/' . $about->img);
-            }
-
-            $file = $validatedData['img'];
-            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/home/about/', $filename);
-
-            $dataToUpdate['img'] = $filename;
+            $dataToUpdate['img'] = $this->replacePublicFile($about->img, $validatedData['img'], 'back/home/about');
         }
 
-        if (!empty($dataToUpdate)) {
-            $about->update($dataToUpdate);
-        }
+        $about->update($dataToUpdate);
 
         return redirect()->route('home.about')->with('success', 'About section updated successfully');
     }
@@ -258,8 +241,10 @@ class HomeMenuController extends Controller
     public function updateServiceSection(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'desc' => 'nullable|string'
+            'name_id' => 'required|string|max:255',
+            'name_en' => 'nullable|string|max:255',
+            'desc_id' => 'required|string',
+            'desc_en' => 'nullable|string',
         ]);
 
         $services = ServiceHome::with('homeMenu')->findOrFail($id);
@@ -287,8 +272,10 @@ class HomeMenuController extends Controller
     public function updateAdvantageSection(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'desc' => 'nullable|string'
+            'title_id' => 'required|string|max:255',
+            'title_en' => 'nullable|string|max:255',
+            'desc_id' => 'required|string',
+            'desc_en' => 'nullable|string',
         ]);
 
         $advantages = AdvantageHome::with('homeMenu')->findOrFail($id);
@@ -330,15 +317,7 @@ class HomeMenuController extends Controller
         }
 
         if (isset($validatedData['img'])) {
-            if ($profile->img && Storage::exists('public/back/home/profile/' . $profile->img)) {
-                Storage::delete('public/back/home/profile/' . $profile->img);
-            }
-
-            $file = $validatedData['img'];
-            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/home/profile/', $filename);
-
-            $dataToUpdate['img'] = $filename;
+            $dataToUpdate['img'] = $this->replacePublicFile($profile->img, $validatedData['img'], 'back/home/profile');
         }
 
         if (!empty($dataToUpdate)) {
@@ -368,37 +347,26 @@ class HomeMenuController extends Controller
     {
         $validatedData = $request->validate([
             'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'title' => 'required|string',
-            'desc' => 'nullable|string',
-            'form_link' => 'nullable|url',
+            'title_id' => 'required|string|max:255',
+            'title_en' => 'nullable|string|max:255',
+            'desc_id' => 'required|string|max:255',
+            'desc_en' => 'nullable|string|max:255',
+            'form_link' => 'required|url|max:255',
         ]);
 
         $business = BusinessHome::with('homeMenu')->findOrFail($id);
 
         $dataToUpdate = [];
 
-        // Update text hanya kalau ada input text baru (tidak null)
-        foreach (['title', 'desc', 'form_link'] as $field) {
-            if (isset($validatedData[$field])) {
-                $dataToUpdate[$field] = $validatedData[$field];
-            }
+        foreach (['title_id', 'title_en', 'desc_id', 'desc_en', 'form_link'] as $field) {
+            $dataToUpdate[$field] = $validatedData[$field] ?? null;
         }
 
         if (isset($validatedData['img'])) {
-            if ($business->img && Storage::exists('public/back/home/business/' . $business->img)) {
-                Storage::delete('public/back/home/business/' . $business->img);
-            }
-
-            $file = $validatedData['img'];
-            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/home/business/', $filename);
-
-            $dataToUpdate['img'] = $filename;
+            $dataToUpdate['img'] = $this->replacePublicFile($business->img, $validatedData['img'], 'back/home/business');
         }
 
-        if (!empty($dataToUpdate)) {
-            $business->update($dataToUpdate);
-        }
+        $business->update($dataToUpdate);
 
         return redirect()->route('home.business')->with('success', 'Business section updated successfully');
     }
@@ -437,15 +405,7 @@ class HomeMenuController extends Controller
 
         // Update file video
         if (isset($validatedData['video'])) {
-            if ($sosmed->video && Storage::exists('public/back/home/sosmed/' . $sosmed->video)) {
-                Storage::delete('public/back/home/sosmed/' . $sosmed->video);
-            }
-
-            $file = $validatedData['video'];
-            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/home/sosmed/', $filename);
-
-            $dataToUpdate['video'] = $filename;
+            $dataToUpdate['video'] = $this->replacePublicFile($sosmed->video, $validatedData['video'], 'back/home/sosmed');
         }
 
         if (!empty($dataToUpdate)) {
@@ -486,11 +446,7 @@ class HomeMenuController extends Controller
         $newGallery->year = $validatedData['year'];
 
         if ($request->hasFile('img')) {
-            $file = $validatedData['img'];
-            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/home/gallery/', $filename);
-
-            $newGallery->img = $filename;
+            $newGallery->img = $this->storePublicFile($validatedData['img'], 'back/home/gallery');
         }
 
         $newGallery->save();
@@ -519,15 +475,7 @@ class HomeMenuController extends Controller
 
         // Handle upload image jika ada
         if ($request->hasFile('img')) {
-            if ($gallery->img && Storage::exists('public/back/home/gallery/' . $gallery->img)) {
-                Storage::delete('public/back/home/gallery/' . $gallery->img);
-            }
-
-            $file = $validatedData['img'];
-            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/home/gallery/', $filename);
-
-            $dataToUpdate['img'] = $filename;
+            $dataToUpdate['img'] = $this->replacePublicFile($gallery->img, $validatedData['img'], 'back/home/gallery');
         }
 
         $gallery->update($dataToUpdate);
@@ -540,9 +488,7 @@ class HomeMenuController extends Controller
         $gallery = GalleryHome::findOrFail($id);
 
         // Hapus file gambar jika ada
-        if ($gallery->img && Storage::exists('public/back/home/gallery/' . $gallery->img)) {
-            Storage::delete('public/back/home/gallery/' . $gallery->img);
-        }
+        $this->deletePublicFile($gallery->img, 'back/home/gallery');
 
         $gallery->delete();
 

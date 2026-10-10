@@ -11,8 +11,10 @@ class AdvantageHome extends Model
 
     protected $fillable = [
         'home_menu_id',
-        'title',
-        'desc',
+        'title_id',
+        'title_en',
+        'desc_id',
+        'desc_en',
     ];
 
     public function homeMenu()

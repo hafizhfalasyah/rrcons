@@ -12,8 +12,10 @@ class BusinessHome extends Model
     protected $fillable = [
         'home_menu_id',
         'img',
-        'title',
-        'desc',
+        'title_id',
+        'title_en',
+        'desc_id',
+        'desc_en',
         'form_link',
     ];
 

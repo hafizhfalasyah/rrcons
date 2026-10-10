@@ -12,7 +12,8 @@ class AboutHome extends Model
     protected $fillable = [
         'home_menu_id',
         'img',
-        'text',
+        'text_id',
+        'text_en',
     ];
 
     public function homeMenu()

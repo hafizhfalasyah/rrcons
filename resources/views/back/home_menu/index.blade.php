@@ -40,8 +40,8 @@
             @foreach ($homeMenus as $item)
                 <tr>
                     <td class="text-center">{{ $loop->iteration }}.</td>
-                    <td>{{ $item->title }}</td>
-                    <td>{{ $item->sub_title }}</td>
+                    <td>{{ $item->{'title_' . $lang} }}</td>
+                    <td>{{ $item->{'sub_title_' . $lang} }}</td>
                     <td>{{ $lastUpdated ? \Carbon\Carbon::parse($lastUpdated)->translatedFormat('d F Y') : '-' }}</td>
                     <td class="text-center">
                         <button class="btn btn-primary btn-sm px-3" data-bs-toggle="modal"
