@@ -11,11 +11,16 @@ class UserAccess
     /**
      * Handle an incoming request.
      *
+     * Contoh pemakaian: ->middleware('UserAccess:admin,writer')
+     *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (!in_array(auth()->user()->role, $roles)) {
+        $user = $request->user();
+
+        // User tanpa role (mis. hasil registrasi publik lama) tidak boleh masuk panel admin
+        if (!$user || !$user->hasAnyRole($roles)) {
             abort(403);
         }
 

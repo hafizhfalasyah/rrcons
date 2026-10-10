@@ -29,9 +29,6 @@ use App\Http\Controllers\Front\HomeController;
 use App\Http\Controllers\Front\ArticleController as FrontArticleController;
 use App\Http\Controllers\Front\CategoryController as FrontCategoryController;
 
-
-use App\Http\Controllers\TwoFactorController;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -65,22 +62,35 @@ Route::get('/set-language/{lang}', function (string $lang) {
     return redirect()->back();
 })->name('set.language');
 
-Route::middleware('auth')->group(function() {
+/**
+ * Hak akses per role (harus sejalan dengan resources/views/back/layout/sidebar.blade.php):
+ * - admin    : semua menu
+ * - writer   : dashboard, profil sendiri, blog (articles & categories), file manager
+ * - uploader : dashboard, profil sendiri, home poster & gallery
+ */
+Route::middleware(['auth', 'UserAccess:admin,writer,uploader'])->group(function() {
     /** DASHBOARD MANAGEMENT **/
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
-    /** USER MANAGEMENT **/
-    Route::resource('/users', UserController::class);
+    /** USER MANAGEMENT (otorisasi detail ada di UserController) **/
+    Route::resource('/users', UserController::class)->only(['index', 'store', 'update', 'destroy']);
 
     /** HOME MENU MANAGEMENT **/
-    Route::prefix('home')->name('home.')->group(function () {
-        Route::get('/menu', [HomeMenuController::class, 'homeMenu'])->name('menu');
-        Route::post('/menu/{id}/update', [HomeMenuController::class, 'updateHomeMenu'])->name('menu.update');
-
+    Route::prefix('home')->name('home.')->middleware('UserAccess:admin,uploader')->group(function () {
         Route::get('/poster', [HomeMenuController::class, 'posterSection'])->name('poster');
         Route::post('/poster/create', [HomeMenuController::class, 'createPosterSection'])->name('poster.create');
         Route::post('/poster/{id}/update', [HomeMenuController::class, 'updatePosterSection'])->name('poster.update');
         Route::delete('/poster/{id}/delete', [HomeMenuController::class, 'deletePosterSection'])->name('poster.delete');
+
+        Route::get('/gallery', [HomeMenuController::class, 'gallerySection'])->name('gallery');
+        Route::post('/gallery/create', [HomeMenuController::class, 'createGallerySection'])->name('gallery.create');
+        Route::post('/gallery/{id}/update', [HomeMenuController::class, 'updateGallerySection'])->name('gallery.update');
+        Route::delete('/gallery/{id}/delete', [HomeMenuController::class, 'deleteGallerySection'])->name('gallery.delete');
+    });
+
+    Route::prefix('home')->name('home.')->middleware('UserAccess:admin')->group(function () {
+        Route::get('/menu', [HomeMenuController::class, 'homeMenu'])->name('menu');
+        Route::post('/menu/{id}/update', [HomeMenuController::class, 'updateHomeMenu'])->name('menu.update');
 
         Route::get('/hero', [HomeMenuController::class, 'heroSection'])->name('hero');
         Route::post('/hero/{id}/update', [HomeMenuController::class, 'updateHeroSection'])->name('hero.update');
@@ -102,15 +112,10 @@ Route::middleware('auth')->group(function() {
 
         Route::get('/sosmed', [HomeMenuController::class, 'sosmedSection'])->name('sosmed');
         Route::post('/sosmed/{id}/update', [HomeMenuController::class, 'updateSosmedSection'])->name('sosmed.update');
-
-        Route::get('/gallery', [HomeMenuController::class, 'gallerySection'])->name('gallery');
-        Route::post('/gallery/create', [HomeMenuController::class, 'createGallerySection'])->name('gallery.create');
-        Route::post('/gallery/{id}/update', [HomeMenuController::class, 'updateGallerySection'])->name('gallery.update');
-        Route::delete('/gallery/{id}/delete', [HomeMenuController::class, 'deleteGallerySection'])->name('gallery.delete');
     });
 
     /** RRFUTURE MENU MANAGEMENT **/
-    Route::prefix('rrfuture')->name('rrfuture.')->group(function () {
+    Route::prefix('rrfuture')->name('rrfuture.')->middleware('UserAccess:admin')->group(function () {
         Route::get('/menu', [RRfutureMenuController::class, 'rrfutureMenu'])->name('menu');
         Route::post('/menu/{id}/update', [RRfutureMenuController::class, 'updateRRfutureMenu'])->name('menu.update');
 
@@ -122,7 +127,7 @@ Route::middleware('auth')->group(function() {
     });
 
     /** SERVICE MENU MANAGEMENT **/
-    Route::prefix('service')->name('service.')->group(function () {
+    Route::prefix('service')->name('service.')->middleware('UserAccess:admin')->group(function () {
         Route::get('/menu', [ServiceMenuController::class, 'serviceMenu'])->name('menu');
         Route::post('/menu/{id}/update', [ServiceMenuController::class, 'updateServiceMenu'])->name('menu.update');
 
@@ -134,7 +139,7 @@ Route::middleware('auth')->group(function() {
     });
 
     /** CONTACT MENU MANAGEMENT **/
-    Route::prefix('contact')->name('contact.')->group(function () {
+    Route::prefix('contact')->name('contact.')->middleware('UserAccess:admin')->group(function () {
         Route::get('/menu', [ContactMenuController::class, 'contactMenu'])->name('menu');
         Route::post('/menu/{id}/update', [ContactMenuController::class, 'updateContactMenu'])->name('menu.update');
 
@@ -146,7 +151,7 @@ Route::middleware('auth')->group(function() {
     });
 
     /** BLOG MANAGEMENT **/
-    Route::prefix('blog')->name('blog.')->group(function () {
+    Route::prefix('blog')->name('blog.')->middleware('UserAccess:admin,writer')->group(function () {
         Route::get('/articles', [BackArticleController::class, 'index'])->name('articles.index');
         Route::get('/articles/create', [BackArticleController::class, 'create'])->name('articles.create');
         Route::post('/articles', [BackArticleController::class, 'store'])->name('articles.store');
@@ -160,12 +165,14 @@ Route::middleware('auth')->group(function() {
         Route::put('/categories/{category}', [BackCategoryController::class, 'update'])->name('categories.update');
         Route::delete('/categories/{category}', [BackCategoryController::class, 'destroy'])->name('categories.destroy');
 
-        Route::get('/configs', [BackConfigController::class, 'index'])->name('configs.index');
-        Route::put('/configs/{config}', [BackConfigController::class, 'update'])->name('configs.update');
+        Route::middleware('UserAccess:admin')->group(function () {
+            Route::get('/configs', [BackConfigController::class, 'index'])->name('configs.index');
+            Route::put('/configs/{config}', [BackConfigController::class, 'update'])->name('configs.update');
+        });
     });
 
     /** MANAGEMENT **/
-    Route::group(['prefix' => 'laravel-filemanager'], function () {
+    Route::group(['prefix' => 'laravel-filemanager', 'middleware' => 'UserAccess:admin,writer'], function () {
         \UniSharp\LaravelFilemanager\Lfm::routes();
     });
 });
@@ -176,10 +183,17 @@ Route::middleware('countPageVisitor')->controller(HomeController::class)->group(
     Route::get('/service', 'service')->name('service');
     Route::get('/blog', 'blog')->name('blog');
     Route::get('/blog/{slug}', 'show')->name('detail_blog');
-    Route::post('/blog/{slug}/comment', 'storeComment')->name('comment.store');
+    Route::post('/blog/{slug}/comment', 'storeComment')->middleware('throttle:5,1')->name('comment.store');
     Route::get('/get-articles', 'getArticles')->name('get.articles');
     Route::get('/search-articles',  'searchArticles')->name('search.articles');
     Route::get('/contact', 'contact')->name('contact');
 });
 
-Auth::routes();
+// Hanya login & logout. Registrasi publik, reset password, dan verifikasi email
+// dinonaktifkan: akun dibuat oleh admin lewat menu Users.
+Auth::routes([
+    'register' => false,
+    'reset' => false,
+    'confirm' => false,
+    'verify' => false,
+]);

@@ -41,12 +41,17 @@
                             <!-- Role -->
                             <div class="col-12">
                                 <label for="role-{{ $item->id }}" class="form-label fw-semibold text-primary">Role</label>
-                                <select name="role" id="role-{{ $item->id }}" class="form-select @error('role') is-invalid @enderror" required>
+                                @php $canChangeRole = auth()->user()->isAdmin() && $item->id != auth()->id(); @endphp
+                                <select name="role" id="role-{{ $item->id }}" class="form-select @error('role') is-invalid @enderror" {{ $canChangeRole ? 'required' : 'disabled' }}>
                                     <option value="" disabled selected>-- Pilih Role --</option>
                                     <option value="admin" {{ old('role', $item->role) == 'admin' ? 'selected' : '' }}>Admin</option>
                                     <option value="writer" {{ old('role', $item->role) == 'writer' ? 'selected' : '' }}>Writer</option>
                                     <option value="uploader" {{ old('role', $item->role) == 'uploader' ? 'selected' : '' }}>Uploader</option>
                                 </select>
+
+                                @unless ($canChangeRole)
+                                    <div class="form-text">Only an admin can change another user's role.</div>
+                                @endunless
 
                                 @error('role')
                                     <div class="invalid-feedback">{{ $message }}</div>
