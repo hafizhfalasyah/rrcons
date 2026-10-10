@@ -1,17 +1,3 @@
-@php
-    if (!function_exists('highlightLastWord')) {
-        function highlightLastWord($text, $class = 'text-blue-500') {
-            $words = explode(' ', trim($text));
-            if (count($words) === 0) return '';
-
-            $lastWord = array_pop($words);
-            $firstPart = implode(' ', $words);
-
-            return $firstPart . ' <span class="' . $class . '">' . $lastWord . '</span>';
-        }
-    }
-@endphp
-
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ open: false }" xmlns="http://www.w3.org/1999/xhtml" >
     <head>
@@ -706,24 +692,24 @@
                             $service2 = $services->firstWhere('id', 2);
                         @endphp
                         <div class="bg-white flex items-center p-6 rounded-2xl shadow-xl border border-purple-300 fade-in-up card-zoom w-full max-w-[900px]" style="animation-delay: 0.5s;">
-                            <img src="{{ asset('front/image/service/cmp.png') }}" alt="{{ $service1->name }}" class="w-1/4 rounded-lg object-cover" />
+                            <img src="{{ asset('front/image/service/cmp.png') }}" alt="{{ $service1?->name }}" class="w-1/4 rounded-lg object-cover" />
                             <div class="pl-8">
                                 <h3 class="text-blue-600 text-xl font-semibold mb-1">
-                                    {{ $service1->name }}
+                                    {{ $service1?->name }}
                                 </h3>
                                 <p class="text-gray-600 text-sm font-normal">
-                                    {{ $service1->desc }}
+                                    {{ $service1?->desc }}
                                 </p>
                             </div>
                         </div>
                         <div class="bg-white flex items-center p-6 rounded-2xl shadow-xl border border-purple-300 fade-in-up card-zoom w-full max-w-[900px]" style="animation-delay: 1s;">
-                            <img src="{{ asset('front/image/service/srd.png') }}" alt="{{ $service2->name }}" class="w-1/4 rounded-lg object-cover" />
+                            <img src="{{ asset('front/image/service/srd.png') }}" alt="{{ $service2?->name }}" class="w-1/4 rounded-lg object-cover" />
                             <div class="pl-8">
                                 <h3 class="text-blue-600 text-xl font-semibold mb-1">
-                                    {{ $service2->name }}
+                                    {{ $service2?->name }}
                                 </h3>
                                 <p class="text-gray-600 text-sm font-normal">
-                                    {{ $service2->desc }}
+                                    {{ $service2?->desc }}
                                 </p>
                             </div>
                         </div>
@@ -736,24 +722,24 @@
                             $service4 = $services->firstWhere('id', 4);
                         @endphp
                         <div class="bg-white flex items-center p-6 rounded-2xl shadow-xl border border-purple-300 fade-in-up card-zoom w-full max-w-[900px]" style="animation-delay: 0.5s;">
-                            <img src="{{ asset('front/image/service/hcm.png') }}" alt="{{ $service3->name }}" class="w-1/4 rounded-lg object-cover" />
+                            <img src="{{ asset('front/image/service/hcm.png') }}" alt="{{ $service3?->name }}" class="w-1/4 rounded-lg object-cover" />
                             <div class="pl-8">
                                 <h3 class="text-blue-600 text-xl font-semibold mb-1">
-                                    {{ $service3->name }}
+                                    {{ $service3?->name }}
                                 </h3>
                                 <p class="text-gray-600 text-sm font-normal">
-                                    {{ $service3->desc }}
+                                    {{ $service3?->desc }}
                                 </p>
                             </div>
                         </div>
                         <div class="bg-white flex items-center p-6 rounded-2xl shadow-xl border border-purple-300 fade-in-up card-zoom w-full max-w-[900px]" style="animation-delay: 1s;">
-                            <img src="{{ asset('front/image/service/cb.png') }}" alt="{{ $service4->name }}" class="w-1/4 rounded-lg object-cover" />
+                            <img src="{{ asset('front/image/service/cb.png') }}" alt="{{ $service4?->name }}" class="w-1/4 rounded-lg object-cover" />
                             <div class="pl-8">
                                 <h3 class="text-blue-600 text-xl font-semibold mb-1">
-                                    {{ $service4->name }}
+                                    {{ $service4?->name }}
                                 </h3>
                                 <p class="text-gray-600 text-sm font-normal">
-                                    {{ $service4->desc }}
+                                    {{ $service4?->desc }}
                                 </p>
                             </div>
                         </div>

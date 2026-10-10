@@ -1,26 +1,4 @@
 @php
-    if (!function_exists('highlightLastWord')) {
-        function highlightLastWord($text, $class = 'text-blue-500') {
-            $words = preg_split('/\s+/', trim((string) $text));
-
-            if (empty($words) || $words === ['']) {
-                return '';
-            }
-
-            $lastWord = array_pop($words);
-            $firstPart = implode(' ', $words);
-
-            return trim(
-                e($firstPart)
-                . ' <span class="'
-                . e($class)
-                . '">'
-                . e($lastWord)
-                . '</span>'
-            );
-        }
-    }
-
     $currentLocale = app()->getLocale();
 
     $activeLanguageFlag = $currentLocale === 'en'

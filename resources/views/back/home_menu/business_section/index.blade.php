@@ -49,8 +49,8 @@
                             <span class="text-muted">No Image</span>
                         @endif
                     </td>
-                    <td>{{ $item->title }}</td>
-                    <td>{{ $item->desc }}</td>
+                    <td>{{ $item->{'title_' . $lang} }}</td>
+                    <td>{{ $item->{'desc_' . $lang} }}</td>
                     <td>{{ $item->form_link }}</td>
                     <td>
                         {{ $item->updated_at ? \Carbon\Carbon::parse($item->updated_at)->translatedFormat('d F Y') : '-' }}

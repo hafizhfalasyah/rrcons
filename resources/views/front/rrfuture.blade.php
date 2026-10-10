@@ -1,24 +1,4 @@
 @php
-    if (!function_exists('highlightLastWord')) {
-        function highlightLastWord($text, $class = 'text-blue-500') {
-            $words = explode(' ', trim($text));
-
-            if (count($words) === 0) {
-                return '';
-            }
-
-            $lastWord = array_pop($words);
-            $firstPart = implode(' ', $words);
-
-            return $firstPart
-                . ' <span class="'
-                . e($class)
-                . '">'
-                . e($lastWord)
-                . '</span>';
-        }
-    }
-
     $currentLocale = app()->getLocale();
 
     $activeLanguageFlag = $currentLocale === 'en'
@@ -581,7 +561,7 @@
                         <span class="bg-blue-100 text-blue-600 px-3 py-1 text-sm rounded-full">
                             {{ __('rrfuture.sections.product.label') }}
                         </span>
-                        <h2 class="text-3xl font-bold mt-2">{!! $products->first()->rrfutureMenu->title ?? '' !!}</h2>
+                        <h2 class="text-3xl font-bold mt-2">{{ $products->first()->rrfutureMenu->title ?? '' }}</h2>
                     </div>
                     <p class="text-gray-500 max-w-xl mt-6 md:mt-0">{{ $products->first()->rrfutureMenu->sub_title ?? '' }}</p>
                 </div>

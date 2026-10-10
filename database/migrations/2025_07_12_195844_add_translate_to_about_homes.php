@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::table('about_homes', function (Blueprint $table) {
             $table->renameColumn('text', 'text_id');
+        });
+
+        Schema::table('about_homes', function (Blueprint $table) {
             $table->text('text_en')->nullable()->after('text_id');
         });
     }
@@ -23,7 +26,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('about_homes', function (Blueprint $table) {
-            //
+            $table->dropColumn(['text_en']);
+        });
+
+        Schema::table('about_homes', function (Blueprint $table) {
+            $table->renameColumn('text_id', 'text');
         });
     }
 };

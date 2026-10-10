@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Back\RRfuture;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\ManagesPublicFiles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,6 +13,8 @@ use App\Models\RRfuture\ProductRRfuture;
 
 class RRfutureMenuController extends Controller
 {
+    use ManagesPublicFiles;
+
     /** ============================== RRFUTURE MENU CONTROLLERS ============================== **/
     public function rrfutureMenu()
     {
@@ -59,15 +62,7 @@ class RRfutureMenuController extends Controller
         $dataToUpdate = [];
 
         if (isset($validatedData['bg_img'])) {
-            if ($hero->bg_img && Storage::exists('public/back/rrfuture/hero/' . $hero->bg_img)) {
-                Storage::delete('public/back/rrfuture/hero/' . $hero->bg_img);
-            }
-
-            $file = $validatedData['bg_img'];
-            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/rrfuture/hero/', $filename);
-
-            $dataToUpdate['bg_img'] = $filename;
+            $dataToUpdate['bg_img'] = $this->replacePublicFile($hero->bg_img, $validatedData['bg_img'], 'back/rrfuture/hero');
         }
 
         // Jika ada data untuk diupdate, panggil update()

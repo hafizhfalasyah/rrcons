@@ -40,8 +40,8 @@
             @foreach ($advantages as $item)
                 <tr>
                     <td class="text-center">{{ $loop->iteration }}.</td>
-                    <td>{{ $item->title }}</td>
-                    <td>{{ $item->desc }}</td>
+                    <td>{{ $item->{'title_' . $lang} }}</td>
+                    <td>{{ $item->{'desc_' . $lang} }}</td>
                     <td>
                         {{ $item->updated_at ? \Carbon\Carbon::parse($item->updated_at)->translatedFormat('d F Y') : '-' }}
                     </td>

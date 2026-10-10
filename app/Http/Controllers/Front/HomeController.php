@@ -128,7 +128,7 @@ class HomeController extends Controller
     {
         // Artikel Private / terjadwal (belum waktunya) tidak boleh bisa diakses publik
         $article = Article::published()
-            ->with(['category', 'comments'])
+            ->with(['category', 'comments', 'Creator'])
             ->where('slug', $slug)
             ->firstOrFail();
 

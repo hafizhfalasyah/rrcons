@@ -20,18 +20,36 @@
 
                             <!-- Title -->
                             <div class="col-12">
-                                <label for="title-{{ $item->id }}" class="form-label fw-semibold">Title</label>
-                                <input type="text" name="title" id="title-{{ $item->id }}" class="form-control @error('title') is-invalid @enderror" value="{{ old('title', $item->title) }}" required>
-                                @error('title')
+                                <label for="title_id-{{ $item->id }}" class="form-label fw-semibold">Title (Indonesia)</label>
+                                <input type="text" name="title_id" id="title_id-{{ $item->id }}" class="form-control @error('title_id') is-invalid @enderror" value="{{ old('title_id', $item->title_id) }}" required>
+                                @error('title_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Title -->
+                            <div class="col-12">
+                                <label for="title_en-{{ $item->id }}" class="form-label fw-semibold">Title (English)</label>
+                                <input type="text" name="title_en" id="title_en-{{ $item->id }}" class="form-control @error('title_en') is-invalid @enderror" value="{{ old('title_en', $item->title_en) }}">
+                                @error('title_en')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <!-- SubTitle as Textarea -->
                             <div class="col-12">
-                                <label for="sub_title-{{ $item->id }}" class="form-label fw-semibold">Sub Title</label>
-                                <textarea name="sub_title" id="sub_title-{{ $item->id }}" class="form-control @error('sub_title') is-invalid @enderror" rows="4" required>{{ old('sub_title', $item->sub_title) }}</textarea>
-                                @error('sub_title')
+                                <label for="sub_title_id-{{ $item->id }}" class="form-label fw-semibold">Sub Title (Indonesia)</label>
+                                <textarea name="sub_title_id" id="sub_title_id-{{ $item->id }}" class="form-control @error('sub_title_id') is-invalid @enderror" rows="4" required>{{ old('sub_title_id', $item->sub_title_id) }}</textarea>
+                                @error('sub_title_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- SubTitle as Textarea -->
+                            <div class="col-12">
+                                <label for="sub_title_en-{{ $item->id }}" class="form-label fw-semibold">Sub Title (English)</label>
+                                <textarea name="sub_title_en" id="sub_title_en-{{ $item->id }}" class="form-control @error('sub_title_en') is-invalid @enderror" rows="4">{{ old('sub_title_en', $item->sub_title_en) }}</textarea>
+                                @error('sub_title_en')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

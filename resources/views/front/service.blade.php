@@ -1,24 +1,4 @@
 @php
-    if (!function_exists('highlightLastWord')) {
-        function highlightLastWord($text, $class = 'text-blue-500') {
-            $words = explode(' ', trim($text));
-
-            if (count($words) === 0) {
-                return '';
-            }
-
-            $lastWord = array_pop($words);
-            $firstPart = implode(' ', $words);
-
-            return e($firstPart)
-                . ' <span class="'
-                . e($class)
-                . '">'
-                . e($lastWord)
-                . '</span>';
-        }
-    }
-
     $currentLocale = app()->getLocale();
 
     $activeLanguageFlag = $currentLocale === 'en'

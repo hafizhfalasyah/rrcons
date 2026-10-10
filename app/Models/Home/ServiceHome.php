@@ -11,8 +11,10 @@ class ServiceHome extends Model
 
     protected $fillable = [
         'home_menu_id',
-        'name',
-        'desc',
+        'name_id',
+        'name_en',
+        'desc_id',
+        'desc_en',
     ];
 
     public function homeMenu()

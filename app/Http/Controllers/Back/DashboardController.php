@@ -36,7 +36,12 @@ class DashboardController extends Controller
 
         foreach ($allowedPaths as $path) {
             $data = $labels->map(function ($dateObj) use ($path) {
-                return Visitor::where('path', $path)
+                return Visitor::query()
+                    // halaman detail tercatat sebagai /blog/{slug}
+                    ->when($path === '/blog_detail',
+                        fn ($q) => $q->where('path', 'like', '/blog/%'),
+                        fn ($q) => $q->where('path', $path)
+                    )
                     ->whereDate('visit_date', $dateObj['query'])
                     ->count();
             });

@@ -196,9 +196,14 @@
                     'blog.configs.index'    => 'Configs',
                 ];
 
+                // Configs hanya untuk admin
+                if (!auth()->user()->isAdmin()) {
+                    unset($blogRoutes['blog.configs.index']);
+                }
+
                 $isBlogActive = isMenuActive(array_keys($blogRoutes));
             @endphp
-            @if (auth()->user()->hasAnyRole(['admin']))
+            @if (auth()->user()->hasAnyRole(['admin', 'writer']))
                 <li class="nav-item">
                     <a class="nav-link d-flex justify-content-between align-items-center {{ $isBlogActive ? 'active' : '' }}"
                         data-bs-toggle="collapse"

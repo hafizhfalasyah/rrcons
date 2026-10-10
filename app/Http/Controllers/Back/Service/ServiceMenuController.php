@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Back\Service;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\ManagesPublicFiles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,6 +13,8 @@ use App\Models\Service\OurService;
 
 class ServiceMenuController extends Controller
 {
+    use ManagesPublicFiles;
+
     /** ============================== SERVICE MENU CONTROLLERS ============================== **/
     public function serviceMenu()
     {
@@ -59,15 +62,7 @@ class ServiceMenuController extends Controller
         $dataToUpdate = [];
 
         if (isset($validatedData['bg_img'])) {
-            if ($hero->bg_img && Storage::exists('public/back/service/hero/' . $hero->bg_img)) {
-                Storage::delete('public/back/service/hero/' . $hero->bg_img);
-            }
-
-            $file = $validatedData['bg_img'];
-            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/back/service/hero/', $filename);
-
-            $dataToUpdate['bg_img'] = $filename;
+            $dataToUpdate['bg_img'] = $this->replacePublicFile($hero->bg_img, $validatedData['bg_img'], 'back/service/hero');
         }
 
         // Jika ada data untuk diupdate, panggil update()

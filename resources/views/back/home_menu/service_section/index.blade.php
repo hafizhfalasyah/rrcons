@@ -40,8 +40,8 @@
             @foreach ($services as $item)
                 <tr>
                     <td class="text-center">{{ $loop->iteration }}.</td>
-                    <td>{{ $item->name }}</td>
-                    <td>{{ $item->desc }}</td>
+                    <td>{{ $item->{'name_' . $lang} }}</td>
+                    <td>{{ $item->{'desc_' . $lang} }}</td>
                     <td>
                         {{ $item->updated_at ? \Carbon\Carbon::parse($item->updated_at)->translatedFormat('d F Y') : '-' }}
                     </td>

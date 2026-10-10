@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Models\Concerns\GeneratesUniqueSlug;
 use App\Models\User;
 
 class Article extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesUniqueSlug;
 
     // Nilai kolom status
     const STATUS_PRIVATE = '0';
@@ -28,6 +29,12 @@ class Article extends Model
     protected $casts = [
         'publish_date' => 'datetime',
     ];
+
+    // /blog/articles, /blog/categories, /blog/configs dipakai route admin
+    protected static function reservedSlugs(): array
+    {
+        return ['articles', 'categories', 'configs'];
+    }
 
     //relasi ke user
     public function User():BelongsTo

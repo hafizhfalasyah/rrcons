@@ -17,26 +17,6 @@ class ArticleSchedulingTest extends TestCase
     private User $user;
     private Category $category;
 
-    /**
-     * Migrasi translate (2025_07_*) belum bisa dijalankan dari database kosong,
-     * jadi test ini hanya memigrasikan tabel yang dibutuhkan fitur blog.
-     */
-    protected function migrateFreshUsing()
-    {
-        return [
-            '--drop-views' => $this->shouldDropViews(),
-            '--drop-types' => $this->shouldDropTypes(),
-            '--path' => [
-                'database/migrations/2014_10_12_000000_create_users_table.php',
-                'database/migrations/2024_10_16_141319_create_categories_table.php',
-                'database/migrations/2024_10_16_141320_create_articles_table.php',
-                'database/migrations/2025_06_27_070846_create_visitors_table.php',
-                'database/migrations/2025_07_06_181334_create_comments_table.php',
-                'database/migrations/2026_10_11_000000_change_publish_date_to_datetime_on_articles_table.php',
-            ],
-        ];
-    }
-
     protected function setUp(): void
     {
         parent::setUp();

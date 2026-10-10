@@ -20,7 +20,7 @@ class ConfigController extends Controller
             'value' => 'required|min:3',
         ]);
 
-        Config::find($id)->update($data);
+        Config::findOrFail($id)->update($data);
 
         return back()->with('success', 'Config has been updated.');
     }

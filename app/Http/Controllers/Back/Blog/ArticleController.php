@@ -10,7 +10,6 @@ use App\Models\Blog\Category;
 
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Str;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -109,7 +108,7 @@ class ArticleController extends Controller
 
         $data['user_id'] = Auth::id();
         $data['created_by'] = Auth::id();
-        $data['slug'] = Str::slug($data['title']);
+        $data['slug'] = Article::uniqueSlug($data['title']);
         // Pakai tanggal terbit pilihan user (bisa di masa depan = terjadwal)
         $data['publish_date'] = $data['publish_date'] ?? now();
 
@@ -124,7 +123,7 @@ class ArticleController extends Controller
     public function show(string $id)
     {
         return view('back.article.show', [
-            'article' => Article::with(['User', 'Category'])->findOrFail($id)
+            'article' => Article::with(['User', 'Creator', 'Category'])->findOrFail($id)
         ]);
     }
 
@@ -164,7 +163,7 @@ class ArticleController extends Controller
         }
 
         $data['user_id'] = auth()->id();
-        $data['slug'] = Str::slug($data['title']);
+        $data['slug'] = Article::uniqueSlug($data['title'], $article->id);
         // Pertahankan tanggal terbit lama bila field dikosongkan
         $data['publish_date'] = $data['publish_date'] ?? $article->publish_date ?? now();
 

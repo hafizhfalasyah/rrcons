@@ -62,8 +62,15 @@
                     <td>{{ optional($article->publish_date)->translatedFormat('d F Y H:i') ?? '-' }}</td>
                 </tr>
                 <tr>
-                    <th class="bg-light">Writer</th>
-                    <td>{{ $article->User->name }}</td>
+                    <th class="bg-light">Created By</th>
+                    <td>{{ $article->Creator?->name ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th class="bg-light">Last Edited By</th>
+                    <td>
+                        {{ $article->User?->name ?? '-' }}
+                        <small class="text-muted">({{ $article->updated_at?->translatedFormat('d F Y H:i') }})</small>
+                    </td>
                 </tr>
             </table>
 

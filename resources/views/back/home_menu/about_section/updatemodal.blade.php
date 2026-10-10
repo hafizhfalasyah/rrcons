@@ -37,9 +37,18 @@
 
                             <!-- Text as Textarea -->
                             <div class="col-12">
-                                <label for="text-{{ $item->id }}" class="form-label fw-semibold">Text</label>
-                                <textarea name="text" id="text-{{ $item->id }}" class="form-control @error('text') is-invalid @enderror" rows="4" required>{{ old('text', $item->text) }}</textarea>
-                                @error('text')
+                                <label for="text_id-{{ $item->id }}" class="form-label fw-semibold">Text (Indonesia)</label>
+                                <textarea name="text_id" id="text_id-{{ $item->id }}" class="form-control @error('text_id') is-invalid @enderror" rows="4" required>{{ old('text_id', $item->text_id) }}</textarea>
+                                @error('text_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Text as Textarea -->
+                            <div class="col-12">
+                                <label for="text_en-{{ $item->id }}" class="form-label fw-semibold">Text (English)</label>
+                                <textarea name="text_en" id="text_en-{{ $item->id }}" class="form-control @error('text_en') is-invalid @enderror" rows="4">{{ old('text_en', $item->text_en) }}</textarea>
+                                @error('text_en')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
