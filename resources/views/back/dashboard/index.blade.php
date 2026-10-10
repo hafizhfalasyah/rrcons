@@ -102,7 +102,12 @@
                                         <td><span class="badge bg-secondary">{{ $item->category->name }}</span></td>
                                         <td>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('H:i | d F Y') }}</td>
                                         @if (auth()->user()->hasAnyRole(['admin', 'writer']))
-                                            <td><a href="{{ url('article/'.$item->id) }}" class="btn btn-sm btn-outline-primary">Detail</a></td>
+                                            <td>
+                                                <a href="{{ route('blog.articles.show', $item->id) }}"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    Detail
+                                                </a>
+                                            </td>
                                         @endif
                                     </tr>
                                 @endforeach
@@ -140,7 +145,12 @@
                                         <td><span class="badge bg-secondary">{{ $item->category->name }}</span></td>
                                         <td><i class="bi bi-eye-fill me-1 text-muted"></i>{{ $item->views }}</td>
                                         @if (auth()->user()->hasAnyRole(['admin', 'writer']))
-                                            <td><a href="{{ url('article/'.$item->id) }}" class="btn btn-sm btn-outline-primary">Detail</a></td>
+                                            <td>
+                                                <a href="{{ route('blog.articles.show', $item->id) }}"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    Detail
+                                                </a>
+                                            </td>
                                         @endif
                                     </tr>
                                 @endforeach
