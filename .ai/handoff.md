@@ -6,6 +6,18 @@ Template and rules: `.claude/skills/rrcons-handoff/SKILL.md` (plain Markdown —
 
 ---
 
+## 2026-10-11 — Claude Code — article slug redirects + blog comment moderation
+- **Branch / HEAD:** `solveit-staging` → PR to `solveit-id/rrcons` main; cherry-picked to `staging` → PR to `hafizhfalasyah/rrcons` main.
+- **Goal:** stop old article URLs from breaking when the title changes; add moderation for blog comments.
+- **Done:**
+  - Slugs: migration `2026_10_17_000000_create_article_slug_redirects_table` (+ renames any article slug `comments`), model `ArticleSlugRedirect`, `Article::booted()` records previous slugs, `Article::slugIsTaken()` keeps old slugs reserved for their article, `HomeController@show` → 301 to the current slug (query kept, published only). Admin: flash message on URL change, "Article URL" + old URLs on the article detail page, updated help text. `GeneratesUniqueSlug::slugIsTaken()` hook.
+  - Comments: migration `2026_10_17_000100_add_moderation_to_comments_table` (status/moderated_by/moderated_at, existing rows → approved), `Comment` statuses/scopes/`moderate()`, public page shows approved only, new pending message (id/en), `Back\Blog\CommentController` + `/blog/comments` routes (admin, writer) + view + sidebar badge, `/blog/comments` disallowed in robots, `comments` reserved slug.
+  - Tests: `ArticleSlugRedirectTest` (7), `CommentModerationTest` (9), access matrix row. Docs: AGENTS.md §6/§7/§8/§12, `.ai/guidelines/rrcons-blog.md`, deploy guide checklist, reviewer agent.
+- **In progress (uncommitted):** none.
+- **Verification:** 104 tests / 877 assertions pass (natively and inside Docker). Docker production copy: both migrations OK, 74 existing comments → approved and still shown; live HTTP flow: submit (hidden) → admin list + badge → approve (shown, 74→75) → delete (74); real article renamed → old URL 301 (with `?lang`) → renamed back → original URL 200, temporary URL 301. Test data cleaned up.
+- **Next steps (user):** redeploy per `docs/DEPLOY-SHARED-HOSTING.md` (production will run 11 pending migrations). After deploy, moderate new comments in Blog → Comments.
+- **Gotchas:** don't delete `article_slug_redirects` rows; keep `comments` in `Article::reservedSlugs()` (route `/blog/comments` shadows `/blog/{slug}`).
+
 ## 2026-10-11 — Claude Code — Docker refresh, remaining bug fixes, shared-hosting deploy kit
 - **Branch / HEAD:** `solveit-staging` → PR to `solveit-id/rrcons` main; cherry-picked to `staging` → PR to `hafizhfalasyah/rrcons` main.
 - **Goal:** bring local Docker in line with the real project, fix remaining bugs, prepare redeploy to shared hosting (not VPS).

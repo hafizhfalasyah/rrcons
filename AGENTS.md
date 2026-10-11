@@ -4,7 +4,7 @@
 > `CLAUDE.md` imports this file. Concise topic rules live in `.ai/guidelines/` (Laravel Boost format).
 > The running work log for handoffs is `.ai/handoff.md`.
 >
-> Last full audit: **2026-10-11** — Laravel 13.35.0 on PHP 8.5 (upgraded 1:1 from Laravel 10.48.22, see §12a), 88 tests / 795 assertions passing (also inside Docker).
+> Last full audit: **2026-10-11** — Laravel 13.35.0 on PHP 8.5 (upgraded 1:1 from Laravel 10.48.22, see §12a), 104 tests / 877 assertions passing (also inside Docker).
 
 ---
 
@@ -192,7 +192,7 @@ docker/, Dockerfile, compose.yaml    local dev only
 | `/users` | all users, create/delete, change roles | own profile only | own profile only |
 | `/home/poster`, `/home/gallery` | ✓ | ✗ | ✓ |
 | other `/home/*`, `/rrfuture/*`, `/service/*`, `/contact/*` | ✓ | ✗ | ✗ |
-| `/blog/articles`, `/blog/categories` | ✓ | ✓ | ✗ |
+| `/blog/articles`, `/blog/categories`, `/blog/comments` (moderation) | ✓ | ✓ | ✗ |
 | `/blog/configs` | ✓ | ✗ | ✗ |
 | `/laravel-filemanager/*` | ✓ | ✓ | ✗ |
 
@@ -221,7 +221,8 @@ Each public page has a `*_menus` table whose rows hold the **section heading** (
 ### Blog
 - `Category` (name_id/en, slug **unique**) `hasMany` `Article`.
 - `Article`: `user_id` = **last editor**, `created_by` = **original author** (relations `User()`, `Creator()`), `category_id` (FK, no cascade — category delete is blocked while it has articles), `title_id/en`, `slug` (**unique**), `desc_id/en` (longText HTML), `meta_title_id/en` (≤70), `meta_description_id/en` (≤320), `img`, `views`, `status` (`'0'` private / `'1'` publish), `publish_date` (datetime, nullable). Index `(status, publish_date)`.
-- `Comment` (article_id cascade, name, email, content). Public, `throttle:5,1`, **no moderation and no admin UI**.
+- `Comment` (article_id cascade, name, email, content, `status` `pending|approved|spam` default `pending`, `moderated_by`, `moderated_at`). Visitors post via `POST /blog/{slug}/comment` (`throttle:5,1`, status cannot be set from the form); only `Comment::approved()` is shown/counted on the article page. Admin + writer moderate at `/blog/comments` (`Back\Blog\CommentController`: filter tabs, search, approve / back to pending / spam / delete; sidebar badge = pending count). Comments that existed before moderation were migrated as `approved`.
+- `ArticleSlugRedirect` (article_id cascade, slug unique): previous slugs of an article.
 - `Config` (name, value): legacy blog settings, admin-editable, **not used by public views**.
 - Relation methods on Article are capitalized (`Category()`, `User()`, `Creator()`); `Category` also has `Articles()`. PHP method names are case-insensitive, so `with('category')` works, but the loaded-relation key is case-sensitive: eager-load with the same casing you later access (e.g. `with('Category')` + `$article->Category`) or the relation is lazy-loaded again.
 
@@ -250,7 +251,7 @@ Migrations must keep working on **both MySQL and SQLite** (tests): one `renameCo
 Admin form choice `publication` ∈ `private | publish | schedule` → `Article::publicationAttributes()` maps to `status` + `publish_date`:
 - private → status `'0'` (keeps old publish_date) · publish → status `'1'`, publish_date = now (already-published articles keep their date) · schedule → status `'1'`, future `publish_date` (validated `after:now`).
 - Public visibility = `Article::published()` scope: status `'1'` AND (`publish_date` NULL or ≤ now). Use this scope for **every** public query (pages, sitemap, feed, llms, comments).
-- Slug = `Article::uniqueSlug($title_id)`; **regenerated on every update**, so changing the Indonesian title changes the public URL (old URL 404s). Reserved slugs: `articles`, `categories`, `configs`.
+- Slug = `Article::uniqueSlug($title_id)`, regenerated when the Indonesian title changes; `Article::booted()` stores every previous slug in `article_slug_redirects` and `HomeController@show` answers old slugs with a **301 to the current URL** (query string kept; only for published articles). A previous slug of one article can never be reused by another (`Article::slugIsTaken`); returning to an old title reuses it and drops the redirect. Reserved slugs: `articles`, `categories`, `configs`, `comments`.
 - Article HTML is sanitized on save (`HtmlSanitizer::clean`) and again on render (`$article->safe_desc`). The sanitizer is an allowlist (iframes only from YouTube/Vimeo/Google Maps).
 - `views` is incremented by the analytics tracker (once per visitor per article per day, bots excluded), not by page loads.
 
@@ -294,7 +295,7 @@ Admin form choice `publication` ∈ `private | publish | schedule` → `Article:
 ## 10. Testing
 
 - `phpunit.xml` forces `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:` (as `<env force>` and `<server>`), and `tests/CreatesApplication.php` aborts on any other connection → tests never touch a real DB, even inside the Docker `app` container. Requires PHP extensions `pdo_sqlite` and `gd`.
-- Suites: `AccessControlTest` (role matrix, registration disabled), `ArticleSchedulingTest`, `ContentManagementTest`, `MultiLanguageTest` (both locales, lang key parity, `lang/id.json` coverage), `SeoTest`, `AnalyticsTest`, `PerformanceTest` (compiled CSS, unique route names, single menu query, image optimization), `LegacyTimezoneFixTest`, `UpgradeCompatibilityTest` + `CsrfProtectionTest` (Laravel 13 pins, §12a), `RegressionTest` (XML prolog/short tags, hero webp, idempotent seeder), `Unit/HtmlSanitizerTest`.
+- Suites: `AccessControlTest` (role matrix, registration disabled), `ArticleSchedulingTest`, `ContentManagementTest`, `MultiLanguageTest` (both locales, lang key parity, `lang/id.json` coverage), `SeoTest`, `AnalyticsTest`, `PerformanceTest` (compiled CSS, unique route names, single menu query, image optimization), `LegacyTimezoneFixTest`, `UpgradeCompatibilityTest` + `CsrfProtectionTest` (Laravel 13 pins, §12a), `RegressionTest` (XML prolog/short tags, hero webp, idempotent seeder), `ArticleSlugRedirectTest`, `CommentModerationTest`, `Unit/HtmlSanitizerTest`.
 - Tests use `RefreshDatabase` + `User::factory()->create(['role' => ...])`. Only `UserFactory` exists — create other rows directly with models.
 - Add/adjust tests with every behaviour change; follow the existing descriptive `test_snake_case_sentence` naming.
 
@@ -325,8 +326,8 @@ Rollback: git tag `backup/laravel10-final` (both remotes) = last Laravel 10 / PH
 1. ~~`ConfigSeeder` broken~~ — fixed 2026-10-11 (correct model, idempotent `firstOrCreate`).
 2. No CMS seeders/factories: fresh installs have empty public sections; need a production dump.
 3. Dead code: `Front\ArticleController`, `Front\CategoryController` (their views `front.article.*`, `front.category.*` don't exist; routes commented out). `Visitor` model is legacy (read-only history).
-4. Blog comments: no moderation, no admin listing/deletion.
-5. Updating an article's Indonesian title regenerates its slug (URL change, no redirect).
+4. ~~Blog comments unmoderated~~ — moderation added 2026-10-11 (`/blog/comments`).
+5. ~~Title change breaks the old article URL~~ — fixed 2026-10-11 (301 redirects from previous slugs).
 6. ~~Hero `webp` rejected on RR Future/Service/Contact~~ — fixed 2026-10-11 (all heroes accept `jpeg,png,jpg,gif,webp`).
 7. ~~Upload limit 20M < 50 MB video validation~~ — fixed 2026-10-11 (`public/.htaccess` + Docker `custom.ini`: 64M/72M; hosting may still cap it — check *Select PHP Version → Options*).
 8. Gallery fallback `home_menu_id = 8` is hard-coded.

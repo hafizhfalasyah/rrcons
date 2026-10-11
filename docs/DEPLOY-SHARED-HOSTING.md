@@ -3,8 +3,10 @@
 Panduan untuk memindahkan versi terbaru (Laravel 13, PHP 8.5) ke shared hosting **tanpa** Composer, Node, atau VPS.
 Paket rilis dibangun di komputer lokal (sudah berisi `vendor/` produksi), lalu diunggah.
 
-> Gladi resik sudah dilakukan pada salinan database produksi di Docker: 9 migration baru berjalan
-> sukses (± 40 detik), semua halaman publik dan admin 200, upload dan sitemap/feed normal.
+> Gladi resik sudah dilakukan pada salinan database produksi di Docker: 11 migration baru berjalan
+> sukses (± 40 detik), semua halaman publik dan admin 200, upload, sitemap/feed, redirect slug dan
+> moderasi komentar normal. Komentar lama otomatis berstatus *disetujui* (tetap tampil); komentar baru
+> menunggu persetujuan di menu **Blog → Comments**.
 
 ---
 
@@ -152,6 +154,8 @@ OPTIMIZE_UPLOADED_IMAGES=true
 - [ ] `/sitemap.xml`, `/feed`, `/robots.txt`, `/llms.txt` terbuka (200).
 - [ ] Gambar lama tampil (artinya `storage/app/public` dan `public/storage` benar).
 - [ ] Login admin → Dashboard (grafik analytics), Blog → daftar artikel, edit artikel, unggah gambar di editor (File Manager).
+- [ ] Blog → Comments terbuka; komentar lama ada di tab *Approved* dan tetap tampil di artikelnya.
+- [ ] Kirim satu komentar uji dari halaman artikel → muncul di tab *Pending* (badge di sidebar) → setujui → tampil → hapus.
 - [ ] Unggah satu gambar poster atau galeri lalu hapus lagi.
 - [ ] Tidak ada error baru di `storage/logs/laravel.log`.
 - [ ] Tidak perlu cron/queue worker. Artikel terjadwal tayang otomatis.
