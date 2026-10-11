@@ -296,16 +296,17 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('popupController', (totalImages) => ({
         open: true,
         images: [],
+        slides: [],
         currentIndex: 0,
         intervalId: null,
         totalImages,
 
         init() {
-            const imgs = document.querySelectorAll(
-                '#image-source img',
+            this.slides = Array.from(
+                this.$root.querySelectorAll('[data-poster-slide]'),
             );
 
-            this.images = Array.from(imgs).map(
+            this.images = this.slides.map(
                 (img) => img.src,
             );
 
@@ -353,9 +354,13 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
 
+            const from = this.currentIndex;
+
             this.currentIndex =
                 (this.currentIndex + 1) %
                 this.images.length;
+
+            this.animateSlide(from, this.currentIndex, 1);
         },
 
         prevImage() {
@@ -363,11 +368,55 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
 
+            const from = this.currentIndex;
+
             this.currentIndex =
                 (this.currentIndex -
                     1 +
                     this.images.length) %
                 this.images.length;
+
+            this.animateSlide(from, this.currentIndex, -1);
+        },
+
+        // Poster lama bergeser keluar sambil memudar, poster baru masuk dari arah
+        // yang sama (direction 1 = berikutnya, -1 = sebelumnya). Opacity akhir diatur
+        // oleh :style di view, animasi hanya menimpa selama berjalan.
+        animateSlide(from, to, direction) {
+            const outgoing = this.slides[from];
+            const incoming = this.slides[to];
+
+            if (!outgoing || !incoming || from === to || typeof incoming.animate !== 'function') {
+                return;
+            }
+
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                return;
+            }
+
+            // Klik cepat berturut-turut: hentikan animasi sebelumnya lebih dulu
+            this.slides.forEach((slide) => {
+                slide.getAnimations().forEach((animation) => animation.cancel());
+            });
+
+            const offset = 6 * direction;
+            const easing = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+            outgoing.animate(
+                [
+                    { opacity: 1, transform: 'translateX(0) scale(1)' },
+                    { opacity: 0, transform: `translateX(${-offset}%) scale(0.98)` },
+                ],
+                { duration: 500, easing },
+            );
+
+            incoming.animate(
+                [
+                    { opacity: 0, transform: `translateX(${offset}%) scale(0.98)` },
+                    { opacity: 1, transform: 'translateX(0) scale(1)' },
+                ],
+                { duration: 700, easing },
+            );
         },
 
         goToNextImage() {
