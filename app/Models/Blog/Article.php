@@ -41,10 +41,36 @@ class Article extends Model
         'publish_date' => 'datetime',
     ];
 
-    // /blog/articles, /blog/categories, /blog/configs dipakai route admin
+    // /blog/articles, /blog/categories, /blog/configs, /blog/comments dipakai route admin
     protected static function reservedSlugs(): array
     {
-        return ['articles', 'categories', 'configs'];
+        return ['articles', 'categories', 'configs', 'comments'];
+    }
+
+    protected static function booted(): void
+    {
+        // Slug ikut judul; URL lama dicatat agar tetap dialihkan (301) ke URL baru
+        static::updated(function (Article $article) {
+            $previous = (string) $article->getOriginal('slug');
+
+            if ($article->wasChanged('slug') && $previous !== '') {
+                ArticleSlugRedirect::updateOrCreate(['slug' => $previous], ['article_id' => $article->id]);
+            }
+        });
+
+        // slug yang sedang dipakai tidak boleh sekaligus menjadi pengalihan
+        static::saved(function (Article $article) {
+            ArticleSlugRedirect::where('slug', $article->slug)->delete();
+        });
+    }
+
+    /**
+     * Slug lama artikel lain tetap milik artikel itu, supaya link lamanya tidak berpindah ke artikel baru.
+     */
+    protected static function slugIsTaken(string $slug, ?int $ignoreId = null): bool
+    {
+        return static::query()->where('slug', $slug)->when($ignoreId, fn ($query) => $query->whereKeyNot($ignoreId))->exists()
+            || ArticleSlugRedirect::where('slug', $slug)->when($ignoreId, fn ($query) => $query->where('article_id', '!=', $ignoreId))->exists();
     }
 
     //relasi ke user
@@ -63,10 +89,16 @@ class Article extends Model
         return $this->belongsTo(Category::class);
     }
 
-    // relasi ke comment
+    // relasi ke comment (semua status; yang tampil di website hanya Comment::approved())
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
+    }
+
+    // slug lama yang dialihkan ke artikel ini
+    public function slugRedirects(): HasMany
+    {
+        return $this->hasMany(ArticleSlugRedirect::class);
     }
 
     // hanya artikel berstatus Publish yang waktu terbitnya sudah tiba
