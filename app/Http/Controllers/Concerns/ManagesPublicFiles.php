@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Concerns;
 
+use App\Support\ImageOptimizer;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,7 +19,14 @@ trait ManagesPublicFiles
     {
         $filename = uniqid() . '.' . $file->getClientOriginalExtension();
 
-        return $file->storeAs($directory, $filename, 'public');
+        $path = $file->storeAs($directory, $filename, 'public');
+
+        // perkecil ukuran file gambar (tanpa perubahan visual) agar halaman lebih cepat dimuat
+        if ($path && ImageOptimizer::enabled()) {
+            ImageOptimizer::optimize(Storage::disk('public')->path($path));
+        }
+
+        return $path;
     }
 
     /**
