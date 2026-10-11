@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(php artisan test:*)",
+      "Bash(php artisan route:list:*)",
+      "Bash(php artisan about:*)",
+      "Bash(php artisan list:*)",
+      "Bash(npm run build:front-css:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git fetch:*)",
+      "Bash(git remote -v:*)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(php artisan migrate:*)",
+      "Bash(php artisan rrcons:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.docker)",
+      "Read(./.env.production)",
+      "Read(./.env.backup)",
+      "Bash(php artisan migrate:fresh:*)",
+      "Bash(php artisan migrate:reset:*)",
+      "Bash(php artisan migrate:refresh:*)",
+      "Bash(php artisan db:wipe:*)",
+      "Bash(php artisan db:seed:*)"
+    ]
+  }
+}
