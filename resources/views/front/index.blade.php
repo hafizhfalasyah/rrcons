@@ -1317,17 +1317,6 @@
             class="relative"
         >
 
-            <!-- Gambar sumber -->
-            <div id="image-source" class="hidden">
-                @foreach ($posters as $poster)
-                    <img
-                        src="{{ asset('storage/' . $poster->img) }}"
-                        alt="{{ $poster->name }}"
-                    />
-                @endforeach
-            </div>
-
-
             <!-- Popup -->
             <div
                 x-show="open"
@@ -1371,11 +1360,21 @@
                         </svg>
                     </button>
 
-                    <img
-                        :src="images[currentIndex]"
-                        alt="{{ __('index.sections.poster.image_alt') }}"
-                        class="w-auto h-auto max-w-[90vw] max-h-[90vh] object-contain rounded-xl"
-                    >
+                    <!-- Semua poster ditumpuk di satu sel grid; perpindahan dianimasikan di popupController -->
+                    <div class="grid">
+                        @foreach ($posters as $poster)
+                            <img
+                                src="{{ asset('storage/' . $poster->img) }}"
+                                alt="{{ $poster->name ?: __('index.sections.poster.image_alt') }}"
+                                data-poster-slide
+                                @unless ($loop->first) style="opacity: 0" @endunless
+                                :style="{ opacity: currentIndex === {{ $loop->index }} ? 1 : 0 }"
+                                :class="currentIndex === {{ $loop->index }} ? 'z-10' : 'pointer-events-none'"
+                                :aria-hidden="(currentIndex !== {{ $loop->index }}).toString()"
+                                class="[grid-area:1/1] place-self-center w-auto h-auto max-w-[90vw] max-h-[90vh] object-contain rounded-xl will-change-transform"
+                            >
+                        @endforeach
+                    </div>
 
                     <button
                         x-show="images.length > 1"

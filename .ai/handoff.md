@@ -6,6 +6,13 @@ Template and rules: `.claude/skills/rrcons-handoff/SKILL.md` (plain Markdown —
 
 ---
 
+## 2026-10-12 — Claude Code — smooth poster popup slide animation
+- **Branch / HEAD:** `solveit-staging` → PR to `solveit-id/rrcons` main; cherry-picked to `staging` → PR to `hafizhfalasyah/rrcons` main.
+- **Done:** home poster popup no longer swaps one `<img>` `src` (abrupt). `front/index.blade.php` renders every poster as an `<img data-poster-slide>` stacked in one grid cell (`[grid-area:1/1]`; non-first ones start with `style="opacity: 0"` so nothing flashes before Alpine), alt = poster name. `popupController` (`public/front/js/index.js`) reads the slides and `animateSlide(from, to, direction)` runs two Web Animations: outgoing 500 ms to `translateX(∓6%) scale(.98)` + fade, incoming 700 ms from `translateX(±6%) scale(.98)`, easing `cubic-bezier(.22,1,.36,1)`; previous animations are cancelled on rapid clicks; `prefers-reduced-motion` = instant switch. Removed the hidden `#image-source` copy. Rebuilt `public/front/css/app.css`.
+- **Tests:** `PosterSliderTest` (2). Full suite green.
+- **Verification:** headless Edge via CDP on the local DB (3 posters): next → outgoing x −39 px / incoming +33 px at 110 ms, settled by ~700 ms; prev runs in the opposite direction; returns to index 0; no JS exceptions.
+- **Gotchas:** the grid cell takes the size of the largest poster, so posters with very different aspect ratios make the close/arrow buttons sit on the largest bounds.
+
 ## 2026-10-12 — Claude Code — loading screen redesign (white/blue site theme, no logo)
 - **Branch / HEAD:** `solveit-staging` → PR to `solveit-id/rrcons` main; cherry-picked to `staging` → PR to `hafizhfalasyah/rrcons` main.
 - **Why:** the user found the first version (logo, yellow glow ring on a blue gradient, orbit, tilt) too "AI slop"; asked for the website's white/blue background, no logo, modern/simple/premium/professional and interactive.
