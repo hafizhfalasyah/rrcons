@@ -193,6 +193,7 @@
                 $blogRoutes = [
                     'blog.articles.index'   => 'Articles',
                     'blog.categories.index' => 'Categories',
+                    'blog.comments.index'   => 'Comments',
                     'blog.configs.index'    => 'Configs',
                 ];
 
@@ -202,6 +203,11 @@
                 }
 
                 $isBlogActive = isMenuActive(array_keys($blogRoutes));
+
+                // jumlah komentar yang menunggu persetujuan (badge di menu Comments)
+                $pendingComments = auth()->user()->hasAnyRole(['admin', 'writer'])
+                    ? \App\Models\Blog\Comment::pending()->count()
+                    : 0;
             @endphp
             @if (auth()->user()->hasAnyRole(['admin', 'writer']))
                 <li class="nav-item">
@@ -224,6 +230,9 @@
                                     <a class="nav-link {{ request()->routeIs($routeName) ? 'active' : '' }}"
                                         href="{{ route($routeName) }}">
                                         {{ __($label) }}
+                                        @if ($routeName === 'blog.comments.index' && $pendingComments > 0)
+                                            <span class="badge rounded-pill bg-warning text-dark ms-1" title="{{ __('Waiting for approval') }}">{{ $pendingComments }}</span>
+                                        @endif
                                     </a>
                                 </li>
                             @endforeach

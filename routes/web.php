@@ -19,6 +19,7 @@ use App\Http\Controllers\Back\Service\ServiceMenuController;
 use App\Http\Controllers\Back\Blog\ArticleController as BackArticleController;
 use App\Http\Controllers\Back\Blog\CategoryController as BackCategoryController;
 use App\Http\Controllers\Back\Blog\ConfigController as BackConfigController;
+use App\Http\Controllers\Back\Blog\CommentController as BackCommentController;
 
 /** IMPORT CONTACT BACK CONTROLLERS **/
 use App\Http\Controllers\Back\Contact\ContactMenuController;
@@ -67,7 +68,7 @@ Route::get('/set-language/{lang}', function (string $lang) {
 /**
  * Hak akses per role (harus sejalan dengan resources/views/back/layout/sidebar.blade.php):
  * - admin    : semua menu
- * - writer   : dashboard, profil sendiri, blog (articles & categories), file manager
+ * - writer   : dashboard, profil sendiri, blog (articles, categories & comments), file manager
  * - uploader : dashboard, profil sendiri, home poster & gallery
  */
 Route::middleware(['auth', 'UserAccess:admin,writer,uploader'])->group(function() {
@@ -167,6 +168,11 @@ Route::middleware(['auth', 'UserAccess:admin,writer,uploader'])->group(function(
         Route::post('/categories', [BackCategoryController::class, 'store'])->name('categories.store');
         Route::put('/categories/{category}', [BackCategoryController::class, 'update'])->name('categories.update');
         Route::delete('/categories/{category}', [BackCategoryController::class, 'destroy'])->name('categories.destroy');
+
+        // moderasi komentar (komentar baru tampil di website setelah disetujui)
+        Route::get('/comments', [BackCommentController::class, 'index'])->name('comments.index');
+        Route::put('/comments/{comment}', [BackCommentController::class, 'update'])->name('comments.update');
+        Route::delete('/comments/{comment}', [BackCommentController::class, 'destroy'])->name('comments.destroy');
 
         Route::middleware('UserAccess:admin')->group(function () {
             Route::get('/configs', [BackConfigController::class, 'index'])->name('configs.index');

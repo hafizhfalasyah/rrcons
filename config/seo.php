@@ -74,7 +74,7 @@ return [
     // Path yang tidak boleh diindeks
     'disallow' => [
         '/dashboard', '/users', '/login', '/logout', '/home/', '/rrfuture/', '/service/', '/contact/',
-        '/blog/articles', '/blog/categories', '/blog/configs', '/laravel-filemanager', '/set-language/',
+        '/blog/articles', '/blog/categories', '/blog/configs', '/blog/comments', '/laravel-filemanager', '/set-language/',
         '/get-articles', '/search-articles',
     ],
 

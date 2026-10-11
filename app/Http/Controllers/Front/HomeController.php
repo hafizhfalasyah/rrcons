@@ -126,13 +126,18 @@ class HomeController extends Controller
         return response()->json(compact('html'));
     }
 
-    public function show($slug)
+    public function show(Request $request, $slug)
     {
         // Artikel Private / terjadwal (belum waktunya) tidak boleh bisa diakses publik
         $article = Article::published()
-            ->with(['category', 'comments', 'Creator'])
+            // hanya komentar yang sudah disetujui moderator yang tampil
+            ->with(['category', 'comments' => fn ($query) => $query->approved(), 'Creator'])
             ->where('slug', $slug)
-            ->firstOrFail();
+            ->first();
+
+        if (!$article) {
+            return $this->redirectFromPreviousSlug($request, $slug);
+        }
 
         // jumlah views dihitung oleh pelacak kunjungan (sekali per pengunjung per hari, tanpa bot)
 
@@ -151,6 +156,22 @@ class HomeController extends Controller
         ) + ['seo' => Seo::article($article)]);
     }
 
+    /**
+     * Slug lama (judul artikel pernah diubah) dialihkan permanen ke URL terbaru.
+     */
+    private function redirectFromPreviousSlug(Request $request, string $slug)
+    {
+        $current = Article::published()
+            ->whereHas('slugRedirects', fn ($query) => $query->where('slug', $slug))
+            ->value('slug');
+
+        abort_unless($current, 404);
+
+        $query = $request->getQueryString();
+
+        return redirect()->to(route('detail_blog', $current) . ($query ? '?' . $query : ''), 301);
+    }
+
     public function storeComment(Request $request, $slug)
     {
         $article = Article::published()->where('slug', $slug)->firstOrFail();
@@ -161,6 +182,7 @@ class HomeController extends Controller
             'content' => 'required|string|max:1000',
         ]);
 
+        // status awal "pending": tampil setelah disetujui di menu Blog > Comments
         $article->comments()->create($validated);
 
         return back()->with('success', __('blog.sections.blog.detail.comments.success'));

@@ -67,6 +67,20 @@
                     </tr>
                 @endforeach
                 <tr>
+                    <th class="bg-light">{{ __('Article URL') }}</th>
+                    <td>
+                        <code>/blog/{{ $article->slug }}</code>
+                        @if ($article->slugRedirects->isNotEmpty())
+                            <div class="small text-muted mt-2">{{ __('Old URLs that redirect here:') }}</div>
+                            <ul class="small mb-0">
+                                @foreach ($article->slugRedirects->sortByDesc('updated_at') as $redirect)
+                                    <li><code>/blog/{{ $redirect->slug }}</code></li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </td>
+                </tr>
+                <tr>
                     <th class="bg-light">{{ __('Category') }}</th>
                     <td>{{ $article->Category?->name ?? '-' }}</td>
                 </tr>
