@@ -220,7 +220,6 @@ body {
     margin-top: var(--rr-header-h);
     margin-left: var(--rr-sidebar-w);
     padding: 1.75rem;
-    transition: margin-left .25s ease;
     min-height: calc(100vh - var(--rr-header-h));
 }
 
