@@ -89,7 +89,7 @@ services:
       - ./:/var/www/html
       - rrcons-node-modules:/var/www/html/node_modules
       - rrcons-npm-cache:/home/node/.npm
-    command: sh -c "[ -x node_modules/.bin/tailwindcss ] || npm ci; npm run build:front-css -- --watch --poll"
+    command: sh -c "[ -x node_modules/.bin/tailwindcss ] || npm ci; npm run build:front-css -- --watch=always --poll"
     networks:
       - rrcons-network
 

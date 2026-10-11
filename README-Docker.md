@@ -11,6 +11,10 @@ Docker hanya untuk komputer lokal. Produksi tetap di shared hosting (lihat `docs
 
 Folder proyek di-mount ke container, jadi perubahan kode langsung terlihat tanpa build ulang.
 
+> Watcher Tailwind (`node`) hanya **menambah** class selama berjalan; class yang dihapus dari view baru hilang setelah build ulang.
+> Sebelum commit `public/front/css/app.css`, jalankan build bersih: `npm run build:front-css`
+> (atau `docker compose --env-file .env.docker restart node`).
+
 ## Pertama kali
 
 ```powershell
