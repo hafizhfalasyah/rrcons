@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Config;
+use App\Models\Blog\Config;
 
 class ConfigSeeder extends Seeder
 {
@@ -13,7 +13,7 @@ class ConfigSeeder extends Seeder
      */
     public function run(): void
     {
-        Config::insert([
+        $defaults = [
             [
                 'name' => 'logo',
                 'value' => 'logo.png'
@@ -66,6 +66,11 @@ class ConfigSeeder extends Seeder
                 'name' => 'footer',
                 'value' => 'rrcons'
             ],
-        ]);
+        ];
+
+        // Aman dijalankan ulang: hanya menambah config yang belum ada, nilai yang sudah diubah admin tidak ditimpa
+        foreach ($defaults as $config) {
+            Config::firstOrCreate(['name' => $config['name']], ['value' => $config['value']]);
+        }
     }
 }

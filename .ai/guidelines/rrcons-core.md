@@ -10,5 +10,6 @@
 - Never run `migrate:fresh|reset|refresh`, `db:wipe` or `db:seed` against the configured database; never read/print/commit `.env*`.
 - Migrations: add new idempotent files only (guard with `Schema::hasColumn`/`hasTable`), compatible with MySQL and SQLite; one `renameColumn` per `Schema::table`.
 - Git: remotes `origin` (hafizhfalasyah/rrcons) and `solveit` (solveit-id/rrcons) have unrelated histories — port with cherry-pick. Commit format `(add|update|fix|perf|test|chore) lowercase summary`, no `Co-Authored-By` trailer.
-- Run `php artisan test` (SQLite in-memory) before declaring work done.
+- Run `php artisan test` (SQLite in-memory; also safe as `docker compose --env-file .env.docker exec app php artisan test`) before declaring work done.
+- Local: Docker stack (`README-Docker.md`, app :8082, MariaDB 127.0.0.1:3307) or native PHP 8.5 + Docker db/mailpit. Deploy to shared hosting: `docs/DEPLOY-SHARED-HOSTING.md`, package via `scripts/build-release.ps1`.
 - Laravel 10→13 upgrade pins (keep them): Laravel 10 error layout `resources/views/errors/minimal.blade.php`, LFM v2.9.1 views in `resources/views/vendor/laravel-filemanager`, CSRF token always required (`VerifyCsrfToken::hasValidOrigin()` = false), `hashing.rehash_on_login = false`. See AGENTS.md §12a.

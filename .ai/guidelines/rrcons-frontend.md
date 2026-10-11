@@ -5,6 +5,7 @@
 - Each page includes `front.partials.seo` (with `$seo` from `App\Support\Seo::<page>()`) and `front.partials.analytics` (pass `['article' => $article]` on the article page). AJAX partials: `front.partials.articles`, `front.partials.article_list`.
 - Styling: Tailwind 3.4.17 utilities compiled with `npm run build:front-css` into `public/front/css/app.css` (committed, loaded via `asset_version()`). After changing classes in front views, `public/front/js`, or `app/Helpers`, rebuild and commit the CSS. Never use the Tailwind Play CDN.
 - CDN libs: Alpine.js 3.17.4, AOS 2.3.4, Feather icons, Google Fonts Poppins. Shared script: `public/front/js/index.js` (mobile menu, WhatsApp box, carousel, etc.).
+- Never write a literal `<?` (other than `<?php`) in a Blade template: Blade uses PHP's tokenizer, so with `short_open_tag=On` it becomes a PHP tag (see `resources/views/seo/sitemap.blade.php` for the split XML prolog).
 - Output: `{{ }}` by default; `{!! highlightLastWord(...) !!}` is safe (helper escapes); article body only via `safe_desc`.
 - `public/front/css/tailwind.css` is a legacy unused 4 MB file; the Vite entries (`resources/js`, `resources/sass`) are not used by any view.
 
