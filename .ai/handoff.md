@@ -6,6 +6,17 @@ Template and rules: `.claude/skills/rrcons-handoff/SKILL.md` (plain Markdown —
 
 ---
 
+## 2026-10-12 — Claude Code — RRCONS loading screen on every page
+- **Branch / HEAD:** `solveit-staging` → PR to `solveit-id/rrcons` main; cherry-picked to `staging` → PR to `hafizhfalasyah/rrcons` main.
+- **Goal:** modern, simple, interactive, circular loading screen with real progress (%) and the RRCONS look on the whole site.
+- **Done:**
+  - `resources/views/partials/page-loader.blade.php`: logo inside a yellow progress ring (logo colours) on brand blue, Poppins percentage + status line, dotted orbit, subtle cursor tilt, "tap to skip" hint after 2.5 s; click/tap/Esc skips. Self-contained inline CSS/JS (no Tailwind rebuild, works with Bootstrap admin). `<noscript>` hides it; respects `prefers-reduced-motion`.
+  - Progress: DOM ready → non-lazy images loaded/total ("Loading images 3 of 8") → `window.load` → 100% "Ready!" and fade out; 12 s safety cap. Shown again on same-site link clicks / form submits after 150 ms (re-checks `defaultPrevented`, so AJAX handlers are untouched; 10 s / 45 s safety, `data-no-loader` opt-out); hidden on bfcache restore and when the tab is in the background.
+  - Included right after `<body>` in the 6 public pages, `back/layout/template` and `auth/login` (not in pinned error/LFM views). Strings in `lang/{id,en}/loader.php`.
+  - `PageLoaderTest` (4 tests); docs: AGENTS.md §5/§9/§10, `.ai/guidelines/rrcons-frontend.md`, `rrcons-testing.md`.
+- **Verification:** full suite green. Headless Edge via CDP with throttled network: images 15→19→24→29 of 30, then Ready!/fade-out; screenshots desktop + login (EN/ID). Note: `--virtual-time-budget` screenshots freeze `requestAnimationFrame`, and headless windows are at least 504 px wide — not app bugs.
+- **Gotchas:** keep the include directly after `<body>` (test enforces). Add `data-no-loader` to links/forms that download files or should not show the overlay.
+
 ## 2026-10-12 — Claude Code — clearer admin panel: bilingual tabbed forms, guides, sidebar & dashboard
 - **Branch / HEAD:** `solveit-staging` → PR to `solveit-id/rrcons` main; cherry-picked to `staging` → PR to `hafizhfalasyah/rrcons` main.
 - **Goal:** make the admin understandable for non-technical staff and stop the "save EN → switch language → save ID" routine.
