@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery as Middleware;
 
 class VerifyCsrfToken extends Middleware
 {
@@ -17,4 +17,15 @@ class VerifyCsrfToken extends Middleware
         '_v/hit',
         '_v/ping',
     ];
+
+    /**
+     * Laravel 13 meloloskan request tanpa token CSRF bila browser mengirim header
+     * Sec-Fetch-Site: same-origin. Dimatikan agar perilakunya tetap sama seperti
+     * sebelumnya: setiap POST/PUT/DELETE wajib membawa token CSRF yang valid
+     * (form yang dikirim setelah sesi kedaluwarsa tetap menampilkan halaman 419).
+     */
+    protected function hasValidOrigin($request)
+    {
+        return false;
+    }
 }

@@ -19,6 +19,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Password Rehashing
+    |--------------------------------------------------------------------------
+    |
+    | Sejak Laravel 11, password bisa di-hash ulang otomatis saat login. Dimatikan
+    | agar login tidak pernah menulis ulang kolom password (perilaku sebelumnya).
+    |
+    */
+
+    'rehash_on_login' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Bcrypt Options
     |--------------------------------------------------------------------------
     |
