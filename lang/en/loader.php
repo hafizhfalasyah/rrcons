@@ -9,15 +9,16 @@ return [
     */
 
     'label' => 'Loading RRCONS page',
-    'skip' => 'Tap to skip',
+    'skip' => 'Skip',
+    'hint' => 'Click the circle to skip',
 
     'status' => [
-        'start' => 'Preparing the page…',
-        'content' => 'Loading content…',
-        'media' => 'Loading images :loaded of :total',
-        'finishing' => 'Almost there…',
-        'ready' => 'Ready!',
-        'navigating' => 'Opening page…',
+        'start' => 'Preparing the page',
+        'content' => 'Loading content',
+        'media' => 'Loading images :loaded/:total',
+        'finishing' => 'Almost there',
+        'ready' => 'Done',
+        'navigating' => 'Opening page',
     ],
 
 ];
