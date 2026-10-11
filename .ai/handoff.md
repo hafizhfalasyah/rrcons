@@ -19,6 +19,7 @@ Template and rules: `.claude/skills/rrcons-handoff/SKILL.md` (plain Markdown —
 - **In progress (uncommitted):** none.
 - **Verification:** 88 tests / 795 assertions pass natively and inside Docker; snapshot diff vs Laravel 10 baseline unchanged (only the 4 known non-visible diffs); release ZIP built and boot-tested.
 - **Next steps (user):** ensure hosting offers PHP 8.5, back up prod DB + `storage/app/public`, follow `docs/DEPLOY-SHARED-HOSTING.md`. Local `.env` for native mode needs `DB_HOST=127.0.0.1`, `DB_PORT=3307` and the Docker DB credentials.
+- **Follow-up fix:** Tailwind v3 `--watch` exits when stdin closes (container) → compose uses `--watch=always --poll`; the watcher never drops removed classes, so run a clean `npm run build:front-css` before committing `app.css`.
 - **Gotchas:** PowerShell 5.1 strips inner double quotes when calling native programs (scripts avoid them). Never write a literal `<?` in Blade templates.
 
 ## 2026-10-11 — Claude Code — Laravel 10.48 → 13.35 and PHP 8.2 → 8.5 upgrade (1:1)
