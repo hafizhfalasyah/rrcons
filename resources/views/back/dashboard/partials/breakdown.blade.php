@@ -1,7 +1,12 @@
-{{-- Tabel persentase. Variabel: $title, $icon, $rows, $labels (opsional: map nilai => label) --}}
-<div class="card shadow-sm border-0 rounded-4 h-100">
-    <div class="card-header bg-white fw-semibold"><i class="bi {{ $icon }} me-2 text-primary"></i>{{ $title }}</div>
-    <div class="card-body">
+{{-- Tabel persentase. Variabel: $title, $icon, $rows, $labels (opsional: map nilai => label), $description (opsional) --}}
+<div class="panel">
+    <div class="panel-header">
+        <span><i class="bi {{ $icon }} me-2 text-primary"></i>{{ $title }}</span>
+    </div>
+    <div class="panel-body">
+        @if (!empty($description))
+            <p class="small text-muted mb-3">{{ $description }}</p>
+        @endif
         @forelse ($rows as $row)
             @php
                 $label = $row->label === '__other' ? __('Others') : (($labels ?? [])[$row->label] ?? $row->label);
@@ -12,7 +17,7 @@
                     <span class="text-muted text-nowrap">{{ number_format($row->views) }} · {{ $row->percent }}%</span>
                 </div>
                 <div class="progress" style="height: 6px;">
-                    <div class="progress-bar" role="progressbar" style="width: {{ $row->percent }}%"></div>
+                    <div class="progress-bar" role="progressbar" style="width: {{ $row->percent }}%; background-color: var(--rr-primary);"></div>
                 </div>
             </div>
         @empty

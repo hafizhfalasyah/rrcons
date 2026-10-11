@@ -243,7 +243,7 @@ class AnalyticsTest extends TestCase
         $this->assertSame(['ai', 'direct', 'social'], $report->sources()->pluck('label')->sort()->values()->all());
 
         $this->actingAs($this->admin)->withSession(['app_locale' => 'id'])->get('/dashboard')
-            ->assertSee('Analitik pengunjung')
+            ->assertSee('Pengunjung website')->assertSee('Asal &amp; perangkat', false)
             ->assertSee('Asisten AI (ChatGPT, Perplexity, …)')
             ->assertSee('Strategi Bisnis');
     }
