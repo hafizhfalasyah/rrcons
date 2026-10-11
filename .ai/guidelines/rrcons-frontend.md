@@ -1,0 +1,15 @@
+## RRCONS — frontend
+
+### Public site (`resources/views/front`)
+- Six **standalone** Blade documents (`index`, `rrfuture`, `service`, `blog`, `detail-blog`, `contact`) — no shared layout. Navbar, mobile menu, language switcher, footer and WhatsApp widget are duplicated; apply shared changes to all six.
+- Each page includes `front.partials.seo` (with `$seo` from `App\Support\Seo::<page>()`) and `front.partials.analytics` (pass `['article' => $article]` on the article page). AJAX partials: `front.partials.articles`, `front.partials.article_list`.
+- Styling: Tailwind 3.4.17 utilities compiled with `npm run build:front-css` into `public/front/css/app.css` (committed, loaded via `asset_version()`). After changing classes in front views, `public/front/js`, or `app/Helpers`, rebuild and commit the CSS. Never use the Tailwind Play CDN.
+- CDN libs: Alpine.js 3.17.4, AOS 2.3.4, Feather icons, Google Fonts Poppins. Shared script: `public/front/js/index.js` (mobile menu, WhatsApp box, carousel, etc.).
+- Output: `{{ }}` by default; `{!! highlightLastWord(...) !!}` is safe (helper escapes); article body only via `safe_desc`.
+- `public/front/css/tailwind.css` is a legacy unused 4 MB file; the Vite entries (`resources/js`, `resources/sass`) are not used by any view.
+
+### Admin (`resources/views/back`)
+- `@extends('back.layout.template')`, `@section('title')`, `@section('content')`, `@push('css')`/`@push('js')`.
+- CDN: Bootstrap 5.2.3 + Icons, jQuery 3.7.1, DataTables 2.1.8, SweetAlert2 11, Chart.js 4.4.4 (dashboard), CKEditor 5 41.2.1 (articles), Feather icons.
+- Section pages: table + Bootstrap modals (`updatemodal`, `createmodal`, `deletemodal`), flash `session('success')`, `$errors`. All text via `__('English')` with Indonesian in `lang/id.json`.
+- Sidebar (`layout/sidebar.blade.php`) hides menus per role; keep it aligned with route middleware.
