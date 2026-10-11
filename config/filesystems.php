@@ -69,6 +69,12 @@ return [
     |
     */
 
+    /*
+    | Gambar yang diunggah lewat panel admin dioptimalkan otomatis (lihat App\Support\ImageOptimizer).
+    */
+
+    'optimize_uploaded_images' => env('OPTIMIZE_UPLOADED_IMAGES', true),
+
     'links' => [
         public_path('storage') => storage_path('app/public'),
     ],

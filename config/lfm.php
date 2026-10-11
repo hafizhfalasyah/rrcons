@@ -15,7 +15,10 @@ return [
     |--------------------------------------------------------------------------
      */
 
-    'use_package_routes'       => true,
+    // false: rute didaftarkan sendiri di routes/web.php (dengan pembatasan role admin dan writer).
+    // Bila true, package menambah duplikat di /filemanager yang hanya mewajibkan login dan
+    // membuat `php artisan route:cache` gagal karena nama rute bentrok.
+    'use_package_routes'       => false,
 
     /*
     |--------------------------------------------------------------------------

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Back\Contact;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\ManagesPublicFiles;
 use App\Http\Controllers\Concerns\ValidatesTranslations;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 use App\Models\Contact\ContactMenu;
 use App\Models\Contact\HeroContact;
@@ -13,7 +13,7 @@ use App\Models\Contact\UsContact;
 
 class ContactMenuController extends Controller
 {
-    use ValidatesTranslations;
+    use ManagesPublicFiles, ValidatesTranslations;
 
     /** ============================== CONTACT MENU CONTROLLERS ============================== **/
     public function contactMenu()
@@ -60,19 +60,8 @@ class ContactMenuController extends Controller
         $hero = HeroContact::findOrFail($id);
 
         if ($request->hasFile('bg_img')) {
-
-            // Hapus gambar lama
-            if ($hero->bg_img) {
-                Storage::disk('public')->delete($hero->bg_img);
-            }
-
-            $file = $request->file('bg_img');
-            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-
-            $path = $file->storeAs('back/contact/hero', $filename, 'public');
-
             $hero->update([
-                'bg_img' => $path // simpan path lengkap
+                'bg_img' => $this->replacePublicFile($hero->bg_img, $request->file('bg_img'), 'back/contact/hero'),
             ]);
         }
 

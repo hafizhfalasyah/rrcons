@@ -46,14 +46,19 @@ class HomeController extends Controller
                 return Storage::disk('public')->exists($poster->img);
         });
 
-        $heroes = HeroHome::with('homeMenu')->get();
-        $abouts = AboutHome::with('homeMenu')->get();
-        $services = ServiceHome::with('homeMenu')->get();
-        $advantages = AdvantageHome::with('homeMenu')->get();
-        $profiles = ProfileHome::with('homeMenu')->get();
-        $business = BusinessHome::with('homeMenu')->get();
-        $sosmed = SosmedHome::with('homeMenu')->get();
-        $gallery = GalleryHome::with('homeMenu')->get();
+        // Semua section memakai tabel home_menus yang sama: muat sekali lalu bagikan
+        // (sebelumnya 1 query per section).
+        $menus = HomeMenu::all()->keyBy('id');
+        $withMenu = fn ($items) => $items->each(fn ($item) => $item->setRelation('homeMenu', $menus->get($item->home_menu_id)));
+
+        $heroes = $withMenu(HeroHome::get());
+        $abouts = $withMenu(AboutHome::get());
+        $services = $withMenu(ServiceHome::get());
+        $advantages = $withMenu(AdvantageHome::get());
+        $profiles = $withMenu(ProfileHome::get());
+        $business = $withMenu(BusinessHome::get());
+        $sosmed = $withMenu(SosmedHome::get());
+        $gallery = $withMenu(GalleryHome::get());
 
         $months = DB::table('gallery_homes')->distinct()->orderBy('month')->pluck('month');
         $years  = DB::table('gallery_homes')->distinct()->orderByDesc('year')->pluck('year');

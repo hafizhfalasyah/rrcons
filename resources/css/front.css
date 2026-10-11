@@ -1,0 +1,4 @@
+/* Sumber CSS halaman publik. Build: npm run build:front-css -> public/front/css/app.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
