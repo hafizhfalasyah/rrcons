@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 /**
@@ -25,6 +26,8 @@ class UpgradeCompatibilityTest extends TestCase
 
     public function test_file_manager_uses_the_previous_interface(): void
     {
+        // File Manager membuat folder photos/{id} & photos/shares; jangan sampai di storage asli
+        Storage::fake('public');
         $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
 
         $this->actingAs($admin)->get('/laravel-filemanager?type=Images')

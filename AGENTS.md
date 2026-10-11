@@ -100,14 +100,14 @@ Native mode (no PHP container): `docker compose --env-file .env.docker up -d db 
 
 ## 4. Git & release workflow (IMPORTANT)
 
-Two GitHub remotes with **unrelated histories** (different root commits, different hashes) but **identical file content except `README.md`**:
+Two GitHub remotes with **unrelated histories** (different root commits, different hashes) and **identical file content** (including `README.md` since 2026-10-11):
 
 | Remote | URL | Root commit | Local branches tracking it |
 |---|---|---|---|
 | `origin` | https://github.com/hafizhfalasyah/rrcons.git | `b1b3269 Deploy v1.0` | `main` → `origin/main`, `staging` → `origin/staging` |
 | `solveit` | https://github.com/solveit-id/rrcons.git | `223420b Initial commit` | `solveit-staging` → `solveit/staging` |
 
-- `README.md` differs on purpose: `origin` has a custom project README; `solveit` still has the Laravel default README. Do not "sync" README between them unless asked.
+- `README.md` is the same project README on both remotes (synced from `origin` on 2026-10-11). Keep it identical: README changes are cherry-picked like any other commit. After every release `git diff origin/main solveit/main` must be empty.
 - `backup/legacy-local-main` is a local-only safety branch — never delete it.
 - Never merge one remote's history into the other (they share no ancestor). Port changes with `git cherry-pick`.
 
@@ -260,7 +260,7 @@ Admin form choice `publication` ∈ `private | publish | schedule` → `Article:
 - `replacePublicFile()` deletes the old file; `deletePublicFile($path, $legacyDir)` handles legacy filename-only values.
 - Images (jpg/jpeg/png/webp) are auto-optimized after upload by `ImageOptimizer` (max 2560px, quality 85, only kept if ≥5% smaller; never fails the upload). Toggle `OPTIMIZE_UPLOADED_IMAGES`.
 - Limits: images `max:2048` KB; sosmed video `max:51200` KB (mp4/mpeg/mkv/mov).
-- CKEditor uploads go to UniSharp LFM (`/laravel-filemanager/upload?type=Images`, disk `public`, private + shared folders enabled, `use_package_routes=false` — routes registered once inside the role-protected group).
+- CKEditor uploads go to UniSharp LFM (`/laravel-filemanager/upload?type=Images`, disk `public`, private + shared folders enabled, `use_package_routes=false` — routes registered once inside the role-protected group). LFM stores them in `storage/app/public/photos/{user_id}` (+ `photos/shares`, `thumbs/`) and recreates those folders whenever the file manager is opened. On a server, `photos/` may hold images referenced inside article HTML — never delete it there; locally it was emptied on 2026-10-11 (contents unreferenced). Tests that open the file manager must call `Storage::fake('public')`.
 
 ### Visitor analytics (first-party, cookieless)
 1. Every public page includes `front.partials.analytics`, which embeds an HMAC-signed token (`Tracker::issue`: view uuid, path, route, article id, locale, timestamp; TTL 7200 s).
@@ -307,7 +307,7 @@ Important `.env` keys (see `.env.example`): `APP_TIMEZONE=Asia/Jakarta`, `APP_LO
 
 ⚠️ The local `.env` in the maintainer's checkout has `APP_ENV=production`; treat its database as **possibly real**. Never run `migrate:fresh`, `migrate:reset`, `db:wipe`, `db:seed` or destructive SQL against it. Never print or commit `.env` / `.env.docker` values.
 
-**Full step-by-step guide: `docs/DEPLOY-SHARED-HOSTING.md`** (build the upload package locally with `scripts/build-release.ps1`: git archive of HEAD + `composer install --no-dev`, no `.env`/uploads/tests/docker). Short version (server must run **PHP 8.5** with `gd`, `pdo_mysql`, `mbstring`, `fileinfo`, `intl` …):
+**Full step-by-step guide: `docs/DEPLOY-SHARED-HOSTING.md`** (local prep without Docker or with Docker; hosting with Terminal, one-off Cron Job, web installer, or phpMyAdmin import). Release package: `scripts/build-release.ps1` (git archive of HEAD + `composer install --no-dev`, no `.env`/uploads/tests/docker/docs; `-UseDocker` runs tests + Composer in the `rrcons-app` image; `-WithWebInstaller` adds `public/install-<random>.php` from `scripts/stubs/web-installer.php`, key printed once and stored in git-ignored `release/*-installer.txt`, which runs optimize:clear, storage:link, migrate, config/route/view cache over HTTP and deletes itself). Rehearsal: `scripts/import-db.ps1 -File dump.sql -Migrate` (Docker) or `-Native` (local MySQL such as XAMPP, DB settings from `.env` or `-EnvFile`). Short version (server must run **PHP 8.5** with `gd`, `pdo_mysql`, `mbstring`, `fileinfo`, `intl` …):
 ```bash
 # back up the database from the hosting panel first
 composer install --no-dev --optimize-autoloader
@@ -373,6 +373,6 @@ Accepted, non-visible differences: response header `charset=utf-8` is now lowerc
 - Don't run destructive DB commands, read/print secrets, or commit `.env*` files.
 - Don't use the Tailwind Play CDN, `@vite` on public pages, or add new CDN libraries without need.
 - Don't edit an already-run migration; add a new, idempotent one (MySQL + SQLite compatible).
-- Don't merge histories between `origin` and `solveit`; cherry-pick instead. Don't sync README across them.
+- Don't merge histories between `origin` and `solveit`; cherry-pick instead. Keep both trees (README included) identical.
 - Don't add `Co-Authored-By` trailers; follow the `(type) summary` commit format.
 - Don't mass-reformat files or upgrade dependencies/framework without an explicit request.

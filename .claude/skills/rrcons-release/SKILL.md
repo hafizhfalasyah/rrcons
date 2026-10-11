@@ -11,7 +11,7 @@ disable-model-invocation: true
 | `solveit` | `solveit-id/rrcons` | `solveit-staging` → `staging` |
 | `origin` | `hafizhfalasyah/rrcons` | `staging` → `staging`, `main` → `main` |
 
-The histories are **unrelated** (no common ancestor). Content is identical except `README.md` (origin has a custom README). Port commits with `git cherry-pick`; never merge one remote into the other; never sync README unless asked.
+The histories are **unrelated** (no common ancestor). Content is identical, `README.md` included. Port commits with `git cherry-pick`; never merge one remote into the other.
 
 ## 0. Pre-flight
 ```bash
@@ -43,7 +43,7 @@ git push origin staging
 gh pr create --repo hafizhfalasyah/rrcons --base main --head staging --title "<summary>" --body "<...>"
 gh pr merge <n> --repo hafizhfalasyah/rrcons --merge
 ```
-On a cherry-pick conflict (usually only `README.md`): keep origin's README unless the change is meant for it, `git add`, `git cherry-pick --continue`.
+On a cherry-pick conflict: resolve so that both remotes end with the same file content, `git add`, `git cherry-pick --continue`. Final check: `git diff origin/main solveit/main` prints nothing.
 
 ## 4. Sync local branches
 ```bash

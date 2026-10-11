@@ -24,7 +24,7 @@ docker compose --env-file .env.docker up -d --build
 docker compose --env-file .env.docker exec app php artisan migrate
 ```
 
-Data produksi (dump phpMyAdmin) bisa dimuat dengan:
+Data produksi (dump phpMyAdmin) bisa dimuat dengan (tanpa Docker: tambahkan `-Native`, memakai MySQL lokal dari `.env`):
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\import-db.ps1 -File D:\backup\produksi.sql -Migrate
@@ -71,3 +71,12 @@ Container juga membuat link relatif yang sama saat start bila link belum ada.
 
 `docker/php/custom.ini` dan `public/.htaccess`: `upload_max_filesize=64M`, `post_max_size=72M`
 (video Social Media boleh 50 MB).
+
+## Paket rilis untuk shared hosting
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\build-release.ps1 -UseDocker
+# hosting tanpa Terminal & Cron Job: tambahkan -WithWebInstaller
+```
+
+Langkah lengkap: `docs/DEPLOY-SHARED-HOSTING.md`.

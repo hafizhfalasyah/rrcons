@@ -6,6 +6,16 @@ Template and rules: `.claude/skills/rrcons-handoff/SKILL.md` (plain Markdown —
 
 ---
 
+## 2026-10-11 — Claude Code — storage cleanup, README sync, no-terminal deploy kit
+- **Branch / HEAD:** `solveit-staging` → PR to `solveit-id/rrcons` main; cherry-picked (except the README commit, already identical there) to `staging` → PR to `hafizhfalasyah/rrcons` main.
+- **Done:**
+  - Checked then deleted local `storage/app/public/photos` and `storage/app/public/public` (= `public/storage/photos|public` via the symlink). `public/` was empty (only the old path-normalisation migration mentioned it); `photos/` is the LFM image folder (config `lfm.php`), its contents (`photos/1/image.png`, empty `13/`, `shares/`) were not referenced in any DB text column of the production copy, code, views or JS. LFM recreates the folders when opened. Fixed `UpgradeCompatibilityTest` which recreated them in real storage (now `Storage::fake`).
+  - `README.md` on solveit is now byte-identical to hafizhfalasyah's; docs/skills updated: both trees must stay identical.
+  - `scripts/build-release.ps1`: `-UseDocker`, `-WithWebInstaller` (stub `scripts/stubs/web-installer.php`); `docs` no longer packaged. `scripts/import-db.ps1`: `-Native` (local MySQL/XAMPP, `-EnvFile`, strips mariadb-dump sandbox header). `docs/DEPLOY-SHARED-HOSTING.md` rewritten (local without/with Docker; hosting via Terminal, Cron Job, web installer, phpMyAdmin import; troubleshooting).
+- **Verification:** 104 tests pass. Native rehearsal on XAMPP MariaDB 10.4 with the production copy: 11 migrations OK, site 200. Build `-UseDocker -WithWebInstaller` OK. Hosting simulation (PHP 8.5 Apache, production mode, pre-migration production data, no storage link): installer 404 on wrong key, all checks ✔, run ✔ (link + 11 migrations + caches), self-deleted, pages 200, no log errors; also verified for a `public_html` layout. Cron command and Method D dump command executed as documented.
+- **Next steps (user):** follow `docs/DEPLOY-SHARED-HOSTING.md`. Keep `release/*-installer.txt` private.
+- **Gotchas:** web installer keys are secrets — never print/commit them. `storage:link` prints ERROR but exits 0 when the link exists (harmless).
+
 ## 2026-10-11 — Claude Code — article slug redirects + blog comment moderation
 - **Branch / HEAD:** `solveit-staging` → PR to `solveit-id/rrcons` main; cherry-picked to `staging` → PR to `hafizhfalasyah/rrcons` main.
 - **Goal:** stop old article URLs from breaking when the title changes; add moderation for blog comments.
