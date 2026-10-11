@@ -73,6 +73,7 @@ Route::get('/set-language/{lang}', function (string $lang) {
 Route::middleware(['auth', 'UserAccess:admin,writer,uploader'])->group(function() {
     /** DASHBOARD MANAGEMENT **/
     Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/dashboard/realtime', [DashboardController::class, 'realtime'])->name('dashboard.realtime');
 
     /** USER MANAGEMENT (otorisasi detail ada di UserController) **/
     Route::resource('/users', UserController::class)->only(['index', 'store', 'update', 'destroy']);
