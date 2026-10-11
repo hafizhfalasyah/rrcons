@@ -48,6 +48,7 @@ class AccessControlTest extends TestCase
             '/contact/hero'        => ['admin' => 200, 'writer' => 403, 'uploader' => 403],
             '/blog/articles'       => ['admin' => 200, 'writer' => 200, 'uploader' => 403],
             '/blog/categories'     => ['admin' => 200, 'writer' => 200, 'uploader' => 403],
+            '/blog/comments'       => ['admin' => 200, 'writer' => 200, 'uploader' => 403],
             '/blog/configs'        => ['admin' => 200, 'writer' => 403, 'uploader' => 403],
         ];
 

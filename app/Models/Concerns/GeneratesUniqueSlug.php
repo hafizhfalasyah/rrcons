@@ -28,16 +28,22 @@ trait GeneratesUniqueSlug
         $slug = $base;
         $suffix = 2;
 
-        while (
-            in_array($slug, static::reservedSlugs(), true)
-            || static::query()
-                ->where('slug', $slug)
-                ->when($ignoreId, fn ($query) => $query->whereKeyNot($ignoreId))
-                ->exists()
-        ) {
+        while (in_array($slug, static::reservedSlugs(), true) || static::slugIsTaken($slug, $ignoreId)) {
             $slug = $base . '-' . $suffix++;
         }
 
         return $slug;
+    }
+
+    /**
+     * Apakah slug sudah dipakai record lain. Model boleh menimpanya (mis. Article juga
+     * memeriksa slug lama yang masih dialihkan ke artikel lain).
+     */
+    protected static function slugIsTaken(string $slug, ?int $ignoreId = null): bool
+    {
+        return static::query()
+            ->where('slug', $slug)
+            ->when($ignoreId, fn ($query) => $query->whereKeyNot($ignoreId))
+            ->exists();
     }
 }

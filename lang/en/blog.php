@@ -167,7 +167,7 @@ return [
 
                     'empty' => 'There are no comments yet.',
 
-                    'success' => 'Your comment has been submitted!',
+                    'success' => 'Thank you! Your comment will appear once it has been approved.',
 
                 ],
 

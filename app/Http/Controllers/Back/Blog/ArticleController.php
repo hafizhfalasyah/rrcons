@@ -96,7 +96,7 @@ class ArticleController extends Controller
     public function show(string $id)
     {
         return view('back.article.show', [
-            'article' => Article::with(['User', 'Creator', 'Category'])->findOrFail($id)
+            'article' => Article::with(['User', 'Creator', 'Category', 'slugRedirects'])->findOrFail($id)
         ]);
     }
 
@@ -127,10 +127,21 @@ class ArticleController extends Controller
         // user_id = editor terakhir, created_by = penulis asli (tidak berubah)
         $data['user_id'] = $request->user()->id;
         $data['slug'] = Article::uniqueSlug($data['title_id'], $article->id);
+        $previousSlug = $article->slug;
 
         $article->update($data);
 
-        return redirect()->route('blog.articles.index')->with('success', $this->savedMessage($article, __('Article has been updated.')));
+        $message = $this->savedMessage($article, __('Article has been updated.'));
+
+        // slug lama otomatis dialihkan (lihat Article::booted)
+        if ($article->slug !== $previousSlug) {
+            $message .= ' ' . __('The article URL changed to /blog/:slug; the old URL /blog/:old redirects there automatically.', [
+                'slug' => $article->slug,
+                'old' => $previousSlug,
+            ]);
+        }
+
+        return redirect()->route('blog.articles.index')->with('success', $message);
     }
 
     /**

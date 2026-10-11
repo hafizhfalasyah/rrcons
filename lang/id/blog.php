@@ -172,7 +172,7 @@ return [
 
                     'empty' => 'Belum ada komentar.',
 
-                    'success' => 'Komentar berhasil dikirim!',
+                    'success' => 'Terima kasih! Komentar Anda akan tampil setelah disetujui admin.',
 
                 ],
 

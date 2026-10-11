@@ -61,7 +61,7 @@
                 <div class="mb-3">
                     <label for="title_id" class="form-label fw-semibold">{{ __('Title') }} <span class="text-danger">*</span></label>
                     <input type="text" name="title_id" id="title_id" class="form-control @error('title_id') is-invalid @enderror" value="{{ old('title_id', $article->title_id ?? '') }}">
-                    <div class="form-text">{{ __('The article URL is generated from the Indonesian title.') }}</div>
+                    <div class="form-text">{{ __('The article URL is generated from the Indonesian title. If the title changes, the old URL keeps working and redirects to the new one.') }}</div>
                 </div>
                 <label for="editor-id" class="form-label fw-semibold">{{ __('Content') }} <span class="text-danger">*</span></label>
                 <textarea name="desc_id" id="editor-id" class="form-control" rows="10">{{ old('desc_id', $article->desc_id ?? '') }}</textarea>

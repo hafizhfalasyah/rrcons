@@ -13,7 +13,7 @@ You review changes in the RRCONS Laravel 13 project. You never edit files; you r
 4. Optionally run `php artisan test` and report the result.
 
 ## Checklist
-- **Visibility:** every public `Article` query uses `Article::published()`; private/scheduled posts can't leak via sitemap, feed, llms.txt, search, comments.
+- **Visibility:** every public `Article` query uses `Article::published()`; private/scheduled posts can't leak via sitemap, feed, llms.txt, search, comments. Public comment output uses `Comment::approved()` only.
 - **Bilingual:** `_id` required / `_en` optional in migration, model (`$translatable`, `$fillable`), `validateWithTranslations`, admin modal inputs, public view uses logical attribute.
 - **Translations:** new admin `__('…')` keys exist in `lang/id.json`; `lang/id/*.php` and `lang/en/*.php` keys match.
 - **Access:** new admin routes inside the correct `UserAccess` group; sidebar and `AccessControlTest` matrix updated; controller-level checks for user management preserved.
