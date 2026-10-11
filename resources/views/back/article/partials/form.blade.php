@@ -14,16 +14,6 @@
     $hasEnglishError = $errors->has('title_en') || $errors->has('desc_en');
 @endphp
 
-@if ($errors->any())
-    <div class="alert alert-danger">
-        <ul class="mb-0 ps-3">
-            @foreach ($errors->all() as $error)
-                <li class="small">{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-
 <form action="{{ $action }}" method="POST" enctype="multipart/form-data" id="article-form" novalidate>
     @csrf
     @if ($method !== 'POST')

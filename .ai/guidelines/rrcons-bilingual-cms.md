@@ -7,4 +7,4 @@
 - CMS rows are edit-only; only posters and gallery items have create/delete. There are no CMS seeders — real content comes from the production DB.
 - Not translated on purpose: `ProfileHome.name`, `UsContact.title` (fixed key such as `Alamat`, used by the contact page and `Seo::streetAddress()`), URLs, media paths.
 - Strings: public pages use grouped keys in `lang/{id,en}/<page>.php` (identical key sets, test-enforced); admin uses `__('English text')` translated in `lang/id.json` (every literal key must exist there, test-enforced).
-- Admin modals show two inputs per field: `Title (Indonesia)` / `Title (English)` (see `resources/views/back/home_menu/advantage_section/updatemodal.blade.php`).
+- Admin forms show both languages in one form with tabs via `<x-admin.translatable :key="$modalId" :item="$item" :fields="[['name' => 'title', 'label' => __('Title'), 'required' => true, 'max' => 255, 'hint' => '...']]" />` (Indonesian tab required, English tab optional).

@@ -55,8 +55,8 @@ Flash messages: `->with('success', __('… updated successfully.'))` and add the
 Add inside the right `Route::prefix(...)->name(...)->middleware('UserAccess:...')` group in `routes/web.php`; unique route name; mirror access in `resources/views/back/layout/sidebar.blade.php`; extend `tests/Feature/AccessControlTest.php` matrix.
 
 ## 5. Admin views (`resources/views/back/<area>_menu/<section>_section/`)
-- `index.blade.php` lists rows; `updatemodal.blade.php` (and `createmodal`/`deletemodal` if CRUD).
-- Provide **two inputs** per field, following `home_menu/advantage_section/updatemodal.blade.php`: label `{{ __('Title (Indonesia)') }}` + `name="title_id"` (required) and `{{ __('Title (English)') }}` + `name="title_en"` (optional); ids suffixed with `-{{ $item->id }}`; values `old('title_id', $item->title_id)`; `@error('title_id') is-invalid @enderror`.
+- Everything lives in `index.blade.php`: `<x-admin.page-header>` (description, `location`, `preview-url`, `guide` tips), the list (use `<x-admin.bilingual>` for ID/EN text, `<x-admin.updated-at>`), then one `<x-admin.form-modal :id="'edit-x-' . $item->id">` per row.
+- Inside the modal: `<x-admin.translatable :key="..." :item="$item" :fields="[['name' => '<field>', 'label' => __('...'), 'required' => true, 'max' => 255, 'hint' => __('...')]]" />` renders the Indonesian/English tabs and `<field>_id` / `<field>_en` inputs; `<x-admin.media-input>` for pictures/videos. Examples: `home_menu/about_section/index.blade.php`, `home_menu/gallery_section/form.blade.php`.
 - Wrap all UI text in `__('English text')` and add to `lang/id.json`.
 
 ## 6. Public view

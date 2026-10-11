@@ -1,60 +1,17 @@
 @extends('back.layout.template')
 
-@section('title', 'RRCONS Admin | ' . __('List RR Future Menus'))
+@section('title', 'RRCONS Admin | ' . __('Section Headings'))
 
 @section('content')
-
-<div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-    <h1 class="h3 fw-bold text-uppercase">{{ __('RR Future Menus') }}</h1>
-</div>
-
-{{-- Flash & Error Messages --}}
-@if ($errors->any())
-    <div class="alert alert-danger shadow-sm">
-        <ul class="mb-0">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-
-@if (session('success'))
-    <div class="alert alert-success shadow-sm">
-        {{ session('success') }}
-    </div>
-@endif
-
-<div class="table-responsive mt-4">
-    <table class="table table-hover table-bordered align-middle shadow-sm">
-        <thead class="table-primary text-center">
-            <tr>
-                <th style="width: 5%;">{{ __('No') }}</th>
-                <th style="width: 20%;">{{ __('Title') }}</th>
-                <th style="width: 35%;">{{ __('Sub Title') }}</th>
-                <th style="width: 20%;">{{ __('Last Updated') }}</th>
-                <th style="width: 20%;">{{ __('Actions') }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($rrfutureMenus as $item)
-                <tr>
-                    <td class="text-center">{{ $loop->iteration }}.</td>
-                    <td>{{ $item->title }}</td>
-                    <td>{{ $item->sub_title }}</td>
-                    <td>{{ $lastUpdated ? \Carbon\Carbon::parse($lastUpdated)->translatedFormat('d F Y') : '-' }}</td>
-                    <td class="text-center">
-                        <button class="btn btn-primary btn-sm px-3" data-bs-toggle="modal"
-                            data-bs-target="#update-rrfutureMenu-modal{{ $item->id }}">
-                            <i data-feather="edit" class="icon-sm me-1"></i> {{ __('Edit') }}
-                        </button>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
-
-@include('back.rrfuture_menu.updatemodal')
-
+    @include('back.partials.section-headings', [
+        'menus' => $rrfutureMenus,
+        'pageName' => __('RR Future Tech Page'),
+        'previewUrl' => route('rrfuture'),
+        'updateRoute' => 'rrfuture.menu.update',
+        'prefix' => 'edit-rrfuture-menu',
+        'sections' => [
+            'heroSections' => [__('Main Banner'), 'rrfuture.hero'],
+            'productSections' => [__('Products'), 'rrfuture.product'],
+        ],
+    ])
 @endsection

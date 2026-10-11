@@ -1,6 +1,6 @@
 @extends('back.layout.template')
 
-@section('title', 'RRCONS Admin | ' . __('List Articles'))
+@section('title', 'RRCONS Admin | ' . __('Articles'))
 
 @push('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.min.css">
@@ -8,29 +8,20 @@
 
 @section('content')
 
-        <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-            <h1 class="h3 fw-bold text-uppercase">{{ __('List Articles') }}</h1>
-            <a href="{{ route('blog.articles.create') }}" class="btn btn-primary rounded shadow-sm px-3 d-flex align-items-center">
-                <i data-feather="plus" class="icon-sm"></i> {{ __('Add Article') }}
-            </a>
-        </div>
-
-        {{-- Flash & Error Messages --}}
-        @if ($errors->any())
-            <div class="alert alert-danger shadow-sm">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        @if (session('success'))
-            <div class="alert alert-success shadow-sm">
-                {{ session('success') }}
-            </div>
-        @endif
+        <x-admin.page-header :title="__('Articles')" icon="file-text"
+            :description="__('Blog articles. Each article can be written in Indonesian and English, and published now, scheduled, or kept private.')"
+            :location="__('Blog page')" :preview-url="route('blog')">
+            <x-slot:actions>
+                <a href="{{ route('blog.articles.create') }}" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1">
+                    <i data-feather="plus" class="icon-xs"></i> {{ __('Add Article') }}
+                </a>
+            </x-slot:actions>
+            <x-slot:guide>
+                <li>{{ __('Use the search box to find an article by title; click a column title to sort.') }}</li>
+                <li>{{ __('The ID only label means the English version is still empty; English visitors then see the Indonesian text.') }}</li>
+                <li>{{ __('Comments from visitors are checked in Blog → Comments before they appear.') }}</li>
+            </x-slot:guide>
+        </x-admin.page-header>
 
         <div class="mb-3">
             <p class="fw-semibold small mb-2">{{ __('Status explanation') }}</p>
@@ -38,8 +29,8 @@
         </div>
 
         <div class="table-responsive mt-4">
-            <table class="table table-hover table-bordered align-middle shadow-sm" id="dataTable">
-                <thead class="table-primary">
+            <table class="table table-admin table-hover align-middle border" id="dataTable">
+                <thead>
                     <tr>
                         <th class="text-center">{{ __('No') }}</th>
                         <th class="text-center">{{ __('Title') }}</th>

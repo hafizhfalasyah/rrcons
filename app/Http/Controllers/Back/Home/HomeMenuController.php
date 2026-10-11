@@ -27,7 +27,8 @@ class HomeMenuController extends Controller
     public function homeMenu()
     {
         $lang = App::getLocale();
-        $homeMenus = HomeMenu::all();
+        // jumlah isi tiap bagian -> halaman admin bisa menunjukkan judul ini dipakai untuk bagian apa
+        $homeMenus = HomeMenu::withCount(['heroSections', 'aboutSections', 'serviceSections', 'advantageSections', 'profileSections', 'businessSections', 'sosmedSections', 'gallerySections'])->get();
         $lastUpdated = HomeMenu::latest('updated_at')->value('updated_at');
 
         return view('back.home_menu.index', compact('homeMenus', 'lastUpdated', 'lang'));

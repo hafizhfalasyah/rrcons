@@ -4,21 +4,23 @@
 
 @section('content')
 @php($status = $article->publication_status)
-<div class="container-fluid px-4 py-4">
-    <div class="mb-4 border-bottom pb-2 d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <h1 class="h3 fw-bold text-uppercase mb-0">{{ __('Detail Article') }}</h1>
-        <div class="d-flex gap-2">
-            @if ($status === \App\Models\Blog\Article::PUBLICATION_PUBLISHED)
-                <a href="{{ route('detail_blog', $article->slug) }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm d-flex align-items-center">
-                    <i data-feather="external-link" class="icon-sm me-1"></i> {{ __('View on website') }}
-                </a>
-            @endif
-            <a href="{{ route('blog.articles.edit', $article->id) }}" class="btn btn-primary btn-sm d-flex align-items-center">
-                <i data-feather="edit" class="icon-sm me-1"></i> {{ __('Edit') }}
+<x-admin.page-header :title="__('Detail Article')" icon="file-text" :description="\Illuminate\Support\Str::limit($article->title_id, 90)">
+    <x-slot:actions>
+        <a href="{{ route('blog.articles.index') }}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+            <i data-feather="arrow-left" class="icon-xs"></i> {{ __('Back to articles') }}
+        </a>
+        @if ($status === \App\Models\Blog\Article::PUBLICATION_PUBLISHED)
+            <a href="{{ route('detail_blog', $article->slug) }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1">
+                <i data-feather="external-link" class="icon-xs"></i> {{ __('View on website') }}
             </a>
-        </div>
-    </div>
+        @endif
+        <a href="{{ route('blog.articles.edit', $article->id) }}" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1">
+            <i data-feather="edit-2" class="icon-xs"></i> {{ __('Edit') }}
+        </a>
+    </x-slot:actions>
+</x-admin.page-header>
 
+<div>
     {{-- Penjelasan status saat ini --}}
     <div class="alert {{ ['private' => 'alert-danger', 'scheduled' => 'alert-warning', 'published' => 'alert-primary'][$status] }} d-flex align-items-start gap-2">
         <div>@include('back.article.partials.status_badge', ['article' => $article])</div>

@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Back;
 use App\Http\Controllers\Controller;
 use App\Models\Blog\Article;
 use App\Models\Blog\Category;
+use App\Models\Blog\Comment;
 use App\Models\Home\GalleryHome;
+use App\Models\Home\PosterHome;
 use App\Models\User;
 use App\Support\Analytics\AnalyticsReport;
 use Illuminate\Http\Request;
@@ -18,6 +20,9 @@ class DashboardController extends Controller
 
         return view('back.dashboard.index', [
             'total_articles' => Article::count(),
+            'published_articles' => Article::published()->count(),
+            'pending_comments' => Comment::pending()->count(),
+            'total_posters' => PosterHome::whereNotNull('img')->where('img', '<>', '')->count(),
             'total_categories' => Category::count(),
             'total_users' => User::count(),
             'total_galleries' => GalleryHome::count(),

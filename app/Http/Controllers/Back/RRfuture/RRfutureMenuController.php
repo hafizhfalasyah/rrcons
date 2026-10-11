@@ -21,7 +21,7 @@ class RRfutureMenuController extends Controller
     /** ============================== RRFUTURE MENU CONTROLLERS ============================== **/
     public function rrfutureMenu()
     {
-        $rrfutureMenus = RRfutureMenu::all();
+        $rrfutureMenus = RRfutureMenu::withCount(['heroSections', 'productSections'])->get();
         $lastUpdated = RRfutureMenu::latest('updated_at')->value('updated_at');
 
         return view('back.rrfuture_menu.index', [
