@@ -1,4 +1,4 @@
-{!! '<?xml version="1.0" encoding="UTF-8"?>' !!}
+{{-- Prolog XML sengaja dipecah: Blade memakai tokenizer PHP, jadi tanda kurung sudut + tanda tanya akan dibaca sebagai tag PHP bila short_open_tag=On --}}{!! '<' . '?xml version="1.0" encoding="UTF-8"?' . '>' !!}
 <rss version="2.0"
      xmlns:atom="http://www.w3.org/2005/Atom"
      xmlns:dc="http://purl.org/dc/elements/1.1/"
