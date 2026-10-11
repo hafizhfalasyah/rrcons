@@ -7,6 +7,7 @@
 - CDN libs: Alpine.js 3.17.4, AOS 2.3.4, Feather icons, Google Fonts Poppins. Shared script: `public/front/js/index.js` (mobile menu, WhatsApp box, carousel, etc.).
 - Never write a literal `<?` (other than `<?php`) in a Blade template: Blade uses PHP's tokenizer, so with `short_open_tag=On` it becomes a PHP tag (see `resources/views/seo/sitemap.blade.php` for the split XML prolog).
 - Output: `{{ }}` by default; `{!! highlightLastWord(...) !!}` is safe (helper escapes); article body only via `safe_desc`.
+- **Loading screen** `resources/views/partials/page-loader.blade.php` (self-contained inline CSS/JS, no Tailwind/Bootstrap): RRCONS logo inside a yellow progress ring on brand blue, live percentage + status (`lang/{id,en}/loader.php`). Progress = DOM ready, then non-lazy `<img>` loaded/total, then `window.load` (12 s safety cap). Click/tap or Esc skips; reappears on same-site link clicks and form submits after 150 ms (skipped for `target`≠`_self`, `download`, `#anchor`, modifier keys, `preventDefault()` handlers, or `data-no-loader` on the link/form); hidden on bfcache restore, in background tabs and without JS. Include it **right after `<body>`** in every standalone document (6 public pages, `back/layout/template`, `auth/login`) — `PageLoaderTest` enforces it. Error pages and LFM views are pinned (see AGENTS.md §12a) and have no loader.
 - `public/front/css/tailwind.css` is a legacy unused 4 MB file; the Vite entries (`resources/js`, `resources/sass`) are not used by any view.
 
 ### Admin (`resources/views/back`)

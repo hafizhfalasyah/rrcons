@@ -109,6 +109,8 @@
     </head>
 
     <body class="body font-body" x-data="{ open: false }">
+        @include('partials.page-loader')
+
 
         @php
             $currentLocale = app()->getLocale();

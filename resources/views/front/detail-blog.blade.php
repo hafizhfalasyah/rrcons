@@ -159,6 +159,8 @@
 </head>
 
 <body class="body font-body" x-data="{ open: false }">
+    @include('partials.page-loader')
+
     <!-- Start of Navbar -->
     <nav class="fixed top-0 left-0 w-full py-5 shadow-sm bg-white z-40 text-lg">
         <div class="max-w-screen-xl mx-auto px-6 flex items-center justify-between">

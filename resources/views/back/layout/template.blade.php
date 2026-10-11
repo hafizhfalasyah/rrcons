@@ -33,6 +33,8 @@
     </head>
 
     <body>
+        @include('partials.page-loader')
+
         @php
             $currentLang = app()->getLocale();
             $flag = $currentLang === 'en' ? 'us' : 'id';

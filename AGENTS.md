@@ -160,6 +160,7 @@ lang/id.json                 admin-panel strings (English source key -> Indonesi
 resources/views/front/       6 standalone public pages + partials/{seo,analytics,articles,article_list}
 resources/views/back/        admin; layout/template.blade.php + layout/sidebar.blade.php
 resources/views/seo/         sitemap.blade.php, feed.blade.php
+resources/views/partials/    page-loader.blade.php (loading screen shared by public, login and admin pages)
 public/front/                css/app.css (compiled, committed), js/index.js, image/, images/
 public/vendor/laravel-filemanager/   published LFM assets (committed)
 tests/Feature, tests/Unit    PHPUnit (see §10)
@@ -294,6 +295,7 @@ Admin form choice `publication` ∈ `private | publish | schedule` → `Article:
 - The 6 public pages (`front/index|rrfuture|service|blog|detail-blog|contact.blade.php`) are **standalone HTML documents** — no shared layout. Navbar, mobile menu, footer, language switcher and WhatsApp widget are duplicated; a change to one usually must be applied to **all six**.
 - Styles: Tailwind utility classes only, compiled by `npm run build:front-css` (config `tailwind.config.js`, source `resources/css/front.css`). The compiled `public/front/css/app.css` is committed and loaded with `asset_version()` (cache-busting by mtime). **Never re-introduce the Tailwind Play CDN** (test enforced).
 - `public/front/css/tailwind.css` (~4 MB) is a legacy, unreferenced file.
+- **Loading screen** `resources/views/partials/page-loader.blade.php` (self-contained inline CSS/JS, no Tailwind/Bootstrap): RRCONS logo inside a yellow progress ring on brand blue, live percentage + status (`lang/{id,en}/loader.php`). Progress = DOM ready, then non-lazy `<img>` loaded/total, then `window.load` (12 s safety cap). Click/tap or Esc skips; reappears on same-site link clicks and form submits after 150 ms (skipped for `target`≠`_self`, `download`, `#anchor`, modifier keys, `preventDefault()` handlers, or `data-no-loader` on the link/form); hidden on bfcache restore, in background tabs and without JS. Include it **right after `<body>`** in every standalone document (6 public pages, `back/layout/template`, `auth/login`) — `PageLoaderTest` enforces it. Error pages and LFM views are pinned (§12a) and have no loader.
 - Section titles use `{!! highlightLastWord($text) !!}` — the helper escapes its input; any other raw output must be escaped/sanitized.
 - Home: poster popup (auto-slide stops when closed), category filter + AJAX articles (`/get-articles`), gallery filter by month/year.
 
@@ -302,7 +304,7 @@ Admin form choice `publication` ∈ `private | publish | schedule` → `Article:
 ## 10. Testing
 
 - `phpunit.xml` forces `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:` (as `<env force>` and `<server>`), and `tests/CreatesApplication.php` aborts on any other connection → tests never touch a real DB, even inside the Docker `app` container. Requires PHP extensions `pdo_sqlite` and `gd`.
-- Suites: `AccessControlTest` (role matrix, registration disabled), `ArticleSchedulingTest`, `ContentManagementTest`, `MultiLanguageTest` (both locales, lang key parity, `lang/id.json` coverage), `SeoTest`, `AnalyticsTest`, `PerformanceTest` (compiled CSS, unique route names, single menu query, image optimization), `LegacyTimezoneFixTest`, `UpgradeCompatibilityTest` + `CsrfProtectionTest` (Laravel 13 pins, §12a), `RegressionTest` (XML prolog/short tags, hero webp, idempotent seeder), `ArticleSlugRedirectTest`, `CommentModerationTest`, `Unit/HtmlSanitizerTest`.
+- Suites: `AccessControlTest` (role matrix, registration disabled), `ArticleSchedulingTest`, `ContentManagementTest`, `MultiLanguageTest` (both locales, lang key parity, `lang/id.json` coverage), `SeoTest`, `AnalyticsTest`, `PerformanceTest` (compiled CSS, unique route names, single menu query, image optimization), `LegacyTimezoneFixTest`, `UpgradeCompatibilityTest` + `CsrfProtectionTest` (Laravel 13 pins, §12a), `RegressionTest` (XML prolog/short tags, hero webp, idempotent seeder), `ArticleSlugRedirectTest`, `CommentModerationTest`, `AdminInterfaceTest`, `PageLoaderTest` (loader included right after `<body>` everywhere, both languages), `Unit/HtmlSanitizerTest`.
 - Tests use `RefreshDatabase` + `User::factory()->create(['role' => ...])`. Only `UserFactory` exists — create other rows directly with models.
 - Add/adjust tests with every behaviour change; follow the existing descriptive `test_snake_case_sentence` naming.
 
