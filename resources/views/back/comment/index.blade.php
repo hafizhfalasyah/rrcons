@@ -22,28 +22,15 @@
     ];
 @endphp
 
-    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-        <h1 class="h3 fw-bold text-uppercase">{{ __('Comment Moderation') }}</h1>
-    </div>
-
-    <p class="text-muted small">{{ __('New comments only appear on the website after they are approved.') }}</p>
-
-    {{-- Flash & Error Messages --}}
-    @if ($errors->any())
-        <div class="alert alert-danger shadow-sm">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    @if (session('success'))
-        <div class="alert alert-success shadow-sm">
-            {{ session('success') }}
-        </div>
-    @endif
+    <x-admin.page-header :title="__('Comment Moderation')" icon="message-square"
+        :description="__('Comments sent by visitors on blog articles. New comments only appear on the website after they are approved.')"
+        :location="__('Below each blog article')" :preview-url="route('blog')">
+        <x-slot:guide>
+            <li><strong>{{ __('Approve') }}</strong> — {{ __('the comment appears below the article.') }}</li>
+            <li><strong>{{ __('Mark as spam') }}</strong> — {{ __('hide advertisements or rude messages without deleting them.') }}</li>
+            <li><strong>{{ __('Delete') }}</strong> — {{ __('remove the comment permanently.') }}</li>
+        </x-slot:guide>
+    </x-admin.page-header>
 
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <ul class="nav nav-pills">
@@ -70,8 +57,8 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-hover table-bordered align-middle shadow-sm">
-            <thead class="table-primary text-center">
+        <table class="table table-admin table-hover align-middle border">
+            <thead>
                 <tr>
                     <th style="width: 5%;">{{ __('No') }}</th>
                     <th style="width: 17%;">{{ __('Commenter') }}</th>

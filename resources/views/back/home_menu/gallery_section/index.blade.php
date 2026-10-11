@@ -1,86 +1,69 @@
 @extends('back.layout.template')
 
-@section('title', 'RRCONS Admin | ' . __('Gallery Section'))
+@section('title', 'RRCONS Admin | ' . __('Event Gallery'))
+
+@php
+    // tanggal 1 agar tidak "meloncat" bulan (mis. 31 Februari menjadi Maret)
+    $monthName = fn ($month) => \Carbon\Carbon::create(2000, (int) $month, 1)->translatedFormat('F');
+    $months = collect(range(1, 12))->mapWithKeys(fn ($month) => [$month => $monthName($month)]);
+
+@endphp
 
 @section('content')
-
-    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-        <h1 class="h3 fw-bold text-uppercase">{{ __('Gallery Section') }}</h1>
-        @if (auth()->user()->isAdmin())
-            <button class="btn btn-primary rounded shadow-sm px-3 d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#create-gallery-modal">
-                <i data-feather="plus" class="icon-sm"></i> {{ __('Add Gallery') }}
+    <x-admin.page-header :title="__('Event Gallery') . ' — ' . __('Home Page')" icon="camera"
+        :description="__('Photos of RR Consultant events. Visitors can filter them by month and year.')"
+        :location="__('Home Page') . ' — ' . __('Event Gallery')" :preview-url="url('/')">
+        <x-slot:actions>
+            <button class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#create-gallery">
+                <i data-feather="plus" class="icon-xs"></i> {{ __('Add photo') }}
             </button>
-        @endif
+        </x-slot:actions>
+        <x-slot:guide>
+            <li>{{ __('Add one photo per event. Fill in the month and year the event took place.') }}</li>
+            <li>{{ __('Photo: JPG, PNG or WEBP, max 2 MB. Landscape photos look best.') }}</li>
+            <li>{{ __('Deleting a photo removes it from the website permanently.') }}</li>
+        </x-slot:guide>
+    </x-admin.page-header>
+
+    <div class="row g-3">
+        @forelse ($gallery as $item)
+            <div class="col-sm-6 col-lg-4 col-xxl-3">
+                <div class="panel d-flex flex-column">
+                    <img src="{{ asset('storage/' . $item->img) }}" alt="{{ $item->title }}" class="w-100" style="height: 180px; object-fit: cover; border-radius: 1rem 1rem 0 0;">
+                    <div class="panel-body d-flex flex-column flex-grow-1">
+                        <span class="badge bg-info-soft text-primary border align-self-start mb-2">
+                            <i data-feather="calendar" class="icon-xs me-1"></i>{{ $monthName($item->month) }} {{ $item->year }}
+                        </span>
+                        <div class="fw-semibold small"><x-admin.bilingual :id="$item->title_id" :en="$item->title_en" :limit="60" /></div>
+                        @if (filled($item->desc_id))
+                            <div class="small text-muted mt-1">{{ \Illuminate\Support\Str::limit($item->desc_id, 90) }}</div>
+                        @endif
+                        <div class="d-flex gap-2 mt-auto pt-3">
+                            <button class="btn btn-primary btn-sm flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1" data-bs-toggle="modal" data-bs-target="#edit-gallery-{{ $item->id }}">
+                                <i data-feather="edit-2" class="icon-xs"></i> {{ __('Edit') }}
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#delete-gallery-{{ $item->id }}" title="{{ __('Delete') }}" aria-label="{{ __('Delete') }}">
+                                <i data-feather="trash-2" class="icon-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="col-12">
+                <div class="empty-state border rounded-3">
+                    <p class="mb-2">{{ __('No photos yet.') }}</p>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#create-gallery">{{ __('Add photo') }}</button>
+                </div>
+            </div>
+        @endforelse
     </div>
 
-    {{-- Flash & Error Messages --}}
-    @if ($errors->any())
-        <div class="alert alert-danger shadow-sm">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    @include('back.home_menu.gallery_section.form', ['key' => 'create-gallery', 'item' => null, 'months' => $months])
 
-    @if (session('success'))
-        <div class="alert alert-success shadow-sm">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    <div class="table-responsive mt-4">
-        <table class="table table-hover table-bordered align-middle shadow-sm">
-            <thead class="table-primary text-center">
-                <tr>
-                    <th style="width: 5%;">{{ __('No') }}</th>
-                    <th style="width: 20%;">{{ __('Image') }}</th>
-                    <th style="width: 10%;">{{ __('Title') }}</th>
-                    <th style="width: 15%;">{{ __('Desc') }}</th>
-                    <th style="width: 10%;">{{ __('Month') }}</th>
-                    <th style="width: 10%;">{{ __('Year') }}</th>
-                    <th style="width: 10%;">{{ __('Last Updated') }}</th>
-                    <th style="width: 10%;">{{ __('Actions') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($gallery as $item)
-                    <tr>
-                        <td class="text-center">{{ $loop->iteration }}.</td>
-                        <td class="text-center">
-                            @if ($item->img)
-                                <img src="{{ asset('storage/' . $item->img) }}" alt="{{ $item->title }}" width="200">
-                            @else
-                                <span class="text-muted">{{ __('No Image') }}</span>
-                            @endif
-                        </td>
-                        <td>{{ $item->title }}</td>
-                        <td>{{ $item->desc }}</td>
-                        <td>{{ \Carbon\Carbon::create()->month($item->month)->format('F') }}</td>
-                        <td>{{ $item->year }}</td>
-                        <td>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y') }}</td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center">
-                                <button class="btn btn-primary btn-sm me-1 d-flex align-items-center px-3" data-bs-toggle="modal"
-                                    data-bs-target="#update-gallery-modal{{ $item->id }}">
-                                    <i data-feather="edit" class="icon-sm me-1"></i> {{ __('Edit') }}
-                                </button>
-
-                                <button class="btn btn-danger btn-sm d-flex align-items-center px-3" data-bs-toggle="modal"
-                                    data-bs-target="#delete-gallery-modal{{ $item->id }}">
-                                    <i data-feather="trash-2" class="icon-sm me-1"></i> {{ __('Delete') }}
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-
-    @include('back.home_menu.gallery_section.createmodal')
-    @include('back.home_menu.gallery_section.updatemodal')
-    @include('back.home_menu.gallery_section.deletemodal')
-
+    @foreach ($gallery as $item)
+        @include('back.home_menu.gallery_section.form', ['key' => 'edit-gallery-' . $item->id, 'item' => $item, 'months' => $months])
+        <x-admin.delete-modal :id="'delete-gallery-' . $item->id" :action="route('home.gallery.delete', $item->id)" :item-name="$item->title_id"
+            :message="__('Delete this photo from the gallery?')" />
+    @endforeach
 @endsection

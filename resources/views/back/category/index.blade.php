@@ -1,71 +1,75 @@
 @extends('back.layout.template')
 
-@section('title', 'RRCONS Admin | ' . __('List Categories'))
+@section('title', 'RRCONS Admin | ' . __('Categories'))
 
 @section('content')
+    <x-admin.page-header :title="__('Categories')" icon="tag"
+        :description="__('Topics used to group blog articles. Visitors can filter the blog by category.')"
+        :location="__('Blog page — category filter')" :preview-url="route('blog')">
+        <x-slot:actions>
+            <button class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#create-category">
+                <i data-feather="plus" class="icon-xs"></i> {{ __('Add Category') }}
+            </button>
+        </x-slot:actions>
+        <x-slot:guide>
+            <li>{{ __('The web address (slug) of a category is created automatically from its Indonesian name.') }}</li>
+            <li>{{ __('A category that still has articles cannot be deleted. Move those articles to another category first.') }}</li>
+        </x-slot:guide>
+    </x-admin.page-header>
 
-    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-        <h1 class="h3 fw-bold text-uppercase">{{ __('List Categories') }}</h1>
-        <button class="btn btn-primary rounded shadow-sm px-3 d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#create-category-modal">
-            <i data-feather="plus" class="icon-sm"></i> {{ __('Add Category') }}
-        </button>
-    </div>
-
-    {{-- Flash & Error Messages --}}
-    @if ($errors->any())
-        <div class="alert alert-danger shadow-sm">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    @if (session('success'))
-        <div class="alert alert-success shadow-sm">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    <div class="table-responsive mt-4">
-        <table class="table table-hover table-bordered align-middle shadow-sm">
-            <thead class="table-primary text-center">
+    <div class="table-responsive">
+        <table class="table table-admin table-hover align-middle border">
+            <thead>
                 <tr>
-                    <th style="width: 5%;">{{ __('No') }}</th>
-                    <th style="width: 20%;">{{ __('Category Name') }}</th>
-                    <th style="width: 20%;">{{ __('Slug') }}</th>
-                    <th style="width: 20%;">{{ __('Created At') }}</th>
-                    <th style="width: 25%;">{{ __('Actions') }}</th>
+                    <th>{{ __('Category Name') }}</th>
+                    <th>{{ __('Slug') }}</th>
+                    <th class="text-center">{{ __('Articles') }}</th>
+                    <th>{{ __('Created At') }}</th>
+                    <th class="text-end">{{ __('Actions') }}</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($categories as $item)
+                @forelse ($categories as $item)
                     <tr>
-                        <td class="text-center">{{ $loop->iteration }}.</td>
-                        <td>{{ $item->name }}</td>
-                        <td>{{ $item->slug }}</td>
-                        <td>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y') }}</td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center">
-                                <button class="btn btn-primary btn-sm me-1 d-flex align-items-center px-3" data-bs-toggle="modal"
-                                    data-bs-target="#update-category-modal{{ $item->id }}">
-                                    <i data-feather="edit" class="icon-sm me-1"></i> {{ __('Edit') }}
+                        <td class="fw-semibold"><x-admin.bilingual :id="$item->name_id" :en="$item->name_en" :limit="60" /></td>
+                        <td><code class="small">{{ $item->slug }}</code></td>
+                        <td class="text-center"><span class="badge bg-light text-dark border">{{ $item->articles_count }}</span></td>
+                        <td class="small">{{ $item->created_at?->translatedFormat('d F Y') }}</td>
+                        <td class="text-end text-nowrap">
+                            <button class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#edit-category-{{ $item->id }}">
+                                <i data-feather="edit-2" class="icon-xs"></i> {{ __('Edit') }}
+                            </button>
+                            @if ($item->articles_count > 0)
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="{{ __('Cannot be deleted while it still has articles.') }}">
+                                    <button class="btn btn-outline-secondary btn-sm" disabled aria-label="{{ __('Delete') }}"><i data-feather="trash-2" class="icon-xs"></i></button>
+                                </span>
+                            @else
+                                <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#delete-category-{{ $item->id }}" title="{{ __('Delete') }}" aria-label="{{ __('Delete') }}">
+                                    <i data-feather="trash-2" class="icon-xs"></i>
                                 </button>
-                                <button class="btn btn-danger btn-sm d-flex align-items-center px-3" data-bs-toggle="modal"
-                                    data-bs-target="#delete-category-modal{{ $item->id }}">
-                                    <i data-feather="trash-2" class="icon-sm me-1"></i> {{ __('Delete') }}
-                                </button>
-                            </div>
+                            @endif
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr><td colspan="5" class="empty-state">{{ __('No data yet.') }}</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 
-    @include('back.category.createmodal')
-    @include('back.category.updatemodal')
-    @include('back.category.deletemodal')
+    @foreach ([null, ...$categories] as $item)
+        @php $key = $item ? 'edit-category-' . $item->id : 'create-category'; @endphp
+        <x-admin.form-modal :id="$key" :action="$item ? route('blog.categories.update', $item->id) : route('blog.categories.store')"
+            :method="$item ? 'PUT' : 'POST'" :title="$item ? __('Edit Category') : __('Add Category')" :icon="$item ? 'edit' : 'plus'"
+            :submit="$item ? __('Save changes') : __('Add Category')">
+            <x-admin.translatable :key="$key" :item="$item" :fields="[
+                ['name' => 'name', 'label' => __('Category Name'), 'required' => true, 'max' => 255, 'hint' => __('At least 3 characters, for example: Business News.')],
+            ]" />
+        </x-admin.form-modal>
 
+        @if ($item && $item->articles_count === 0)
+            <x-admin.delete-modal :id="'delete-category-' . $item->id" :action="route('blog.categories.destroy', $item->id)" :item-name="$item->name_id"
+                :message="__('Delete this category?')" />
+        @endif
+    @endforeach
 @endsection

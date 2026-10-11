@@ -7,12 +7,13 @@
 
         <title>@yield('title')</title>
 
-        <!-- SEO Meta Tags -->
-        <meta name="description" content="Deskripsi singkat halaman ini untuk keperluan SEO.">
-        <meta name="author" content="Nama Penulis atau Perusahaan">
-
         <!-- CSRF Token for Laravel -->
         <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <!-- Font (sama dengan website publik) -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
         <!-- Bootstrap CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
@@ -24,209 +25,51 @@
         <!-- Icon -->
         <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('front/image/logo.png') }}">
 
-        {{-- <!-- Custom CSS (opsional jika digunakan) -->
-        <link href="{{ asset('back/css/custom.css') }}" rel="stylesheet"> --}}
-
-        <style>
-            body {
-                overflow-x: hidden;
-                background-color: #f8f9fa;
-            }
-
-            .sidebar {
-                height: 100vh;
-                overflow-y: auto;
-                overflow-x: hidden;
-                transition: all 0.3s;
-            }
-
-            .sidebar.collapsed {
-                width: 0;
-                overflow: hidden;
-            }
-
-            .sidebar .nav-link {
-                color: #0d6efd;
-                font-weight: 500;
-                border-radius: 0.375rem;
-            }
-
-            .sidebar .nav-link:hover,
-            .sidebar .nav-link.active {
-                background-color: #e7f1ff;
-                color: #0a58ca;
-            }
-
-            .sidebar .nav-link.logout-btn {
-                color: red;
-                font-weight: 500;
-                border-radius: 0.375rem;
-            }
-
-            .sidebar .nav-link.logout-btn:hover,
-            .sidebar .nav-link.logout-btn.active {
-                background-color: #ffe7e7;
-                color: red;
-            }
-
-            .content {
-                transition: margin-left 0.3s;
-            }
-
-            .content.full {
-                margin-left: 0 !important;
-            }
-
-            /* Custom scrollbar untuk elemen tertentu */
-            .sidebar::-webkit-scrollbar {
-                width: 5px;
-            }
-
-            .sidebar::-webkit-scrollbar-track {
-                background: #f1f1f1;
-                border-radius: 10px;
-            }
-
-            .sidebar::-webkit-scrollbar-thumb {
-                background: #e7f1ff; /* Warna utama scrollbar */
-                border-radius: 10px;
-            }
-
-            @media (min-width: 992px) {
-                .sidebar.collapsed ~ .content {
-                margin-left: 0 !important;
-                }
-
-                .sidebar ~ .content {
-                margin-left: 240px;
-                }
-            }
-
-            .sidebar {
-                width: 240px;
-                background-color: #fff;
-                border-right: 1px solid #dee2e6;
-                position: fixed;
-                top: 56px;
-                left: 0;
-                z-index: 1000;
-            }
-
-            .content {
-                margin-top: 56px;
-                padding: 2rem;
-            }
-
-            .navbar {
-                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            }
-
-            .dropdown-item img {
-                border-radius: 3px;
-            }
-
-            .navbar-brand {
-                white-space: nowrap;
-            }
-
-            .dropdown-item img {
-                border-radius: 3px;
-            }
-
-            .sidebar .nav-link {
-                padding: 0.75rem 1rem;
-                transition: background-color 0.2s ease;
-            }
-
-            .sidebar .dropdown-icon {
-                transition: transform 0.3s ease;
-            }
-
-            .sidebar .nav-link[aria-expanded="true"] .dropdown-icon {
-                transform: rotate(180deg);
-            }
-
-            .icon-sm {
-                width: 18px;
-                height: 18px;
-                margin-right: 4px;
-                stroke-width: 2;
-            }
-
-            .modal-content {
-                animation: fadeInUp 0.3s ease;
-            }
-
-            @keyframes fadeInUp {
-                from {
-                    transform: translateY(20px);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateY(0px);
-                    opacity: 1;
-                }
-            }
-
-            .form-label {
-                font-weight: 600;
-            }
-
-            .bg-gradient-primary {
-                background: linear-gradient(135deg, #0d6efd, #2563eb);
-            }
-
-            .bg-gradient-secondary {
-                background: linear-gradient(135deg, #6c757d, #495057);
-            }
-
-            .glass {
-                backdrop-filter: blur(10px);
-                background: rgba(13, 110, 253, 0.75);
-                border-radius: 1rem;
-            }
-
-            .card-header i {
-                font-size: 1.2rem;
-            }
-
-            .badge {
-                font-size: 0.75rem;
-                padding: 0.4em 0.6em;
-                border-radius: 0.5rem;
-            }
-        </style>
+        <!-- Tampilan panel admin -->
+        <link rel="stylesheet" href="{{ asset_version('back/css/admin.css') }}">
 
         <!-- CSS Tambahan per-halaman (opsional) -->
         @stack('css')
     </head>
 
     <body>
+        @php
+            $currentLang = app()->getLocale();
+            $flag = $currentLang === 'en' ? 'us' : 'id';
+            $langLabel = $currentLang === 'en' ? 'English' : 'Indonesia';
+            $authUser = auth()->user();
+        @endphp
+
         <!-- Header -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-            <div class="container-fluid justify-content-between align-items-center">
-                <!-- Kiri: Logo & Sidebar Toggle -->
-                <div class="d-flex align-items-center">
-                    <a class="navbar-brand fs-4 fw-bold ms-3" href="#">RRCONS</a>
-                    <!-- Selalu tampil -->
-                    <button id="toggleSidebar" class="btn btn-outline-light ms-5">☰</button>
+        <header class="admin-header navbar fixed-top px-2 px-md-3">
+            <div class="container-fluid gap-2 px-0">
+                <div class="d-flex align-items-center gap-2 gap-md-3">
+                    <button id="toggleSidebar" class="btn btn-sidebar-toggle" type="button" aria-label="{{ __('Show or hide the menu') }}" aria-controls="sidebar">
+                        <i data-feather="menu" class="icon-sm"></i>
+                    </button>
+                    <a class="brand d-flex align-items-center gap-2" href="{{ url('dashboard') }}">
+                        <img src="{{ asset('front/image/logo.png') }}" alt="RRCONS">
+                        <span class="d-flex flex-column lh-1">
+                            <span>RRCONS</span>
+                            <small class="d-none d-sm-inline">{{ __('Admin Panel') }}</small>
+                        </span>
+                    </a>
                 </div>
 
-                <div class="d-flex align-items-center gap-3 me-3">
-                    <!-- Kanan: Language Selector & Profile -->
-                    @php
-                        $currentLang = app()->getLocale();
-                        $flag = $currentLang === 'en' ? 'us' : 'id';
-                        $label = $currentLang === 'en' ? 'English' : 'Indonesia';
-                    @endphp
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ url('/') }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-light d-none d-md-inline-flex align-items-center gap-1" title="{{ __('Opens the public website in a new tab') }}">
+                        <i data-feather="external-link" class="icon-xs"></i> {{ __('View website') }}
+                    </a>
 
+                    <!-- Bahasa panel admin -->
                     <div class="dropdown">
                         <button class="btn btn-sm btn-light dropdown-toggle d-flex align-items-center gap-2" type="button"
-                            id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="https://flagcdn.com/w40/{{ $flag }}.png" width="20" alt="{{ $label }}">
-                            <span class="d-none d-sm-inline">{{ $label }}</span>
+                            id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="{{ __('Admin panel language') }}">
+                            <img src="https://flagcdn.com/w40/{{ $flag }}.png" width="20" alt="{{ $langLabel }}">
+                            <span class="d-none d-sm-inline">{{ $langLabel }}</span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="langDropdown">
+                            <li><h6 class="dropdown-header">{{ __('Admin panel language') }}</h6></li>
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('set.language', 'id') }}">
                                     <img src="https://flagcdn.com/w40/id.png" width="20" alt="{{ __('Indonesia') }}"> {{ __('Indonesia') }}
@@ -240,56 +83,99 @@
                         </ul>
                     </div>
 
-
-                    <!-- Profile Dropdown -->
+                    <!-- Profil -->
                     <div class="dropdown">
                         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-                        id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="rounded-circle bg-light text-primary fw-bold d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="{{ auth()->user()->name }}">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
+                            id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="avatar" title="{{ $authUser->name }}">{{ mb_strtoupper(mb_substr($authUser->name, 0, 1)) }}</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                            <li class="px-3 py-2 small text-muted">{{ auth()->user()->name }}<br><span class="badge bg-secondary">{{ __(ucfirst((string) auth()->user()->role)) }}</span></li>
-                            <li><a class="dropdown-item" href="{{ url('users') }}">{{ __('My Profile') }}</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="profileDropdown" style="min-width: 220px;">
+                            <li class="px-3 py-2">
+                                <div class="fw-semibold text-truncate">{{ $authUser->name }}</div>
+                                <div class="small text-muted text-truncate">{{ $authUser->email }}</div>
+                                <span class="badge role-badge mt-1">{{ __(ucfirst((string) $authUser->role)) }}</span>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                    @csrf
-                                </form>
-                                <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('Logout') }}</a>
+                                <a class="dropdown-item text-danger fw-semibold d-flex align-items-center gap-2" href="{{ route('logout') }}"
+                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <i data-feather="log-out" class="icon-sm"></i> {{ __('Logout') }}
+                                </a>
                             </li>
                         </ul>
                     </div>
                 </div>
             </div>
-        </nav>
+        </header>
+
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+            @csrf
+        </form>
 
         <!-- Sidebar -->
         @include('back.layout.sidebar')
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
         <!-- Main Content -->
         <main id="mainContent" class="content">
-            <div class="card shadow-sm border-0">
-                <div class="card-body px-5">
-                    @yield('content')
-                </div>
+            <div class="page-card">
+                @yield('content')
             </div>
         </main>
 
         <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 
-        <!-- Collapse Sidebar JS -->
         <script>
-            document.getElementById('toggleSidebar')?.addEventListener('click', function () {
-                document.getElementById('sidebar')?.classList.toggle('collapsed');
-            });
-        </script>
+            (function () {
+                const body = document.body;
+                const desktop = () => window.matchMedia('(min-width: 992px)').matches;
 
-        <!-- Feather Icon -->
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                feather.replace();
-            });
+                // Sidebar: di layar besar bisa disembunyikan (diingat), di HP tampil sebagai panel geser
+                try {
+                    if (localStorage.getItem('rrcons-sidebar') === 'collapsed' && desktop()) {
+                        body.classList.add('sidebar-collapsed');
+                    }
+                } catch (e) {}
+
+                document.getElementById('toggleSidebar')?.addEventListener('click', function () {
+                    if (desktop()) {
+                        body.classList.toggle('sidebar-collapsed');
+                        try { localStorage.setItem('rrcons-sidebar', body.classList.contains('sidebar-collapsed') ? 'collapsed' : 'open'); } catch (e) {}
+                    } else {
+                        body.classList.toggle('sidebar-open');
+                    }
+                });
+
+                document.getElementById('sidebarBackdrop')?.addEventListener('click', () => body.classList.remove('sidebar-open'));
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    feather.replace();
+
+                    // Tooltip penjelasan
+                    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
+
+                    // Pratinjau gambar/video yang dipilih sebelum disimpan
+                    document.querySelectorAll('input[type="file"][data-preview]').forEach(function (input) {
+                        input.addEventListener('change', function () {
+                            const target = document.getElementById(input.dataset.preview);
+                            const file = input.files && input.files[0];
+                            if (!target || !file) return;
+                            const url = URL.createObjectURL(file);
+                            target.innerHTML = file.type.startsWith('video/')
+                                ? '<video src="' + url + '" controls muted></video>'
+                                : '<img src="' + url + '" alt="">';
+                            target.insertAdjacentHTML('beforeend', '<div class="small text-muted mt-1">' + @json(__('New file (not saved yet)')) + ': ' + file.name.replace(/[<>&"]/g, '') + '</div>');
+                        });
+                    });
+
+                    // Setelah validasi gagal, buka lagi form yang tadi diisi
+                    @if (old('_modal'))
+                        const failedModal = document.getElementById(@json(old('_modal')));
+                        if (failedModal) bootstrap.Modal.getOrCreateInstance(failedModal).show();
+                    @endif
+                });
+            })();
         </script>
 
         <!-- JS Tambahan per-halaman (opsional) -->

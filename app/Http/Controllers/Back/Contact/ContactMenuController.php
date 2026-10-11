@@ -18,7 +18,7 @@ class ContactMenuController extends Controller
     /** ============================== CONTACT MENU CONTROLLERS ============================== **/
     public function contactMenu()
     {
-        $contactMenus = ContactMenu::all();
+        $contactMenus = ContactMenu::withCount(['heroSections', 'contactSections'])->get();
         $lastUpdated = ContactMenu::latest('updated_at')->value('updated_at');
 
         return view('back.contact_menu.index', [

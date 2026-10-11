@@ -1,80 +1,77 @@
 @extends('back.layout.template')
 
-@section('title', 'RRCONS Admin | ' . __('Poster Section'))
+@section('title', 'RRCONS Admin | ' . __('Pop-up Poster'))
 
 @section('content')
-
-    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-        <h1 class="h3 fw-bold text-uppercase">{{ __('Poster Section') }}</h1>
-        @if (auth()->user()->isAdmin())
-            <button class="btn btn-primary rounded shadow-sm px-3 d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#create-poster-modal">
-                <i data-feather="plus" class="icon-sm"></i> {{ __('Add Poster') }}
+    <x-admin.page-header :title="__('Pop-up Poster') . ' — ' . __('Home Page')" icon="maximize"
+        :description="__('Posters that pop up when visitors open the home page, e.g. promotions or event announcements.')"
+        :location="__('Home Page') . ' — ' . __('pop-up window when the page opens')" :preview-url="url('/')">
+        <x-slot:actions>
+            <button class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#create-poster">
+                <i data-feather="plus" class="icon-xs"></i> {{ __('Add poster') }}
             </button>
+        </x-slot:actions>
+        <x-slot:guide>
+            <li>{{ __('If there is more than one poster, they slide automatically. Delete posters that are no longer relevant.') }}</li>
+            <li>{{ __('Posters without a picture are not shown on the website.') }}</li>
+            <li>{{ __('Picture: JPG, PNG or WEBP, max 2 MB. Portrait or square works best.') }}</li>
+        </x-slot:guide>
+    </x-admin.page-header>
+
+    <div class="row g-3">
+        @forelse ($posters as $item)
+            <div class="col-sm-6 col-lg-4 col-xxl-3">
+                <div class="panel d-flex flex-column">
+                    @if ($item->img)
+                        <img src="{{ asset('storage/' . $item->img) }}" alt="{{ $item->name }}" class="w-100" style="height: 240px; object-fit: contain; background: #f8fafc; border-radius: 1rem 1rem 0 0;">
+                    @else
+                        <div class="empty-state" style="height: 240px;">
+                            <span class="badge bg-warning text-dark">{{ __('Not shown: no picture') }}</span>
+                        </div>
+                    @endif
+                    <div class="panel-body d-flex flex-column flex-grow-1">
+                        <div class="fw-semibold small"><x-admin.bilingual :id="$item->name_id" :en="$item->name_en" :limit="60" /></div>
+                        <div class="small text-muted mt-2"><x-admin.updated-at :value="$item->updated_at" /></div>
+                        <div class="d-flex gap-2 mt-auto pt-3">
+                            <button class="btn btn-primary btn-sm flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1" data-bs-toggle="modal" data-bs-target="#edit-poster-{{ $item->id }}">
+                                <i data-feather="edit-2" class="icon-xs"></i> {{ __('Edit') }}
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#delete-poster-{{ $item->id }}" title="{{ __('Delete') }}" aria-label="{{ __('Delete') }}">
+                                <i data-feather="trash-2" class="icon-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="col-12">
+                <div class="empty-state border rounded-3">
+                    <p class="mb-2">{{ __('No posters yet. When there are none, no pop-up appears on the website.') }}</p>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#create-poster">{{ __('Add poster') }}</button>
+                </div>
+            </div>
+        @endforelse
+    </div>
+
+    @foreach ([null, ...$posters] as $item)
+        @php $key = $item ? 'edit-poster-' . $item->id : 'create-poster'; @endphp
+        <x-admin.form-modal :id="$key" :files="true"
+            :action="$item ? route('home.poster.update', $item->id) : route('home.poster.create')"
+            :title="$item ? __('Edit poster') : __('Add poster')" :icon="$item ? 'edit' : 'plus'"
+            :submit="$item ? __('Save changes') : __('Add poster')">
+            <div class="form-section-title">{{ __('Picture') }}</div>
+            <x-admin.media-input :key="$key" name="img" :label="__('Poster picture')" :current="$item?->img"
+                accept="image/png,image/jpeg,image/webp" :hint="__('JPG, PNG or WEBP, max 2 MB. Without a picture the poster is not shown.')" />
+
+            <div class="form-section-title">{{ __('Name') }}</div>
+            <x-admin.translatable :key="$key" :item="$item" :fields="[
+                ['name' => 'name', 'label' => __('Poster name'), 'required' => true, 'max' => 255, 'hint' => __('Used as the picture description (alt text) for accessibility and search engines.')],
+            ]" />
+        </x-admin.form-modal>
+
+        @if ($item)
+            <x-admin.delete-modal :id="'delete-poster-' . $item->id" :action="route('home.poster.delete', $item->id)" :item-name="$item->name_id"
+                :message="__('Delete this poster? It will no longer pop up on the website.')" />
         @endif
-    </div>
-
-    {{-- Flash & Error Messages --}}
-    @if ($errors->any())
-        <div class="alert alert-danger shadow-sm">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    @if (session('success'))
-        <div class="alert alert-success shadow-sm">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    <div class="table-responsive mt-4">
-        <table class="table table-hover table-bordered align-middle shadow-sm">
-            <thead class="table-primary text-center">
-                <tr>
-                    <th style="width: 5%;">{{ __('No') }}</th>
-                    <th style="width: 25%;">{{ __('Image') }}</th>
-                    <th style="width: 15%;">{{ __('Poster Name') }}</th>
-                    <th style="width: 10%;">{{ __('Last Updated') }}</th>
-                    <th style="width: 10%;">{{ __('Actions') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($posters as $item)
-                    <tr>
-                        <td class="text-center">{{ $loop->iteration }}.</td>
-                        <td class="text-center">
-                            @if ($item->img)
-                                <img src="{{ asset('storage/' . $item->img) }}" alt="{{ $item->name }}" width="200">
-                            @else
-                                <span class="text-muted">{{ __('No Image') }}</span>
-                            @endif
-                        </td>
-                        <td>{{ $item->name }}</td>
-                        <td>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y') }}</td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center">
-                                <button class="btn btn-primary btn-sm me-1 d-flex align-items-center px-3" data-bs-toggle="modal"
-                                    data-bs-target="#update-poster-modal{{ $item->id }}">
-                                    <i data-feather="edit" class="icon-sm me-1"></i> {{ __('Edit') }}
-                                </button>
-
-                                <button class="btn btn-danger btn-sm d-flex align-items-center px-3" data-bs-toggle="modal"
-                                    data-bs-target="#delete-poster-modal{{ $item->id }}">
-                                    <i data-feather="trash-2" class="icon-sm me-1"></i> {{ __('Delete') }}
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-
-    @include('back.home_menu.poster_section.createmodal')
-    @include('back.home_menu.poster_section.updatemodal')
-    @include('back.home_menu.poster_section.deletemodal')
-
+    @endforeach
 @endsection

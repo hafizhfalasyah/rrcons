@@ -104,10 +104,12 @@ class MultiLanguageTest extends TestCase
             }
         }
 
+        // form konten memakai tab Bahasa Indonesia / English dalam satu form
         $this->actingAs($this->admin)->withSession(['app_locale' => 'id'])->get('/home/about')
-            ->assertSee('Bagian Tentang')->assertSee('Teks (English)');
+            ->assertSee('Tentang Kami')->assertSee('Panduan singkat')
+            ->assertSee('Bahasa Indonesia')->assertSee('name="text_id"', false)->assertSee('name="text_en"', false);
         $this->actingAs($this->admin)->withSession(['app_locale' => 'en'])->get('/home/about')
-            ->assertSee('About Section');
+            ->assertSee('About Us')->assertSee('Quick guide');
     }
 
     public function test_public_pages_show_cms_content_in_the_selected_language(): void

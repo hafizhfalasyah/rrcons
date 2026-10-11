@@ -21,7 +21,7 @@ class ServiceMenuController extends Controller
     /** ============================== SERVICE MENU CONTROLLERS ============================== **/
     public function serviceMenu()
     {
-        $serviceMenus = ServiceMenu::all();
+        $serviceMenus = ServiceMenu::withCount(['heroSections', 'serviceSections'])->get();
         $lastUpdated = ServiceMenu::latest('updated_at')->value('updated_at');
 
         return view('back.service_menu.index', [

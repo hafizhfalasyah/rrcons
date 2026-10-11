@@ -1,296 +1,157 @@
-<div id="sidebar" class="sidebar">
-    <div class="p-4">
+{{--
+    Menu admin. Hak akses per menu harus sejalan dengan middleware di routes/web.php
+    (dan tests/Feature/AccessControlTest.php):
+    - admin    : semua menu
+    - writer   : dashboard, akun sendiri, blog
+    - uploader : dashboard, akun sendiri, poster & galeri beranda
+--}}
+@php
+    $user = auth()->user();
+    $isAdmin = $user->isAdmin();
+
+    // Halaman website yang kontennya bisa diubah, beserta bagian-bagiannya
+    $contentGroups = [
+        'home' => [
+            'label' => __('Home Page'),
+            'icon' => 'home',
+            'items' => [
+                'home.menu' => [__('Section Headings'), ['admin']],
+                'home.poster' => [__('Pop-up Poster'), ['admin', 'uploader']],
+                'home.hero' => [__('Main Banner'), ['admin']],
+                'home.about' => [__('About Us'), ['admin']],
+                'home.service' => [__('Services'), ['admin']],
+                'home.advantage' => [__('Advantages'), ['admin']],
+                'home.profile' => [__('Team Profiles'), ['admin']],
+                'home.business' => [__('Business Training'), ['admin']],
+                'home.sosmed' => [__('Social Media Videos'), ['admin']],
+                'home.gallery' => [__('Event Gallery'), ['admin', 'uploader']],
+            ],
+        ],
+        'rrfuture' => [
+            'label' => __('RR Future Tech Page'),
+            'icon' => 'cpu',
+            'items' => [
+                'rrfuture.menu' => [__('Section Headings'), ['admin']],
+                'rrfuture.hero' => [__('Main Banner'), ['admin']],
+                'rrfuture.product' => [__('Products'), ['admin']],
+            ],
+        ],
+        'service' => [
+            'label' => __('RR Vision Page'),
+            'icon' => 'briefcase',
+            'items' => [
+                'service.menu' => [__('Section Headings'), ['admin']],
+                'service.hero' => [__('Main Banner'), ['admin']],
+                'service.ourService' => [__('Services'), ['admin']],
+            ],
+        ],
+        'contact' => [
+            'label' => __('Contact Page'),
+            'icon' => 'phone',
+            'items' => [
+                'contact.menu' => [__('Section Headings'), ['admin']],
+                'contact.hero' => [__('Main Banner'), ['admin']],
+                'contact.usContact' => [__('Contact Details'), ['admin']],
+            ],
+        ],
+    ];
+
+    foreach ($contentGroups as $key => $group) {
+        $contentGroups[$key]['items'] = array_filter($group['items'], fn ($item) => $user->hasAnyRole($item[1]));
+    }
+    $contentGroups = array_filter($contentGroups, fn ($group) => $group['items'] !== []);
+
+    $blogItems = [];
+    if ($user->hasAnyRole(['admin', 'writer'])) {
+        $blogItems = [
+            'blog.articles.index' => [__('Articles'), 'file-text'],
+            'blog.categories.index' => [__('Categories'), 'tag'],
+            'blog.comments.index' => [__('Comments'), 'message-square'],
+        ];
+        if ($isAdmin) {
+            $blogItems['blog.configs.index'] = [__('Blog Settings'), 'sliders'];
+        }
+    }
+
+    // jumlah komentar yang menunggu persetujuan (badge di menu Comments)
+    $pendingComments = $blogItems ? \App\Models\Blog\Comment::pending()->count() : 0;
+@endphp
+
+<aside id="sidebar" class="sidebar" aria-label="{{ __('Admin menu') }}">
+    <div class="sidebar-scroll">
         <ul class="nav flex-column">
-            <!-- DASHBOARD MENU -->
-            @if (auth()->user()->hasAnyRole(['admin', 'writer', 'uploader']))
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('dashboard*') ? 'active' : '' }}" href="{{ url('dashboard') }}">
-                        <i data-feather="grid" class="me-2"></i> {{ __('Dashboard') }}
-                    </a>
-                </li>
-            @endif
+            <li class="sidebar-section">{{ __('Overview') }}</li>
+            <li class="nav-item">
+                <a class="nav-link {{ Request::is('dashboard*') ? 'active' : '' }}" href="{{ url('dashboard') }}">
+                    <i data-feather="grid"></i> {{ __('Dashboard') }}
+                </a>
+            </li>
+        </ul>
 
-            <!-- USERS MENU -->
-            @if (auth()->user()->hasAnyRole(['admin', 'writer', 'uploader']))
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('users*') ? 'active' : '' }}" href="{{ url('users') }}">
-                        <i data-feather="user" class="me-2"></i> {{ __('Users') }}
-                    </a>
-                </li>
-            @endif
-
-            <!-- HOME MENU -->
-            @php
-                $homeRoutes = [
-                    'home.menu'      => '-- Menus --',
-                    'home.poster'    => 'Poster',
-                    'home.hero'      => 'Hero',
-                    'home.about'     => 'About',
-                    'home.service'   => 'Service',
-                    'home.advantage' => 'Advantage',
-                    'home.profile'   => 'Profile',
-                    'home.business'  => 'Business',
-                    'home.sosmed'    => 'Social Media',
-                    'home.gallery'   => 'Gallery',
-                ];
-
-                $isHomeActive = isMenuActive(array_keys($homeRoutes));
-            @endphp
-
-            @if (auth()->user()->hasAnyRole(['admin', 'uploader']))
-                <li class="nav-item">
-                    <a class="nav-link d-flex justify-content-between align-items-center {{ $isHomeActive ? 'active' : '' }}"
-                        data-bs-toggle="collapse"
-                        href="#homeSubmenu"
-                        role="button"
-                        aria-expanded="{{ $isHomeActive ? 'true' : 'false' }}"
-                        aria-controls="homeSubmenu">
-                        <div class="d-flex align-items-center">
-                            <i data-feather="home" class="me-2"></i>
-                            <span>{{ __('Home') }}</span>
-                        </div>
-                        <i data-feather="chevron-down" class="dropdown-icon {{ $isHomeActive ? 'rotate-180' : '' }}"></i>
-                    </a>
-
-                    <div class="collapse ps-4 {{ $isHomeActive ? 'show' : '' }}" id="homeSubmenu">
-                        <ul class="nav flex-column">
-                            @foreach ($homeRoutes as $routeName => $label)
-                                @php
-                                    // Tentukan akses per route
-                                    $canAccess = match ($routeName) {
-                                        'home.poster', 'home.gallery' => auth()->user()->hasAnyRole(['admin', 'uploader']),
-                                        default => auth()->user()->hasRole('admin'),
-                                    };
-                                @endphp
-
-                                @if ($canAccess)
+        @if ($contentGroups)
+            <ul class="nav flex-column" id="sidebarContentGroups">
+                <li class="sidebar-section">{{ __('Website content') }}</li>
+                @foreach ($contentGroups as $key => $group)
+                    @php $active = isMenuActive(array_keys($group['items'])); @endphp
+                    <li class="nav-item">
+                        <a class="nav-link nav-group-toggle {{ $active ? 'active' : '' }}" data-bs-toggle="collapse" href="#menu-{{ $key }}"
+                            role="button" aria-expanded="{{ $active ? 'true' : 'false' }}" aria-controls="menu-{{ $key }}">
+                            <i data-feather="{{ $group['icon'] }}"></i>
+                            <span>{{ $group['label'] }}</span>
+                            <i data-feather="chevron-down" class="chevron"></i>
+                        </a>
+                        <div class="collapse {{ $active ? 'show' : '' }}" id="menu-{{ $key }}" data-bs-parent="#sidebarContentGroups">
+                            <ul class="nav flex-column submenu">
+                                @foreach ($group['items'] as $routeName => [$label])
                                     <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs($routeName) ? 'active' : '' }}"
-                                            href="{{ route($routeName) }}">
-                                            {{ __($label) }}
-                                        </a>
+                                        <a class="nav-link {{ request()->routeIs($routeName) ? 'active' : '' }}" href="{{ route($routeName) }}">{{ $label }}</a>
                                     </li>
-                                @endif
-                            @endforeach
-                        </ul>
-                    </div>
-                </li>
-            @endif
-
-            <!-- RRFUTURE MENU -->
-            @php
-                $rrfutureRoutes = [
-                    'rrfuture.menu'    => '-- Menus --',
-                    'rrfuture.hero'    => 'Hero',
-                    'rrfuture.product' => 'Product',
-                ];
-
-                $isRRfutureActive = isMenuActive(array_keys($rrfutureRoutes));
-            @endphp
-            @if (auth()->user()->hasAnyRole(['admin']))
-                <li class="nav-item">
-                    <a class="nav-link d-flex justify-content-between align-items-center {{ $isRRfutureActive ? 'active' : '' }}"
-                        data-bs-toggle="collapse"
-                        href="#rrfutureSubmenu"
-                        role="button"
-                        aria-expanded="{{ $isRRfutureActive ? 'true' : 'false' }}"
-                        aria-controls="rrfutureSubmenu">
-                        <div class="d-flex align-items-center">
-                            <i data-feather="trending-up" class="me-2"></i>
-                            <span>{{ __('RR Future') }}</span>
+                                @endforeach
+                            </ul>
                         </div>
-                        <i data-feather="chevron-down" class="dropdown-icon {{ $isRRfutureActive ? 'rotate-180' : '' }}"></i>
-                    </a>
-                    <div class="collapse ps-4 {{ $isRRfutureActive ? 'show' : '' }}" id="rrfutureSubmenu">
-                        <ul class="nav flex-column">
-                            @foreach ($rrfutureRoutes as $routeName => $label)
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs($routeName) ? 'active' : '' }}"
-                                    href="{{ route($routeName) }}">
-                                        {{ __($label) }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </li>
-            @endif
+                    </li>
+                @endforeach
+            </ul>
+        @endif
 
-            <!-- SERVICE MENU -->
-            @php
-                $serviceRoutes = [
-                    'service.menu'       => '-- Menus --',
-                    'service.hero'       => 'Hero',
-                    'service.ourService' => 'Our Service',
-                ];
+        @if ($blogItems)
+            <ul class="nav flex-column">
+                <li class="sidebar-section">{{ __('Blog') }}</li>
+                @foreach ($blogItems as $routeName => [$label, $icon])
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs(str_replace('.index', '.*', $routeName)) ? 'active' : '' }}" href="{{ route($routeName) }}">
+                            <i data-feather="{{ $icon }}"></i> <span>{{ $label }}</span>
+                            @if ($routeName === 'blog.comments.index' && $pendingComments > 0)
+                                <span class="badge rounded-pill bg-warning text-dark ms-auto" title="{{ __('Waiting for approval') }}">{{ $pendingComments }}</span>
+                            @endif
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
 
-                $isServiceActive = isMenuActive(array_keys($serviceRoutes));
-            @endphp
-            @if (auth()->user()->hasAnyRole(['admin']))
-                <li class="nav-item">
-                    <a class="nav-link d-flex justify-content-between align-items-center {{ $isServiceActive ? 'active' : '' }}"
-                        data-bs-toggle="collapse"
-                        href="#serviceSubmenu"
-                        role="button"
-                        aria-expanded="{{ $isServiceActive ? 'true' : 'false' }}"
-                        aria-controls="serviceSubmenu">
-                        <div class="d-flex align-items-center">
-                            <i data-feather="briefcase" class="me-2"></i>
-                            <span>{{ __('Service') }}</span>
-                        </div>
-                        <i data-feather="chevron-down" class="dropdown-icon {{ $isServiceActive ? 'rotate-180' : '' }}"></i>
-                    </a>
-                    <div class="collapse ps-4 {{ $isServiceActive ? 'show' : '' }}" id="serviceSubmenu">
-                        <ul class="nav flex-column">
-                            @foreach ($serviceRoutes as $routeName => $label)
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs($routeName) ? 'active' : '' }}"
-                                    href="{{ route($routeName) }}">
-                                        {{ __($label) }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </li>
-            @endif
-
-            <!-- BLOGS MENU -->
-            {{-- @php
-                $blogRoutes = ['articles', 'categories', 'configs'];
-                $isBlogActive = isMenuActive($blogRoutes);
-            @endphp
-            @if (auth()->user()->hasAnyRole(['admin', 'writer']))
-                <li class="nav-item">
-                    <a class="nav-link d-flex justify-content-between align-items-center {{ $isBlogActive ? 'active' : '' }}"
-                    data-bs-toggle="collapse"
-                    href="#blogSubmenu"
-                    role="button"
-                    aria-expanded="{{ $isBlogActive ? 'true' : 'false' }}"
-                    aria-controls="blogSubmenu">
-                        <div class="d-flex align-items-center">
-                            <i data-feather="file-text" class="me-2"></i>
-                            <span>Blog</span>
-                        </div>
-                        <i data-feather="chevron-down" class="dropdown-icon {{ $isBlogActive ? 'rotate-180' : '' }}"></i>
-                    </a>
-                    <div class="collapse ps-4 {{ $isBlogActive ? 'show' : '' }}" id="blogSubmenu">
-                        <ul class="nav flex-column">
-                            @foreach ($blogRoutes as $route)
-                                <li class="nav-item">
-                                    <a class="nav-link {{ Request::is($route) || Request::is($route . '/*') ? 'active' : '' }}"
-                                    href="{{ url($route) }}">
-                                        {{ Str::title($route) }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </li>
-            @endif --}}
-
-            @php
-                $blogRoutes = [
-                    'blog.articles.index'   => 'Articles',
-                    'blog.categories.index' => 'Categories',
-                    'blog.comments.index'   => 'Comments',
-                    'blog.configs.index'    => 'Configs',
-                ];
-
-                // Configs hanya untuk admin
-                if (!auth()->user()->isAdmin()) {
-                    unset($blogRoutes['blog.configs.index']);
-                }
-
-                $isBlogActive = isMenuActive(array_keys($blogRoutes));
-
-                // jumlah komentar yang menunggu persetujuan (badge di menu Comments)
-                $pendingComments = auth()->user()->hasAnyRole(['admin', 'writer'])
-                    ? \App\Models\Blog\Comment::pending()->count()
-                    : 0;
-            @endphp
-            @if (auth()->user()->hasAnyRole(['admin', 'writer']))
-                <li class="nav-item">
-                    <a class="nav-link d-flex justify-content-between align-items-center {{ $isBlogActive ? 'active' : '' }}"
-                        data-bs-toggle="collapse"
-                        href="#blogSubmenu"
-                        role="button"
-                        aria-expanded="{{ $isBlogActive ? 'true' : 'false' }}"
-                        aria-controls="blogSubmenu">
-                        <div class="d-flex align-items-center">
-                            <i data-feather="file-text" class="me-2"></i>
-                            <span>{{ __('Blog') }}</span>
-                        </div>
-                        <i data-feather="chevron-down" class="dropdown-icon {{ $isBlogActive ? 'rotate-180' : '' }}"></i>
-                    </a>
-                    <div class="collapse ps-4 {{ $isBlogActive ? 'show' : '' }}" id="blogSubmenu">
-                        <ul class="nav flex-column">
-                            @foreach ($blogRoutes as $routeName => $label)
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs($routeName) ? 'active' : '' }}"
-                                        href="{{ route($routeName) }}">
-                                        {{ __($label) }}
-                                        @if ($routeName === 'blog.comments.index' && $pendingComments > 0)
-                                            <span class="badge rounded-pill bg-warning text-dark ms-1" title="{{ __('Waiting for approval') }}">{{ $pendingComments }}</span>
-                                        @endif
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </li>
-            @endif
-
-            <!-- CONTACT MENU -->
-            @php
-                $contactRoutes = [
-                    'contact.menu' => '-- Menus --',
-                    'contact.hero' => 'Hero',
-                    'contact.usContact' => 'Contact Us',
-                ];
-
-                $isContactActive = isMenuActive(array_keys($contactRoutes));
-            @endphp
-            @if (auth()->user()->hasAnyRole(['admin']))
-                <li class="nav-item">
-                    <a class="nav-link d-flex justify-content-between align-items-center {{ $isContactActive ? 'active' : '' }}"
-                        data-bs-toggle="collapse"
-                        href="#contactSubmenu"
-                        role="button"
-                        aria-expanded="{{ $isContactActive ? 'true' : 'false' }}"
-                        aria-controls="contactSubmenu">
-                        <div class="d-flex align-items-center">
-                            <i data-feather="mail" class="me-2"></i>
-                            <span>{{ __('Contact') }}</span>
-                        </div>
-                        <i data-feather="chevron-down" class="dropdown-icon {{ $isContactActive ? 'rotate-180' : '' }}"></i>
-                    </a>
-                    <div class="collapse ps-4 {{ $isContactActive ? 'show' : '' }}" id="contactSubmenu">
-                        <ul class="nav flex-column">
-                            @foreach ($contactRoutes as $routeName => $label)
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs($routeName) ? 'active' : '' }}"
-                                    href="{{ route($routeName) }}">
-                                        {{ __($label) }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </li>
-            @endif
-
-            <!-- LOGOUT MENU -->
-            @if (auth()->user()->hasAnyRole(['admin', 'writer', 'uploader']))
-                <li class="nav-item">
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                        @csrf
-                    </form>
-                    <a class="nav-link logout-btn" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i data-feather="log-out" class="me-2"></i> {{ __('Logout') }}
-                    </a>
-                </li>
-            @endif
+        <ul class="nav flex-column">
+            <li class="sidebar-section">{{ __('Account') }}</li>
+            <li class="nav-item">
+                <a class="nav-link {{ Request::is('users*') ? 'active' : '' }}" href="{{ url('users') }}">
+                    <i data-feather="{{ $isAdmin ? 'users' : 'user' }}"></i> {{ $isAdmin ? __('Users') : __('My Account') }}
+                </a>
+            </li>
         </ul>
     </div>
-</div>
+
+    <!-- Selalu terlihat walaupun menu di atas dibuka semua -->
+    <div class="sidebar-footer">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="avatar border" style="width: 32px; height: 32px;">{{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}</span>
+            <div class="min-w-0">
+                <div class="user-name text-truncate">{{ $user->name }}</div>
+                <div class="small text-muted">{{ __(ucfirst((string) $user->role)) }}</div>
+            </div>
+        </div>
+        <a class="btn btn-logout btn-sm w-100 d-flex align-items-center justify-content-center gap-2" href="{{ route('logout') }}"
+            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+            <i data-feather="log-out" class="icon-sm"></i> {{ __('Logout') }}
+        </a>
+    </div>
+</aside>
