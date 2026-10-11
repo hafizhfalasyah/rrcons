@@ -17,7 +17,7 @@ Docker migration is being implemented incrementally to preserve the behavior of 
 
 ## Intended local architecture
 
-The completed environment will use PHP 8.2 with Apache 2.4, MariaDB 10.6.27, Composer inside the PHP container, Node.js in a separate service, Mailpit for local email capture, UTC timezone, persistent uploaded media, file-based Laravel cache and sessions, and synchronous queues.
+The completed environment will use PHP 8.5.7 with Apache 2.4, MariaDB 10.6.27, Composer inside the PHP container, Node.js in a separate service, Mailpit for local email capture, UTC timezone, persistent uploaded media, file-based Laravel cache and sessions, and synchronous queues.
 
 Production remains on shared hosting. Docker files are local development infrastructure and are not part of the shared-hosting runtime.
 
