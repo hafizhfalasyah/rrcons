@@ -36,12 +36,12 @@ class PageLoaderTest extends TestCase
                 ->assertSee('id="rr-loader"', false)
                 ->assertSee('role="progressbar"', false)
                 ->assertSee('Memuat halaman RRCONS')
-                ->assertSee('Ketuk untuk melewati');
+                ->assertSee('Klik lingkaran untuk melewati');
 
             $this->get($uri . '?lang=en')->assertOk()
                 ->assertSee('id="rr-loader"', false)
                 ->assertSee('Loading RRCONS page')
-                ->assertSee('Tap to skip');
+                ->assertSee('Click the circle to skip');
         }
     }
 
@@ -52,7 +52,17 @@ class PageLoaderTest extends TestCase
         $html = $this->actingAs($admin)->withSession(['app_locale' => 'id'])->get('/dashboard')->assertOk()->getContent();
 
         $this->assertSame(1, substr_count($html, 'id="rr-loader"'));
-        $this->assertStringContainsString('Memuat gambar :loaded dari :total', $html);
+        $this->assertStringContainsString('Memuat gambar :loaded\/:total', $html);
+    }
+
+    public function test_loader_uses_the_white_and_blue_site_theme_without_a_logo(): void
+    {
+        $source = file_get_contents(resource_path('views/partials/page-loader.blade.php'));
+
+        $this->assertStringContainsString('background: #fff;', $source);
+        $this->assertStringContainsString('--rr-blue: #2563eb;', $source);
+        $this->assertStringNotContainsString('<img', $source);
+        $this->assertStringNotContainsString('logo', strtolower($source));
     }
 
     public function test_loader_hides_itself_without_javascript(): void
