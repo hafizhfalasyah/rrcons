@@ -18,7 +18,7 @@ Tests run on SQLite `:memory:` (forced by `phpunit.xml`), so they never touch th
 
 | If you changed… | Then |
 |---|---|
-| Tailwind classes in `resources/views/front/**`, `public/front/js/**`, `app/Helpers/**` | `npm run build:front-css` and include `public/front/css/app.css` in the commit (`PerformanceTest` checks key classes) |
+| Tailwind classes in `resources/views/front/**`, `public/front/js/**`, `app/Helpers/**` | Clean `npm run build:front-css` (the Docker watcher keeps removed classes) and include `public/front/css/app.css` in the commit (`PerformanceTest` checks key classes) |
 | Admin text `__('…')` in `resources/views/back`, `app/Http/Controllers`, `app/Http/Requests` | Add the key to `lang/id.json` (`MultiLanguageTest`) |
 | `lang/id/*.php` or `lang/en/*.php` | Same keys in both locales (except `validation.php`) |
 | `routes/web.php` | Route names unique (`php artisan route:list` + `PerformanceTest`); role middleware matches `back/layout/sidebar.blade.php` and `AccessControlTest` |

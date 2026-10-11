@@ -90,7 +90,8 @@ The scheduler (`app/Console/Kernel.php`) is **empty** — nothing requires cron.
 cp .env.docker.example .env.docker      # fill passwords + RRCONS_APP_KEY
 docker compose --env-file .env.docker up -d --build
 # app http://localhost:8082 (PHP 8.5.7 + Apache) · MariaDB 10.6.27 on 127.0.0.1:3307 · Mailpit UI 8025
-# node service = Tailwind watcher (npm ci if needed, then build:front-css --watch); Vite is not used
+# node service = Tailwind watcher (npm ci if needed, then build:front-css --watch=always --poll); Vite is not used
+# the watcher never drops removed classes -> run a clean `npm run build:front-css` before committing app.css
 docker compose --env-file .env.docker exec app php artisan test   # safe: tests are forced onto SQLite :memory:
 ```
 Native mode (no PHP container): `docker compose --env-file .env.docker up -d db mailpit` + `php artisan serve` with `.env` `DB_HOST=127.0.0.1`, `DB_PORT=3307` (see `.env.example`). `public/storage` is a **relative** symlink (`../storage/app/public`) that works in both modes. Load a production dump into Docker with `scripts/import-db.ps1 -File dump.sql -Migrate`. Upload limits: 64M/72M (`docker/php/custom.ini` and `public/.htaccess`). See `README-Docker.md`.
