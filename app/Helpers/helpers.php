@@ -31,3 +31,15 @@ if (!function_exists('highlightLastWord')) {
         return trim(e($firstPart) . ' <span class="' . e($class) . '">' . e($lastWord) . '</span>');
     }
 }
+
+if (!function_exists('asset_version')) {
+    /**
+     * URL aset publik dengan parameter versi (waktu modifikasi file), sehingga browser
+     * boleh menyimpan file lama di cache tetapi langsung mengambil versi baru saat berubah.
+     */
+    function asset_version(string $path): string {
+        $file = public_path($path);
+
+        return asset($path) . (is_file($file) ? '?v=' . filemtime($file) : '');
+    }
+}

@@ -34,8 +34,6 @@
 
     @include('front.partials.seo', ['seo' => $seo])
 
-    <!-- Tailwind CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Icon -->
     <link
@@ -71,7 +69,7 @@
     <!-- Alpine.js -->
     <script
         defer
-        src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
+        src="https://unpkg.com/alpinejs@3.17.4/dist/cdn.min.js"
     ></script>
 
     <!-- AOS CSS -->
@@ -80,8 +78,6 @@
         rel="stylesheet"
     >
 
-    <!-- Lottie Player CDN -->
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
     <style>
         .nav-link::before {
@@ -158,6 +154,8 @@
             font-style: italic;
         }
     </style>
+    <!-- Tailwind (dikompilasi, lihat tailwind.config.js). Terakhir di <head> agar urutan cascade sama seperti Play CDN -->
+    <link rel="stylesheet" href="{{ asset_version('front/css/app.css') }}">
 </head>
 
 <body class="body font-body" x-data="{ open: false }">
@@ -574,6 +572,7 @@
                 <!-- Featured Image -->
                 <section>
                     <img
+                        fetchpriority="high"
                         src="{{ asset('storage/' . $article->img) }}"
                         alt="{{ $article->title }}"
                         class="w-full rounded-md mb-4"
