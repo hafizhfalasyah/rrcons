@@ -18,3 +18,5 @@ yarn-error.log
 /.vscode
 .env.docker
 .phpunit.result.cache
+/.claude/settings.local.json
+CLAUDE.local.md
