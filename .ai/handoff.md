@@ -6,6 +6,13 @@ Template and rules: `.claude/skills/rrcons-handoff/SKILL.md` (plain Markdown —
 
 ---
 
+## 2026-10-12 — Claude Code — loading screen redesign (white/blue site theme, no logo)
+- **Branch / HEAD:** `solveit-staging` → PR to `solveit-id/rrcons` main; cherry-picked to `staging` → PR to `hafizhfalasyah/rrcons` main.
+- **Why:** the user found the first version (logo, yellow glow ring on a blue gradient, orbit, tilt) too "AI slop"; asked for the website's white/blue background, no logo, modern/simple/premium/professional and interactive.
+- **Done:** `resources/views/partials/page-loader.blade.php` rewritten: white background, 120 px ring (2 px blue-600 arc on blue-100 track), percentage inside (Poppins 500, tabular numbers), status line + "click the circle to skip" hint below. The ring is a `<button>`: hover/focus fills it blue with "Skip"/"Lewati". Finish = circular reveal (CSS mask radius grows from the ring to the viewport corners, 700 ms ease-in-out) instead of a fade. Progress logic, navigation/submit behaviour, bfcache/background-tab/no-JS handling unchanged. `role="progressbar"` moved to the status line (a button cannot sit inside a progressbar). Strings updated (`skip`, new `hint`, no ellipses, `media` = `:loaded/:total`).
+- **Tests:** `PageLoaderTest` updated + new check (white background, `#2563eb`, no `<img>`/logo). Full suite green.
+- **Verification:** headless Edge via CDP (throttled network): desktop 1280×800 progress 69% "Memuat gambar 19/30", hover state, reveal mid-animation, page after reveal; mobile 390×844 (device emulation) EN.
+
 ## 2026-10-12 — Claude Code — RRCONS loading screen on every page
 - **Branch / HEAD:** `solveit-staging` → PR to `solveit-id/rrcons` main; cherry-picked to `staging` → PR to `hafizhfalasyah/rrcons` main.
 - **Goal:** modern, simple, interactive, circular loading screen with real progress (%) and the RRCONS look on the whole site.

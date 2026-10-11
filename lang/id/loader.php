@@ -9,15 +9,16 @@ return [
     */
 
     'label' => 'Memuat halaman RRCONS',
-    'skip' => 'Ketuk untuk melewati',
+    'skip' => 'Lewati',
+    'hint' => 'Klik lingkaran untuk melewati',
 
     'status' => [
-        'start' => 'Menyiapkan halaman…',
-        'content' => 'Memuat konten…',
-        'media' => 'Memuat gambar :loaded dari :total',
-        'finishing' => 'Hampir selesai…',
-        'ready' => 'Siap!',
-        'navigating' => 'Membuka halaman…',
+        'start' => 'Menyiapkan halaman',
+        'content' => 'Memuat konten',
+        'media' => 'Memuat gambar :loaded/:total',
+        'finishing' => 'Hampir selesai',
+        'ready' => 'Selesai',
+        'navigating' => 'Membuka halaman',
     ],
 
 ];
