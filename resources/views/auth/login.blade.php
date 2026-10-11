@@ -99,6 +99,8 @@
 </head>
 
 <body>
+    @include('partials.page-loader')
+
     <main class="container px-4">
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-5">
