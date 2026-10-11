@@ -315,9 +315,22 @@ document.addEventListener('alpine:init', () => {
             // Mulai auto slide hanya jika gambar lebih dari satu.
             if (this.images.length > 1) {
                 setTimeout(() => {
-                    this.startAutoSlide();
+                    // jangan mulai bila popup sudah ditutup dalam 1 detik pertama
+                    if (this.open) {
+                        this.startAutoSlide();
+                    }
                 }, 1000);
             }
+
+            // Hentikan slide otomatis saat popup ditutup agar interval tidak terus
+            // berjalan (dan merender ulang popup tersembunyi) selama halaman terbuka.
+            this.$watch('open', (isOpen) => {
+                if (!isOpen) {
+                    this.stopAutoSlide();
+                } else if (this.images.length > 1) {
+                    this.startAutoSlide();
+                }
+            });
         },
 
         startAutoSlide() {
