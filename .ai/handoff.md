@@ -6,6 +6,18 @@ Template and rules: `.claude/skills/rrcons-handoff/SKILL.md` (plain Markdown —
 
 ---
 
+## 2026-10-12 — Claude Code — clearer admin panel: bilingual tabbed forms, guides, sidebar & dashboard
+- **Branch / HEAD:** `solveit-staging` → PR to `solveit-id/rrcons` main; cherry-picked to `staging` → PR to `hafizhfalasyah/rrcons` main.
+- **Goal:** make the admin understandable for non-technical staff and stop the "save EN → switch language → save ID" routine.
+- **Done:**
+  - Layout: `public/back/css/admin.css` (RRCONS blue + Poppins), new header (view website, panel language, profile with role, red Logout; "My Profile" removed), sidebar grouped Overview / Website content (accordion per public page, plain labels) / Blog / Account, logout pinned in `.sidebar-footer` (old bug: `height: 100vh` + `top: 56px` hid the bottom), collapsible on desktop, off-canvas on mobile.
+  - Components `resources/views/components/admin/*` (page-header + guide, alerts, form-modal, translatable ID/EN tabs, media-input with preview, delete-modal, bilingual, updated-at) and partials `back/partials/{section-headings,hero-banner,text-items}`. Every CMS page rewritten with them; old `*modal.blade.php` files removed. Lists show both languages and flag missing English.
+  - Fixes on the way: failed form now reopens with its own old input only (`_modal`), per-row "last updated" (was a global value), gallery month name overflow, duplicate `#logout-form`, `sub_title` HTML `required` vs nullable validation.
+  - Dashboard: welcome + quick actions, role-based content summary (published articles, pending comments, categories, gallery, posters, users), visitor analytics in tabs with explanations, latest/popular articles. Controllers add `withCount` / counts only.
+  - ~230 strings in `lang/id.json`; `AdminInterfaceTest` (5) + updated assertions in `MultiLanguageTest`, `AnalyticsTest`. Docs: AGENTS.md admin UI patterns, frontend/bilingual guidelines, bilingual skill.
+- **Verification:** 109 tests pass. Visual check with headless Edge on the Docker copy (desktop 1440×900/640, mobile 390): dashboard, section headings, about modal (ID/EN tabs), gallery, services, users, profile dropdown, short screen + mobile sidebar with logout visible; no JS errors. Temporary check account removed afterwards.
+- **Gotchas:** Bootstrap is 5.2.3 — no `*-subtle` / `text-bg-*`. Strings inside components and sidebar labels must exist in `lang/id.json` (test enforces literals only — arrays of labels passed to components are not scanned, check by hand).
+
 ## 2026-10-11 — Claude Code — storage cleanup, README sync, no-terminal deploy kit
 - **Branch / HEAD:** `solveit-staging` → PR to `solveit-id/rrcons` main; cherry-picked (except the README commit, already identical there) to `staging` → PR to `hafizhfalasyah/rrcons` main.
 - **Done:**

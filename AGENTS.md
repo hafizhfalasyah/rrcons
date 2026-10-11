@@ -276,8 +276,15 @@ Admin form choice `publication` ∈ `private | publish | schedule` → `Article:
 - Blog search results (`?q=`) are `noindex`.
 
 ### Admin UI patterns
-- Pages `@extends('back.layout.template')`, `@section('title')`, `@section('content')`, `@push('css'|'js')`.
-- Section index pages list rows in a table with Bootstrap modals (`updatemodal.blade.php`, `createmodal`, `deletemodal`) posting to the routes above; flash `session('success')` and `$errors`.
+- Pages `@extends('back.layout.template')`, `@section('title')`, `@section('content')`, `@push('css'|'js')`. Look & feel: `public/back/css/admin.css` (Poppins + `#2563eb`, same as the public site), Bootstrap 5.2.3 (no 5.3-only classes such as `*-subtle`/`text-bg-*`; soft utilities are defined in admin.css).
+- Shared Blade components in `resources/views/components/admin/` — use them for every admin page/form:
+  `<x-admin.page-header>` (title, icon, description, `location` = where it shows on the website, `preview-url`, slots `actions` and `guide` = short non-technical tips; also renders `<x-admin.alerts>`),
+  `<x-admin.form-modal>` (modal + form; hidden `_modal` makes the layout reopen it after a validation error),
+  `<x-admin.translatable :key :item :fields>` (Indonesian/English **tabs**; old input & errors only for the submitted form),
+  `<x-admin.media-input>` (image/video with current + live preview), `<x-admin.delete-modal>`, `<x-admin.bilingual>` (ID/EN text in lists), `<x-admin.updated-at>`.
+- Shared page partials: `back/partials/section-headings.blade.php` (the 4 `*_menus` pages, with a "Used for" column from `withCount`), `hero-banner.blade.php`, `text-items.blade.php` (name + description lists). Create/edit/delete live inline in each `index.blade.php` (no separate `*modal.blade.php` files any more).
+- Sidebar (`layout/sidebar.blade.php`): groups Overview / Website content (one accordion per public page, non-technical labels such as "Main Banner", "Section Headings") / Blog / Account; role filtering per item; logout pinned in `.sidebar-footer` (sidebar height is `100vh - header`). Profile dropdown has no "My Profile"; logout is red.
+- Dashboard (`back/dashboard/index.blade.php`): welcome + role-based quick actions, content summary cards, visitor analytics in tabs (overview / right now / pages & articles / sources & devices, tab kept in the URL hash), latest & popular articles. Element ids `realtime-*`, `trend-chart` are used by the polling script.
 - Article list is server-side DataTables (`request()->ajax()` branch in `Back\Blog\ArticleController@index`); delete is AJAX + SweetAlert returning JSON.
 
 ---

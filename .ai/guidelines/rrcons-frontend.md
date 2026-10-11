@@ -12,5 +12,7 @@
 ### Admin (`resources/views/back`)
 - `@extends('back.layout.template')`, `@section('title')`, `@section('content')`, `@push('css')`/`@push('js')`.
 - CDN: Bootstrap 5.2.3 + Icons, jQuery 3.7.1, DataTables 2.1.8, SweetAlert2 11, Chart.js 4.4.4 (dashboard), CKEditor 5 41.2.1 (articles), Feather icons.
-- Section pages: table + Bootstrap modals (`updatemodal`, `createmodal`, `deletemodal`), flash `session('success')`, `$errors`. All text via `__('English')` with Indonesian in `lang/id.json`.
-- Sidebar (`layout/sidebar.blade.php`) hides menus per role; keep it aligned with route middleware.
+- Build admin pages with the components in `resources/views/components/admin/`: `page-header` (+ `guide` tips for non-technical admins, location, preview link), `form-modal`, `translatable` (ID/EN tabs), `media-input`, `delete-modal`, `bilingual`, `updated-at`. Every page and form field gets a short plain-language note.
+- Styling lives in `public/back/css/admin.css` (Poppins, `#2563eb`). Bootstrap is 5.2.3: do not use 5.3-only classes.
+- All text via `__('English')` with Indonesian in `lang/id.json` (also strings inside components; sidebar labels are passed through `__()` too).
+- Sidebar (`layout/sidebar.blade.php`) hides menus per role; keep it aligned with route middleware. Logout must stay in the always-visible `.sidebar-footer`.
