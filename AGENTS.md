@@ -4,7 +4,7 @@
 > `CLAUDE.md` imports this file. Concise topic rules live in `.ai/guidelines/` (Laravel Boost format).
 > The running work log for handoffs is `.ai/handoff.md`.
 >
-> Last full audit: **2026-10-11** — Laravel 13.35.0 on PHP 8.5 (upgraded 1:1 from Laravel 10.48.22, see §12a), 84 tests / 773 assertions passing.
+> Last full audit: **2026-10-11** — Laravel 13.35.0 on PHP 8.5 (upgraded 1:1 from Laravel 10.48.22, see §12a), 88 tests / 795 assertions passing (also inside Docker).
 
 ---
 
@@ -89,9 +89,11 @@ The scheduler (`app/Console/Kernel.php`) is **empty** — nothing requires cron.
 ```bash
 cp .env.docker.example .env.docker      # fill passwords + RRCONS_APP_KEY
 docker compose --env-file .env.docker up -d --build
-# app http://localhost:8082 · vite 5173 · mailpit UI 8025 · db service "db" (MariaDB 10.6.27)
+# app http://localhost:8082 (PHP 8.5.7 + Apache) · MariaDB 10.6.27 on 127.0.0.1:3307 · Mailpit UI 8025
+# node service = Tailwind watcher (npm ci if needed, then build:front-css --watch); Vite is not used
+docker compose --env-file .env.docker exec app php artisan test   # safe: tests are forced onto SQLite :memory:
 ```
-See `README-Docker.md`. Docker PHP uses `upload_max_filesize=20M`, `post_max_size=25M`.
+Native mode (no PHP container): `docker compose --env-file .env.docker up -d db mailpit` + `php artisan serve` with `.env` `DB_HOST=127.0.0.1`, `DB_PORT=3307` (see `.env.example`). `public/storage` is a **relative** symlink (`../storage/app/public`) that works in both modes. Load a production dump into Docker with `scripts/import-db.ps1 -File dump.sql -Migrate`. Upload limits: 64M/72M (`docker/php/custom.ini` and `public/.htaccess`). See `README-Docker.md`.
 
 ---
 
@@ -290,8 +292,8 @@ Admin form choice `publication` ∈ `private | publish | schedule` → `Article:
 
 ## 10. Testing
 
-- `phpunit.xml` forces `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:` → tests never touch the real DB. Requires PHP extensions `pdo_sqlite` and `gd`.
-- Suites: `AccessControlTest` (role matrix, registration disabled), `ArticleSchedulingTest`, `ContentManagementTest`, `MultiLanguageTest` (both locales, lang key parity, `lang/id.json` coverage), `SeoTest`, `AnalyticsTest`, `PerformanceTest` (compiled CSS, unique route names, single menu query, image optimization), `LegacyTimezoneFixTest`, `UpgradeCompatibilityTest` + `CsrfProtectionTest` (Laravel 13 pins, §12a), `Unit/HtmlSanitizerTest`.
+- `phpunit.xml` forces `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:` (as `<env force>` and `<server>`), and `tests/CreatesApplication.php` aborts on any other connection → tests never touch a real DB, even inside the Docker `app` container. Requires PHP extensions `pdo_sqlite` and `gd`.
+- Suites: `AccessControlTest` (role matrix, registration disabled), `ArticleSchedulingTest`, `ContentManagementTest`, `MultiLanguageTest` (both locales, lang key parity, `lang/id.json` coverage), `SeoTest`, `AnalyticsTest`, `PerformanceTest` (compiled CSS, unique route names, single menu query, image optimization), `LegacyTimezoneFixTest`, `UpgradeCompatibilityTest` + `CsrfProtectionTest` (Laravel 13 pins, §12a), `RegressionTest` (XML prolog/short tags, hero webp, idempotent seeder), `Unit/HtmlSanitizerTest`.
 - Tests use `RefreshDatabase` + `User::factory()->create(['role' => ...])`. Only `UserFactory` exists — create other rows directly with models.
 - Add/adjust tests with every behaviour change; follow the existing descriptive `test_snake_case_sentence` naming.
 
@@ -303,7 +305,7 @@ Important `.env` keys (see `.env.example`): `APP_TIMEZONE=Asia/Jakarta`, `APP_LO
 
 ⚠️ The local `.env` in the maintainer's checkout has `APP_ENV=production`; treat its database as **possibly real**. Never run `migrate:fresh`, `migrate:reset`, `db:wipe`, `db:seed` or destructive SQL against it. Never print or commit `.env` / `.env.docker` values.
 
-Shared-hosting deploy checklist (server must run **PHP 8.5** with `gd`, `pdo_mysql`, `mbstring`, `fileinfo`, `intl` recommended):
+**Full step-by-step guide: `docs/DEPLOY-SHARED-HOSTING.md`** (build the upload package locally with `scripts/build-release.ps1`: git archive of HEAD + `composer install --no-dev`, no `.env`/uploads/tests/docker). Short version (server must run **PHP 8.5** with `gd`, `pdo_mysql`, `mbstring`, `fileinfo`, `intl` …):
 ```bash
 # back up the database from the hosting panel first
 composer install --no-dev --optimize-autoloader
@@ -319,18 +321,19 @@ Rollback: git tag `backup/laravel10-final` (both remotes) = last Laravel 10 / PH
 
 ## 12. Known issues & tech debt (verified 2026-10-11)
 
-1. `Database\Seeders\ConfigSeeder` imports non-existent `App\Models\Config` → `php artisan db:seed` fails.
+1. ~~`ConfigSeeder` broken~~ — fixed 2026-10-11 (correct model, idempotent `firstOrCreate`).
 2. No CMS seeders/factories: fresh installs have empty public sections; need a production dump.
 3. Dead code: `Front\ArticleController`, `Front\CategoryController` (their views `front.article.*`, `front.category.*` don't exist; routes commented out). `Visitor` model is legacy (read-only history).
 4. Blog comments: no moderation, no admin listing/deletion.
 5. Updating an article's Indonesian title regenerates its slug (URL change, no redirect).
-6. Hero image validation differs: Home hero allows `webp`; RR Future/Service/Contact heroes allow only `jpeg,png,jpg,gif`.
-7. Docker PHP `upload_max_filesize=20M` < sosmed video validation (50 MB) — large videos fail in Docker (check hosting limits too).
+6. ~~Hero `webp` rejected on RR Future/Service/Contact~~ — fixed 2026-10-11 (all heroes accept `jpeg,png,jpg,gif,webp`).
+7. ~~Upload limit 20M < 50 MB video validation~~ — fixed 2026-10-11 (`public/.htaccess` + Docker `custom.ini`: 64M/72M; hosting may still cap it — check *Select PHP Version → Options*).
 8. Gallery fallback `home_menu_id = 8` is hard-coded.
 9. `public/front/css/tailwind.css` (4 MB) unused; Vite pipeline (`resources/js`, `resources/sass`) unused; `/api/user` Sanctum route unused; `users.two_factor_code` unused.
 10. `composer.json` requires PHP `^8.5`: the hosting must run PHP 8.5 before this code is deployed (Composer's platform check stops the app otherwise). Laravel Boost 2.x is now installable (Laravel 13) but not installed (see `.ai/README.md`).
 11. No `pint.json`; code style isn't uniformly Pint-formatted — do **not** run Pint over the whole repo (huge unrelated diff). Format only the files you touch, if at all.
-12. `resources/views/seo/sitemap.blade.php` and `feed.blade.php` start with `{!! '<?xml ...?>' !!}`; on PHP with `short_open_tag=On` (the default of the official Docker `php:*` images, both 8.2 and 8.5) `/sitemap.xml` and `/feed` return 500 (`ParseError`) and 2 `SeoTest` cases fail inside Docker. Pre-existing (reproduced on the Laravel 10 code), not caused by the upgrade; works where `short_open_tag=Off` (local Windows PHP). Check the hosting's `short_open_tag` before relying on the sitemap.
+12. ~~`/sitemap.xml` & `/feed` 500 with `short_open_tag=On`~~ — fixed 2026-10-11: Blade tokenizes templates with PHP's tokenizer, so a literal `<?` in a template becomes a PHP open tag; the XML prolog is now built from split strings. `RegressionTest` forbids `<?` (except `<?php`) in any template.
+13. `phpunit.xml` uses `<server>` entries + `tests/CreatesApplication.php` refuses any connection other than SQLite `:memory:` — needed because process env vars (docker compose) override `<env>` and `RefreshDatabase` would wipe the real database.
 
 ## 12a. Laravel 10 → 13 upgrade (2026-10-11) — what was pinned to stay 1:1
 

@@ -32,5 +32,7 @@ Keep project knowledge in `AGENTS.md` / `.ai/guidelines/`; keep this file for Cl
 
 ### Environment notes
 - Windows host; both PowerShell and Git Bash are available. Paths contain spaces (`D:\PROYEK\PROYEK SOLVE IT\WEB\rrcons`) — always quote them.
-- Laravel 13.35 on PHP 8.5.7 runs natively on this machine (`php artisan serve`, `php artisan test`); Docker is optional. After dependency changes run `php artisan optimize:clear`.
+- Laravel 13.35 on PHP 8.5.7 runs natively on this machine (`php artisan serve` with Docker MariaDB on 127.0.0.1:3307) or fully in Docker (http://localhost:8082). After dependency changes run `php artisan optimize:clear`.
+- `.env*` reads are denied by `.claude/settings.json`; inspect config with `php artisan tinker --execute="echo config('...');"` instead.
+- Deploy to shared hosting: `docs/DEPLOY-SHARED-HOSTING.md` (`scripts/build-release.ps1`, `scripts/import-db.ps1`).
 - Commit messages: `(type) lowercase summary`, **no `Co-Authored-By` trailer** (explicit user preference).

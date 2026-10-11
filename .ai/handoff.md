@@ -6,6 +6,21 @@ Template and rules: `.claude/skills/rrcons-handoff/SKILL.md` (plain Markdown —
 
 ---
 
+## 2026-10-11 — Claude Code — Docker refresh, remaining bug fixes, shared-hosting deploy kit
+- **Branch / HEAD:** `solveit-staging` → PR to `solveit-id/rrcons` main; cherry-picked to `staging` → PR to `hafizhfalasyah/rrcons` main.
+- **Goal:** bring local Docker in line with the real project, fix remaining bugs, prepare redeploy to shared hosting (not VPS).
+- **Done:**
+  - Docker: app rebuilt on PHP 8.5.7; `db` published on `127.0.0.1:3307` (native `php artisan serve` can use it); `node` → Node 22 running the Tailwind watcher (Vite was unused); Composer cache dir fixed; upload limits 64M/72M; entrypoint makes a relative `public/storage` link; dead `docker/node/entrypoint.sh` removed; `.env.docker.example`, `.env.example`, `README-Docker.md` rewritten.
+  - Bugs: `/sitemap.xml` + `/feed` 500 with `short_open_tag=On` (Blade tokenizer; XML prolog now split), `package-lock.json` out of sync (`npm ci` failed on Linux — regenerated; compiled CSS byte-identical on Windows and Linux), `public/.htaccess` upload limit 20M < 50 MB video rule, hero `webp` rejected on RR Future/Service/Contact, broken + non-idempotent `ConfigSeeder`, tests could hit MariaDB when run inside the `app` container.
+  - Deploy kit: `docs/DEPLOY-SHARED-HOSTING.md`, `scripts/build-release.ps1` (release ZIP with production vendor), `scripts/import-db.ps1` (load a prod dump into Docker + migrate). `/release` git-ignored.
+  - Tests: `RegressionTest` (4). Docs: AGENTS.md (§3, §11, §12), CLAUDE.md, `.ai/guidelines/*`.
+- **Rehearsal on a production copy (Docker DB):** 9 pending `2026_10_*` migrations ran fine on Laravel 13/PHP 8.5 (timezone fix ~37 s, 11,482 legacy visits → 7,894 page views); 66 public URLs + 68 admin pages + 33 assets + CRUD/upload/CSRF checks OK; no new log errors.
+- **Incident (resolved):** running `php artisan test` inside the `app` container wiped the local Docker DB because compose env overrode phpunit `<env>`. Restored from `rrcons-backups/docker-db-20261011-143301` and re-migrated (same counts as before). Root cause fixed (`<server>` env + hard guard in `tests/CreatesApplication.php`). Production was never touched.
+- **In progress (uncommitted):** none.
+- **Verification:** 88 tests / 795 assertions pass natively and inside Docker; snapshot diff vs Laravel 10 baseline unchanged (only the 4 known non-visible diffs); release ZIP built and boot-tested.
+- **Next steps (user):** ensure hosting offers PHP 8.5, back up prod DB + `storage/app/public`, follow `docs/DEPLOY-SHARED-HOSTING.md`. Local `.env` for native mode needs `DB_HOST=127.0.0.1`, `DB_PORT=3307` and the Docker DB credentials.
+- **Gotchas:** PowerShell 5.1 strips inner double quotes when calling native programs (scripts avoid them). Never write a literal `<?` in Blade templates.
+
 ## 2026-10-11 — Claude Code — Laravel 10.48 → 13.35 and PHP 8.2 → 8.5 upgrade (1:1)
 - **Branch / HEAD:** `solveit-staging` → PR to `solveit-id/rrcons` main; same commits cherry-picked to `staging` → PR to `hafizhfalasyah/rrcons` main.
 - **Goal:** upgrade framework + PHP only, with zero change in flow, logic, UI, responsiveness, relationships, performance, data or migrations.
