@@ -129,7 +129,7 @@ class HomeController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
-        $article->increment('views');
+        // jumlah views dihitung oleh pelacak kunjungan (sekali per pengunjung per hari, tanpa bot)
 
         $recentPosts = Article::published()
             ->latest('publish_date')

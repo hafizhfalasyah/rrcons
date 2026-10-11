@@ -3,64 +3,48 @@
 namespace App\Http\Controllers\Back;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Blog\Article;
 use App\Models\Blog\Category;
-use App\Models\Visitor;
+use App\Models\Home\GalleryHome;
+use App\Models\User;
+use App\Support\Analytics\AnalyticsReport;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $allowedPaths = ['/', '/rrfuture', '/service', '/blog', '/blog_detail', '/contact'];
-
-        $labelMap = [
-            '/' => 'Home',
-            '/rrfuture' => 'RR Future',
-            '/service' => 'Service',
-            '/blog' => 'Blog',
-            '/blog_detail' => 'Blog Detail',
-            '/contact' => 'Contact',
-        ];
-
-        $labels = collect(range(6, 0))->map(fn($daysAgo) => [
-            'query' => Carbon::now()->subDays($daysAgo)->toDateString(),
-            'label' => Carbon::now()->subDays($daysAgo)->translatedFormat('d F Y'),
-        ]);
-
-        $labelList = $labels->pluck('label');
-
-        $visitorStats = [];
-
-        foreach ($allowedPaths as $path) {
-            $data = $labels->map(function ($dateObj) use ($path) {
-                return Visitor::query()
-                    // halaman detail tercatat sebagai /blog/{slug}
-                    ->when($path === '/blog_detail',
-                        fn ($q) => $q->where('path', 'like', '/blog/%'),
-                        fn ($q) => $q->where('path', $path)
-                    )
-                    ->whereDate('visit_date', $dateObj['query'])
-                    ->count();
-            });
-
-            $visitorStats[] = [
-                'label' => __($labelMap[$path]),
-                'data' => $data,
-            ];
-        }
+        $report = new AnalyticsReport((string) $request->query('range', '7d'));
 
         return view('back.dashboard.index', [
             'total_articles' => Article::count(),
             'total_categories' => Category::count(),
             'total_users' => User::count(),
+            'total_galleries' => GalleryHome::count(),
             'latest_article' => Article::with('Category')->published()->latest('publish_date')->take(10)->get(),
             'popular_article' => Article::with('Category')->published()->orderBy('views', 'desc')->take(5)->get(),
-            'labels' => $labelList,
-            'visitorStats' => $visitorStats,
+            'report' => $report,
+            'summary' => $report->summary(),
+            'daily' => $report->daily(),
+            'topPages' => $report->topPages(),
+            'topArticles' => $report->topArticles(),
+            'sources' => $report->sources(),
+            'referrers' => $report->referrers(),
+            'devices' => $report->breakdown('device'),
+            'browsers' => $report->breakdown('browser'),
+            'systems' => $report->breakdown('os'),
+            'languages' => $report->breakdown('locale'),
+            'countries' => $report->breakdown('country'),
+            'legacyShare' => $report->legacyShare(),
+            'realtime' => AnalyticsReport::realtime(),
         ]);
     }
 
+    /**
+     * Data real-time untuk panel "sedang online" (di-poll oleh dashboard).
+     */
+    public function realtime()
+    {
+        return response()->json(AnalyticsReport::realtime())->header('Cache-Control', 'no-store');
+    }
 }

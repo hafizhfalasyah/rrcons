@@ -1181,5 +1181,6 @@
             });
         });
     </script>
+    @include('front.partials.analytics', ['article' => $article])
 </body>
 </html>

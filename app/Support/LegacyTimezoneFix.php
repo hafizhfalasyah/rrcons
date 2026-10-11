@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Support\Analytics\LegacyVisitorImporter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -95,6 +96,11 @@ class LegacyTimezoneFix
             }
         }
 
+        // salinan riwayat kunjungan di page_views mengikuti tabel visitors
+        if (!$this->dryRun) {
+            $this->report['page_views.legacy_synced'] = LegacyVisitorImporter::syncTimestamps();
+        }
+
         return $this->report;
     }
 
@@ -124,6 +130,8 @@ class LegacyTimezoneFix
                 DB::table(self::BACKUP_TABLE)->where('id', $row->id)->delete();
             }
         });
+
+        $report['page_views.legacy_synced'] = LegacyVisitorImporter::syncTimestamps();
 
         return $report;
     }

@@ -25,4 +25,18 @@ class TrustProxies extends Middleware
         Request::HEADER_X_FORWARDED_PORT |
         Request::HEADER_X_FORWARDED_PROTO |
         Request::HEADER_X_FORWARDED_AWS_ELB;
+
+    /**
+     * Proxy tepercaya bisa diatur lewat TRUSTED_PROXIES (lihat config/analytics.php).
+     */
+    protected function proxies()
+    {
+        $configured = config('analytics.trusted_proxies');
+
+        if (blank($configured)) {
+            return $this->proxies;
+        }
+
+        return $configured === '*' ? '*' : array_map('trim', explode(',', $configured));
+    }
 }

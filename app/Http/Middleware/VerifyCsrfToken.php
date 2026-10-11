@@ -12,6 +12,9 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        // Dikirim navigator.sendBeacon (tidak bisa membawa header CSRF). Aman karena setiap
+        // kunjungan wajib membawa token halaman bertanda tangan HMAC & hanya mencatat statistik.
+        '_v/hit',
+        '_v/ping',
     ];
 }
