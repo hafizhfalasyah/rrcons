@@ -37,6 +37,8 @@ services:
       MAIL_ENCRYPTION: null
       MAIL_FROM_ADDRESS: ${RRCONS_MAIL_FROM_ADDRESS:-noreply@rrcons.local}
       MAIL_FROM_NAME: ${RRCONS_MAIL_FROM_NAME:-RRCONS}
+
+      COMPOSER_CACHE_DIR: /tmp/composer-cache
     volumes:
       - ./:/var/www/html
       - rrcons-composer-cache:/tmp/composer-cache
@@ -51,6 +53,9 @@ services:
   db:
     image: mariadb:10.6.27
     restart: unless-stopped
+    ports:
+      # Hanya dari komputer ini (127.0.0.1), agar `php artisan serve` native (PHP 8.5) bisa memakai database ini
+      - "127.0.0.1:${RRCONS_DB_PORT:-3307}:3306"
     environment:
       MARIADB_DATABASE: ${RRCONS_DB_DATABASE:-rrcons}
       MARIADB_USER: ${RRCONS_DB_USERNAME:-rrcons}
@@ -74,17 +79,17 @@ services:
       - rrcons-network
 
   node:
-    image: node:18-bookworm-slim
+    # Halaman publik memakai Tailwind yang dikompilasi ke public/front/css/app.css (tidak memakai Vite).
+    # Service ini memasang dependensi bila belum ada lalu meng-compile ulang CSS setiap view berubah.
+    image: node:22-bookworm-slim
     working_dir: /var/www/html
     environment:
       NODE_ENV: development
-    ports:
-      - "${RRCONS_VITE_PORT:-5173}:5173"
     volumes:
       - ./:/var/www/html
       - rrcons-node-modules:/var/www/html/node_modules
       - rrcons-npm-cache:/home/node/.npm
-    command: npm run dev -- --host 0.0.0.0
+    command: sh -c "[ -x node_modules/.bin/tailwindcss ] || npm ci; npm run build:front-css -- --watch --poll"
     networks:
       - rrcons-network
 
