@@ -27,8 +27,9 @@
 # =========================================
 # Tambahan setting PHP untuk upload
 # =========================================
-php_value upload_max_filesize 20M
-php_value post_max_size 25M
+# Video Social Media boleh sampai 50 MB (validasi max:51200), jadi batas PHP harus di atasnya
+php_value upload_max_filesize 64M
+php_value post_max_size 72M
 php_value max_execution_time 300
 php_value max_input_time 300
 php_value max_file_uploads 50

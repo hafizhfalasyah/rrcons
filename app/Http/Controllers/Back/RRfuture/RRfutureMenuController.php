@@ -57,7 +57,7 @@ class RRfutureMenuController extends Controller
     public function updateHeroSection(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'bg_img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'bg_img' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $hero = HeroRRfuture::with('rrfutureMenu')->findOrFail($id);
