@@ -17,7 +17,7 @@ The histories are **unrelated** (no common ancestor). Content is identical excep
 ```bash
 git fetch --all --prune
 git status -sb && git branch -vv
-php artisan test 2>&1 | grep -v Deprecated     # must be green
+php artisan test     # must be green
 ```
 Make sure the working branch is based on the latest `solveit/main` (`git merge --ff-only solveit/main` if behind and clean).
 

@@ -9,19 +9,12 @@ The canonical, detailed project guide is `/AGENTS.md`; `/CLAUDE.md` imports it. 
 
 ## Laravel Boost status
 
-Laravel Boost (`laravel/boost`) is **not installed yet**. Version constraints checked against Packagist on 2026-10-11:
-
-| Boost | Requires |
-|---|---|
-| 1.8.x (latest 1.x) | PHP ^8.1, `illuminate/support` ^10.49 \| ^11.45.3 \| ^12.41.1, `laravel/mcp` ^0.5 |
-| 2.x | PHP ^8.2, Laravel ^11.45.3 \| ^12.41.1 \| ^13 |
-
-This project is on **Laravel 10.48.22**, so Boost 1.8 needs a framework patch bump first. Only do this when the user asks (it changes `composer.json`/`composer.lock`):
+Laravel Boost (`laravel/boost`) is **not installed yet**. Since the project now runs **Laravel 13.35 on PHP 8.5**, Boost 2.x (PHP ^8.2, Laravel ^11.45.3 | ^12.41.1 | ^13) can be installed directly. Only do this when the user asks (it changes `composer.json`/`composer.lock`):
 
 ```bash
-composer require laravel/boost:^1.8 --dev -W   # also updates laravel/framework to >=10.49
-php artisan test                               # confirm nothing broke
+composer require laravel/boost:^2.0 --dev
 php artisan boost:install                      # pick agents: Claude Code, Codex, Cursor, …
+php artisan test                               # confirm nothing broke
 ```
 
 What `boost:install` does with this folder:

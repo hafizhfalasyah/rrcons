@@ -4,7 +4,7 @@
 > `CLAUDE.md` imports this file. Concise topic rules live in `.ai/guidelines/` (Laravel Boost format).
 > The running work log for handoffs is `.ai/handoff.md`.
 >
-> Last full audit: **2026-10-11** — Laravel 10.48.22, 77 tests / 759 assertions passing.
+> Last full audit: **2026-10-11** — Laravel 13.35.0 on PHP 8.5 (upgraded 1:1 from Laravel 10.48.22, see §12a), 84 tests / 773 assertions passing.
 
 ---
 
@@ -36,14 +36,14 @@ Company-profile website + CMS for **RR Consultant Indonesia** (legal name *Rita 
 
 | Layer | Details |
 |---|---|
-| Backend | PHP `^8.1` (composer), **Laravel 10.48.22**, Eloquent, Blade |
-| Packages | `laravel/ui` (auth scaffolding, login only), `laravel/sanctum` (unused API `/api/user`), `yajra/laravel-datatables` 10 (admin article table), `unisharp/laravel-filemanager` 2.9 (CKEditor uploads), `intervention/image` 3 + `intervention/image-laravel` (GD driver, upload optimization), `doctrine/dbal` 3 (column `change()` in migrations) |
-| Dev packages | PHPUnit 10, Pint, Sail, Collision, Ignition, Faker, Mockery |
+| Backend | PHP **`^8.5`** (composer; developed on 8.5.7), **Laravel 13.35.0** (Laravel 10 directory structure kept: `app/Http/Kernel.php`, `RouteServiceProvider`, `config/app.php` providers), Eloquent, Blade, Carbon 3 |
+| Packages | `laravel/ui` 4.6 (auth scaffolding, login only), `laravel/sanctum` 4 (unused API `/api/user`), `laravel/tinker` 3, `yajra/laravel-datatables-oracle` 13 (admin article table — core package only, the v13 meta package would add Livewire), `unisharp/laravel-filemanager` 2.15 (CKEditor uploads; **v2.9.1 views pinned**, see §12a), `intervention/image` 3.11 + `intervention/image-laravel` 1.5 (GD driver, upload optimization). `doctrine/dbal` was removed (Laravel 11+ has native schema tools) |
+| Dev packages | PHPUnit 12, Pint, Sail, Collision 8, Ignition 2.12, Faker, Mockery |
 | DB | MySQL/MariaDB in production & Docker (MariaDB 10.6.27); **SQLite in-memory for tests** |
 | Public frontend | Standalone Blade pages + **Tailwind 3.4.17 compiled to `public/front/css/app.css`** (committed). CDN: Alpine 3.17.4, AOS 2.3.4, Feather icons, Google Fonts (Poppins). Shared JS: `public/front/js/index.js` |
 | Admin frontend | CDN: Bootstrap 5.2.3, Bootstrap Icons, jQuery 3.7.1, DataTables 2.1.8, SweetAlert2 11, Chart.js 4.4.4, CKEditor 5 (41.2.1 classic), Feather icons |
 | Vite | `vite.config.js` (`resources/sass/app.scss`, `resources/js/app.js`) exists but **no view uses `@vite`** — not part of the runtime |
-| Local toolchain seen | PHP CLI 8.5 (Laravel 10 vendor prints `Deprecated:` notices — harmless noise), Composer 2.8, Node 22, npm 10. Docker image: PHP 8.2 + Apache |
+| Local toolchain seen | PHP CLI 8.5.7 (runs the app directly, no Docker needed), Composer 2.8, Node 22, npm 10. Docker image: PHP 8.5.7 + Apache |
 
 ---
 
@@ -72,7 +72,7 @@ php artisan route:list --except-vendor
 php artisan migrate:status
 ```
 
-PHP 8.5 locally prints vendor deprecation notices on every artisan call; filter with `2>&1 | grep -v Deprecated` when reading output.
+After pulling dependency changes run `php artisan optimize:clear` (or at least `php artisan view:clear`): Blade decides staleness by file mtime and Composer keeps old mtimes, so stale compiled vendor views can survive an upgrade.
 
 ### Custom artisan commands (`app/Console/Commands`)
 
@@ -291,7 +291,7 @@ Admin form choice `publication` ∈ `private | publish | schedule` → `Article:
 ## 10. Testing
 
 - `phpunit.xml` forces `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:` → tests never touch the real DB. Requires PHP extensions `pdo_sqlite` and `gd`.
-- Suites: `AccessControlTest` (role matrix, registration disabled), `ArticleSchedulingTest`, `ContentManagementTest`, `MultiLanguageTest` (both locales, lang key parity, `lang/id.json` coverage), `SeoTest`, `AnalyticsTest`, `PerformanceTest` (compiled CSS, unique route names, single menu query, image optimization), `LegacyTimezoneFixTest`, `Unit/HtmlSanitizerTest`.
+- Suites: `AccessControlTest` (role matrix, registration disabled), `ArticleSchedulingTest`, `ContentManagementTest`, `MultiLanguageTest` (both locales, lang key parity, `lang/id.json` coverage), `SeoTest`, `AnalyticsTest`, `PerformanceTest` (compiled CSS, unique route names, single menu query, image optimization), `LegacyTimezoneFixTest`, `UpgradeCompatibilityTest` + `CsrfProtectionTest` (Laravel 13 pins, §12a), `Unit/HtmlSanitizerTest`.
 - Tests use `RefreshDatabase` + `User::factory()->create(['role' => ...])`. Only `UserFactory` exists — create other rows directly with models.
 - Add/adjust tests with every behaviour change; follow the existing descriptive `test_snake_case_sentence` naming.
 
@@ -303,14 +303,17 @@ Important `.env` keys (see `.env.example`): `APP_TIMEZONE=Asia/Jakarta`, `APP_LO
 
 ⚠️ The local `.env` in the maintainer's checkout has `APP_ENV=production`; treat its database as **possibly real**. Never run `migrate:fresh`, `migrate:reset`, `db:wipe`, `db:seed` or destructive SQL against it. Never print or commit `.env` / `.env.docker` values.
 
-Shared-hosting deploy checklist:
+Shared-hosting deploy checklist (server must run **PHP 8.5** with `gd`, `pdo_mysql`, `mbstring`, `fileinfo`, `intl` recommended):
 ```bash
+# back up the database from the hosting panel first
 composer install --no-dev --optimize-autoloader
-php artisan migrate --force          # 2026_10_* migrations are idempotent
+php artisan optimize:clear           # REQUIRED after the Laravel 13 upgrade: drops stale compiled views/config/routes
+php artisan migrate --force          # the upgrade adds no migrations -> "Nothing to migrate"
 php artisan storage:link             # once
 php artisan config:cache && php artisan route:cache && php artisan view:cache
 ```
 No Node on the server is needed (compiled CSS is committed). No queue worker, no cron.
+Rollback: git tag `backup/laravel10-final` (both remotes) = last Laravel 10 / PHP 8.2 code.
 
 ---
 
@@ -325,15 +328,32 @@ No Node on the server is needed (compiled CSS is committed). No queue worker, no
 7. Docker PHP `upload_max_filesize=20M` < sosmed video validation (50 MB) — large videos fail in Docker (check hosting limits too).
 8. Gallery fallback `home_menu_id = 8` is hard-coded.
 9. `public/front/css/tailwind.css` (4 MB) unused; Vite pipeline (`resources/js`, `resources/sass`) unused; `/api/user` Sanctum route unused; `users.two_factor_code` unused.
-10. Laravel 10 is past end of security support; local PHP 8.5 emits vendor deprecations. Laravel Boost 1.x needs Laravel ≥ 10.49, Boost 2.x needs Laravel ≥ 11 (see `.ai/README.md`).
+10. `composer.json` requires PHP `^8.5`: the hosting must run PHP 8.5 before this code is deployed (Composer's platform check stops the app otherwise). Laravel Boost 2.x is now installable (Laravel 13) but not installed (see `.ai/README.md`).
 11. No `pint.json`; code style isn't uniformly Pint-formatted — do **not** run Pint over the whole repo (huge unrelated diff). Format only the files you touch, if at all.
+12. `resources/views/seo/sitemap.blade.php` and `feed.blade.php` start with `{!! '<?xml ...?>' !!}`; on PHP with `short_open_tag=On` (the default of the official Docker `php:*` images, both 8.2 and 8.5) `/sitemap.xml` and `/feed` return 500 (`ParseError`) and 2 `SeoTest` cases fail inside Docker. Pre-existing (reproduced on the Laravel 10 code), not caused by the upgrade; works where `short_open_tag=Off` (local Windows PHP). Check the hosting's `short_open_tag` before relying on the sitemap.
+
+## 12a. Laravel 10 → 13 upgrade (2026-10-11) — what was pinned to stay 1:1
+
+The upgrade changed only framework/PHP versions. Behaviour was verified identical with before/after snapshots of every public/admin page (HTML, JSON, XML, headers, redirects, validation errors), resulting DB rows, MariaDB 10.6 schema of all 43 migrations (identical DDL), route table, file-manager endpoints and image-optimizer output (identical bytes). Things deliberately pinned — **do not remove them unless the user wants the new Laravel behaviour**:
+
+| Item | Why |
+|---|---|
+| `resources/views/errors/minimal.blade.php` (copy of Laravel 10's) | Laravel 11+ redesigned the default 403/404/419/429/500/503 pages |
+| `resources/views/vendor/laravel-filemanager/*` (LFM v2.9.1 views; inline CSS/JS read from `public/vendor/laravel-filemanager`) | LFM 2.15 (the only version supporting Laravel 13) ships a new UI |
+| `App\Http\Middleware\VerifyCsrfToken::hasValidOrigin()` returns `false` (extends `PreventRequestForgery`) | Laravel 13 accepts token-less POSTs with `Sec-Fetch-Site: same-origin`; the app still requires a CSRF token |
+| `config/hashing.php` `'rehash_on_login' => false` | Laravel 11+ may rewrite password hashes on login |
+| `AnalyticsReport::summary()` casts `diffInSeconds(..., true)` to int | Carbon 3 returns signed floats |
+| Migration `2026_10_16_000000_add_performance_indexes` uses `Schema::getIndexes()` | Doctrine DBAL removed in Laravel 11 (same index names, same result) |
+| `yajra/laravel-datatables-oracle` instead of the `yajra/laravel-datatables` meta package | v13 meta package pulls Livewire + PhpSpreadsheet and adds routes |
+
+Accepted, non-visible differences: response header `charset=utf-8` is now lowercase; LFM's `Route::any` upload route also lists the new `QUERY` verb; the LFM JS language object contains 5 extra unused keys; DataTables JSON key order follows the SQLite test schema. Session serialization stays `php`, cache/session prefixes and cookie name are unchanged (app config files define them), so active sessions survive the deploy. Guard tests: `tests/Feature/UpgradeCompatibilityTest.php`, `tests/Feature/CsrfProtectionTest.php`.
 
 ---
 
 ## 13. Rules for agents
 
 **Do**
-- Match surrounding style: PSR-4 Laravel 10 conventions, Indonesian code comments (existing convention), English identifiers.
+- Match surrounding style: PSR-4 with the Laravel 10-style structure the app keeps on Laravel 13, Indonesian code comments (existing convention), English identifiers.
 - Use `Article::published()` for all public article queries.
 - Keep bilingual pairs (`_id` required, `_en` optional) in migrations, models (`$translatable`, `$fillable`), controller validation, admin modals (both language inputs), public views, and `lang/{id,en}` files.
 - Add every new admin `__('…')` string to `lang/id.json`; keep `lang/id/*.php` ↔ `lang/en/*.php` keys identical.
