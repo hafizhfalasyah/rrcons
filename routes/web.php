@@ -29,6 +29,7 @@ use App\Http\Controllers\Front\HomeController;
 use App\Http\Controllers\Front\ArticleController as FrontArticleController;
 use App\Http\Controllers\Front\CategoryController as FrontCategoryController;
 use App\Http\Controllers\Front\SeoController;
+use App\Http\Controllers\Front\AnalyticsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -186,7 +187,13 @@ Route::controller(SeoController::class)->group(function () {
     Route::get('/feed', 'feed')->name('feed');
 });
 
-Route::middleware('countPageVisitor')->controller(HomeController::class)->group(function () {
+/** VISITOR ANALYTICS: dipanggil browser (sendBeacon), tanpa CSRF (lihat VerifyCsrfToken) **/
+Route::middleware('throttle:120,1')->controller(AnalyticsController::class)->group(function () {
+    Route::post('/_v/hit', 'hit')->name('analytics.hit');
+    Route::post('/_v/ping', 'ping')->name('analytics.ping');
+});
+
+Route::controller(HomeController::class)->group(function () {
     Route::get('/', 'index')->name('home');
     Route::get('/rrfuture', 'rrfuture')->name('rrfuture');
     Route::get('/service', 'service')->name('service');

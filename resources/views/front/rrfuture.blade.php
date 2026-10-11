@@ -814,5 +814,7 @@
 
         <script src="{{ asset('front/js/index.js') }}"></script>
 
+    @include('front.partials.analytics')
+
 </body>
 </html>
