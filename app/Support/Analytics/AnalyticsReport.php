@@ -40,7 +40,8 @@ class AnalyticsReport
         $current = $this->kpis($this->from, $this->to);
 
         // periode sebelumnya dengan panjang sama untuk perbandingan
-        $length = $this->from->diffInSeconds($this->to);
+        // Carbon 3 mengembalikan float bertanda; dibulatkan ke detik penuh seperti Carbon 2
+        $length = (int) $this->from->diffInSeconds($this->to, true);
         $previous = $this->kpis($this->from->copy()->subSeconds($length + 1), $this->from->copy()->subSecond());
 
         return collect($current)->map(fn ($value, $key) => [
