@@ -17,7 +17,7 @@ description: Resume or hand off work on the RRCONS Laravel project. Use at the s
    ```
    Remember: `origin` (hafizhfalasyah/rrcons) and `solveit` (solveit-id/rrcons) have **unrelated histories**; `main`/`staging` track `origin`, `solveit-staging` tracks `solveit/staging`.
 3. If there are uncommitted changes, read them (`git diff`, `git diff --staged`) and match them to the "In progress" section of the log before editing anything.
-4. Establish a baseline: `php artisan test` (ignore vendor `Deprecated:` noise from PHP 8.5). Note any pre-existing failures in the log instead of "fixing" unrelated code silently.
+4. Establish a baseline: `php artisan test`. Note any pre-existing failures in the log instead of "fixing" unrelated code silently.
 5. Summarise to the user in a few lines: branch, last commit, what is in progress, what you will do next.
 
 ## B. Handing off (before stopping)

@@ -10,7 +10,7 @@ Run only the checks relevant to what changed, then report results honestly (past
 ## 1. Always
 ```bash
 git status -sb && git diff --stat
-php artisan test 2>&1 | grep -v Deprecated
+php artisan test
 ```
 Tests run on SQLite `:memory:` (forced by `phpunit.xml`), so they never touch the real database.
 

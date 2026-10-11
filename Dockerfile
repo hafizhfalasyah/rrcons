@@ -1,6 +1,7 @@
 FROM composer:2.10.2 AS composer
 
-FROM php:8.2.32-apache-trixie
+# PHP 8.5: OPcache sudah built-in (tidak di-install lewat docker-php-ext-install); konfigurasi tetap di docker/php/custom.ini
+FROM php:8.5.7-apache-trixie
 
 ENV APP_HOME=/var/www/html \
     COMPOSER_ALLOW_SUPERUSER=1 \
@@ -30,7 +31,6 @@ RUN apt-get update \
         gd \
         intl \
         mysqli \
-        opcache \
         pdo_mysql \
         zip \
     && a2enmod rewrite headers expires \

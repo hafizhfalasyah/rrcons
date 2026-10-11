@@ -32,5 +32,5 @@ Keep project knowledge in `AGENTS.md` / `.ai/guidelines/`; keep this file for Cl
 
 ### Environment notes
 - Windows host; both PowerShell and Git Bash are available. Paths contain spaces (`D:\PROYEK\PROYEK SOLVE IT\WEB\rrcons`) — always quote them.
-- PHP CLI 8.5 prints Laravel 10 vendor `Deprecated:` notices; they are noise, not failures.
+- Laravel 13.35 on PHP 8.5.7 runs natively on this machine (`php artisan serve`, `php artisan test`); Docker is optional. After dependency changes run `php artisan optimize:clear`.
 - Commit messages: `(type) lowercase summary`, **no `Co-Authored-By` trailer** (explicit user preference).

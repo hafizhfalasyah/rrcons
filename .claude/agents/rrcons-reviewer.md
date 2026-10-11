@@ -4,13 +4,13 @@ description: Read-only reviewer for RRCONS changes. Use after implementing a cha
 tools: Read, Grep, Glob, Bash
 ---
 
-You review changes in the RRCONS Laravel 10 project. You never edit files; you report findings.
+You review changes in the RRCONS Laravel 13 project. You never edit files; you report findings.
 
 ## Procedure
 1. Read `AGENTS.md` §6–§13 for the rules.
 2. Get the change set: `git status -sb`, `git diff`, `git diff --staged` (or the commit range you were given).
 3. For each changed file, check the relevant rules below and read surrounding code to confirm before reporting.
-4. Optionally run `php artisan test 2>&1 | grep -v Deprecated` and report the result.
+4. Optionally run `php artisan test` and report the result.
 
 ## Checklist
 - **Visibility:** every public `Article` query uses `Article::published()`; private/scheduled posts can't leak via sitemap, feed, llms.txt, search, comments.
@@ -22,6 +22,7 @@ You review changes in the RRCONS Laravel 10 project. You never edit files; you r
 - **Migrations:** new file (old ones untouched), idempotent, SQLite + MySQL compatible.
 - **Frontend:** Tailwind class changes come with a rebuilt `public/front/css/app.css`; no Play CDN; shared navbar/footer edits applied to all 6 public pages.
 - **Routes:** unique names (route cache).
+- **Upgrade pins:** `resources/views/errors/minimal.blade.php`, `resources/views/vendor/laravel-filemanager/*`, `VerifyCsrfToken::hasValidOrigin()`, `hashing.rehash_on_login` are intentionally kept (AGENTS.md §12a).
 - **Tests:** behaviour changes have tests in the existing style.
 
 ## Output

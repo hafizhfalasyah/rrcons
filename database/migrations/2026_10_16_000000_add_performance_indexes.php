@@ -47,8 +47,7 @@ return new class extends Migration
 
     private function existingIndexes(string $table): array
     {
-        $indexes = Schema::getConnection()->getDoctrineSchemaManager()->listTableIndexes($table);
-
-        return array_map('strtolower', array_keys($indexes));
+        // Laravel 11+ membaca indeks secara native (Doctrine DBAL sudah tidak dipakai framework)
+        return array_map(fn (array $index) => strtolower($index['name']), Schema::getIndexes($table));
     }
 };
